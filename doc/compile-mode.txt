@@ -4,8 +4,9 @@
 Table of Contents                             *compile-mode-table-of-contents*
 
 1. Introduction                                    |compile-mode-introduction|
-2. API                                                      |compile-mode-api|
-3. Commands                                            |compile-mode-commands|
+2. Installation                                    |compile-mode-installation|
+3. API                                                      |compile-mode-api|
+4. Commands                                            |compile-mode-commands|
 
 ==============================================================================
 1. Introduction                                    *compile-mode-introduction*
@@ -19,7 +20,34 @@ for more details.
 
 
 ==============================================================================
-2. API                                                      *compile-mode-api*
+2. Installation                                    *compile-mode-installation*
+
+Use your favorite plugin manager. `compile-mode.nvim` depends on
+`nvim-lua/plenary.nvim` and on `m00qek/baleia.nvim` (unless the
+|compile-mode-`no_baleia_support`| option is set).
+
+Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
+`compile-mode.nvim`:
+
+>lua
+    return {
+      "ej-shafran/compile-mode.nvim",
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        { "m00qek/baleia.nvim", tag = "v1.3.0" },
+      },
+      opts = {
+        -- you can disable colors by uncommenting this line
+        -- no_baleia_support = true,
+        split_vertically = true,
+        default_command = "npm run build"
+      }
+    }
+<
+
+
+==============================================================================
+3. API                                                      *compile-mode-api*
 
 compile_mode.setup({opts})                    *compile-mode.setup()*
 
@@ -85,7 +113,7 @@ using |vim.notify()|.
 
 
 ==============================================================================
-3. Commands                                            *compile-mode-commands*
+4. Commands                                            *compile-mode-commands*
 
 
                                                      *compile-mode-:Compile*
