@@ -1,8 +1,8 @@
-# Introduction
+## Introduction
 
 `compile-mode.nvim` is a Neovim plugin which emulates the features of Emacs' `Compilation Mode`. It allows you to run commands which are output into a special buffer, and then rerun that command over and over again as much as you need. See [Emacs Compilation Mode](https://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation-Mode.html) for more details.
 
-# Installation
+## Installation
 
 Use your favorite plugin manager. `compile-mode.nvim` depends on `nvim-lua/plenary.nvim` and on `m00qek/baleia.nvim` (unless the [`no_baleia_support`](#no_baleia_support) option is set).
 
@@ -24,11 +24,11 @@ return {
 }
 ```
 
-# API
+## API
 
 <!-- panvimdoc-ignore-start -->
 
-## setup({opts})
+### setup({opts})
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
@@ -54,7 +54,7 @@ Valid keys and values for {opts}:
 
 <!-- panvimdoc-ignore-start -->
 
-### `no_baleia_support`
+#### `no_baleia_support`
 
 By default, `compile-mode.nvim` uses `baleia.nvim` to color in ANSI color escape sequences in the compilation buffer.
 You can disable this behavior by setting this config option to `true`.
@@ -69,7 +69,7 @@ You can disable this behavior by setting this config option to `true`.
 
 <!-- panvimdoc-ignore-start -->
 
-### `split_vertically`
+#### `split_vertically`
 
 When set to `true`, the Compilation window will be opened using a vertical split (`:h :vsplit`) instead of a horizontal one (`:h :split`).
 
@@ -82,9 +82,9 @@ split_vertically
 
 <!-- panvimdoc-ignore-start -->
 
-### `default_command`
+#### `default_command`
 
-The string to show in the |compile-mode.compile()| prompt as a default.
+The string to show in the `compile()` prompt as a default.
 Defaults to: `"make -k "`.
 
 <!-- panvimdoc-ignore-end -->
@@ -97,7 +97,7 @@ Defaults to: `"make -k "`
 
 <!-- panvimdoc-ignore-start -->
 
-## compile({param})
+### compile({param})
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
@@ -106,19 +106,16 @@ compile_mode.compile({param})					*compile-mode.compile()*
 ```
 -->
 
-Run a command and place its output in the compilation buffer,
-reporting on its result.
+Run a command and place its output in the compilation buffer, reporting on its result.
+If `{param.args}` is not passed in, the user is prompted for a command using `:h vim.ui.input()`.
 
-If {param.args} is not passed in, the user is prompted for a command
-using |vim.ui.input()|.
+#### Parameters
 
-### Parameters
-
-- {param} (table) has a single field, `args`, which is the string of the command itself, or `nil` if the user should be prompted to enter a command (optional)
+- `{param}` (table) has a single field, `args`, which is the string of the command itself, or `nil` if the user should be prompted to enter a command (optional)
 
 <!-- panvimdoc-ignore-start -->
 
-## recompile()
+### recompile()
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
@@ -129,11 +126,11 @@ compile_mode.recompile()					*compile-mode.recompile()*
 
 Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
 
-# Commands
+## Commands
 
 <!-- panvimdoc-ignore-start -->
 
-## `:Compile`
+### `:Compile`
 
 Runs a command and places its output in the compilation buffer.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
@@ -148,7 +145,7 @@ If an argument is present, it is used as the command. Otherwise, the user is pro
 
 <!-- panvimdoc-ignore-start -->
 
-## `:Recompile`
+### `:Recompile`
 
 Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
 
@@ -158,3 +155,11 @@ Reruns the last compiled command. If there isn't one, the error is reported usin
 
 : Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
 -->
+
+<!-- panvimdoc-ignore-start -->
+
+## Contributing
+
+Contributions are welcome in the form of GitHub issues and pull requests.
+
+<!-- panvimdoc-ignore-end -->
