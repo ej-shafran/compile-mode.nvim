@@ -97,6 +97,21 @@ Defaults to: `"make -k "`
 
 <!-- panvimdoc-ignore-start -->
 
+#### `time_format`
+
+The way to format the time displayed at the top of the Compilation buffer. Passed into `:h strftime()`.
+Defaults to: `"%a %b %e %H:%M:%S"`.
+
+<!-- panvimdoc-ignore-end -->
+<!-- panvimdoc-include-comment
+time_format
+
+: The way to format the time displayed at the top of the Compilation buffer. Passed into `:h strftime()`.
+Defaults to: `"%a %b %e %H:%M:%S"`.
+-->
+
+<!-- panvimdoc-ignore-start -->
+
 ### compile({param})
 
 <!-- panvimdoc-ignore-end -->

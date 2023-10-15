@@ -1,5 +1,5 @@
 ---@alias CommandParam { args: string? }
----@alias Config { split_vertically: boolean?, no_baleia_support: boolean?, default_command: string? }
+---@alias Config { split_vertically: boolean?, no_baleia_support: boolean?, default_command: string?, time_format: string? }
 
 local a = require("plenary.async")
 ---@diagnostic disable-next-line: undefined-field
@@ -60,15 +60,16 @@ local function split_unless_open(fname)
 end
 
 ---Get the current time, formatted.
----
----TODO: make this configurable?
 local function time()
-	return vim.fn.strftime("%a %b %e %H:%M:%S")
+	local format = "%a %b %e %H:%M:%S"
+	if M.config.time_format then
+		format = M.config.time_format
+	end
+
+	return vim.fn.strftime(format)
 end
 
 ---Get the default directory, formatted.
----
----TODO: make this configurable?
 local function default_dir()
 	local cwd = vim.fn.getcwd() --[[@as string]]
 	return cwd:gsub("^" .. vim.env.HOME, "~")
