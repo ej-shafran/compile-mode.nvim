@@ -113,7 +113,7 @@ local runcommand = a.void(function(command)
 
 	local bufnr = split_unless_open("Compilation")
 
-	--TODO: set `q` keymap
+	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
 	--TODO: set ExitPre autocmd
 
 	buf_set_opt(bufnr, "filetype", "compile")
