@@ -3,13 +3,8 @@
 ==============================================================================
 Table of Contents                             *compile-mode-table-of-contents*
 
-1. Introduction                                    |compile-mode-introduction|
-2. Installation                                    |compile-mode-installation|
-3. API                                                      |compile-mode-api|
-4. Commands                                            |compile-mode-commands|
 
-==============================================================================
-1. Introduction                                    *compile-mode-introduction*
+INTRODUCTION ~
 
 `compile-mode.nvim` is a Neovim plugin which emulates the features of Emacs’
 `Compilation Mode`. It allows you to run commands which are output into a
@@ -19,8 +14,7 @@ need. See Emacs Compilation Mode
 for more details.
 
 
-==============================================================================
-2. Installation                                    *compile-mode-installation*
+INSTALLATION ~
 
 Use your favorite plugin manager. `compile-mode.nvim` depends on
 `nvim-lua/plenary.nvim` and on `m00qek/baleia.nvim` (unless the
@@ -46,8 +40,7 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
 <
 
 
-==============================================================================
-3. API                                                      *compile-mode-api*
+API ~
 
 compile_mode.setup({opts})                    *compile-mode.setup()*
 
@@ -96,15 +89,13 @@ default_command                        The string to show in the |compile-mode.c
 compile_mode.compile({param})                   *compile-mode.compile()*
 
 Run a command and place its output in the compilation buffer, reporting on its
-result.
-
-If {param.args} is not passed in, the user is prompted for a command using
-|vim.ui.input()|.
+result. If `{param.args}` is not passed in, the user is prompted for a command
+using |vim.ui.input()|.
 
 
-PARAMETERS ~
+PARAMETERS
 
-- {param} (table) has a single field, `args`, which is the string of the command itself, or `nil` if the user should be prompted to enter a command (optional)
+- `{param}` (table) has a single field, `args`, which is the string of the command itself, or `nil` if the user should be prompted to enter a command (optional)
 
 compile_mode.recompile()                    *compile-mode.recompile()*
 
@@ -112,8 +103,7 @@ Reruns the last compiled command. If there isn’t one, the error is reported
 using |vim.notify()|.
 
 
-==============================================================================
-4. Commands                                            *compile-mode-commands*
+COMMANDS ~
 
 
                                                      *compile-mode-:Compile*
