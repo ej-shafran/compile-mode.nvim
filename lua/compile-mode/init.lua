@@ -114,7 +114,12 @@ local runcommand = a.void(function(command)
 	local bufnr = split_unless_open("Compilation")
 
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
-	--TODO: set ExitPre autocmd
+	vim.api.nvim_create_autocmd("ExitPre", {
+		group = vim.api.nvim_create_augroup("compile-mode", { clear = true }),
+		callback = function()
+			vim.api.nvim_buf_delete(bufnr, { force = true })
+		end,
+	})
 
 	buf_set_opt(bufnr, "filetype", "compile")
 
