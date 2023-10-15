@@ -122,6 +122,7 @@ compile_mode.compile({param})					*compile-mode.compile()*
 -->
 
 Run a command and place its output in the compilation buffer, reporting on its result.
+The command is run from the current working directory.
 If `{param.args}` is not passed in, the user is prompted for a command using `:h vim.ui.input()`.
 
 #### Parameters
@@ -140,6 +141,7 @@ compile_mode.recompile()					*compile-mode.recompile()*
 -->
 
 Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
+The command is rerun from the directory in which it was originally run.
 
 ## Commands
 
@@ -148,12 +150,14 @@ Reruns the last compiled command. If there isn't one, the error is reported usin
 ### `:Compile`
 
 Runs a command and places its output in the compilation buffer.
+The command is run from the current working directory.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
 :Compile
 : Runs a command and places its output in the compilation buffer.
+The command is run from the current working directory.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
 
 -->
@@ -163,12 +167,14 @@ If an argument is present, it is used as the command. Otherwise, the user is pro
 ### `:Recompile`
 
 Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
+The command is rerun from the directory in which it was originally run.
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
 :Recompile
 
 : Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
+The command is rerun from the directory in which it was originally run.
 -->
 
 <!-- panvimdoc-ignore-start -->

@@ -9,35 +9,40 @@ local M = {}
 
 ---@type string|nil
 M.prev_command = nil
+---@type string|nil
+M.prev_dir = nil
 ---@type Config
 M.config = {}
 
 ---@type fun(opts: table): string
 local input = a.wrap(vim.ui.input, 2)
 
----@type fun(cmd: string[]): string[], integer
-local runjob = a.wrap(function(cmd, callback)
+---@type fun(cmd: string[], opts: table?): string[], integer
+local runjob = a.wrap(function(cmd, opts, callback)
 	local result = {}
 
-	vim.fn.jobstart(cmd, {
-		stdout_buffered = true,
-		stderr_buffered = true,
-		on_stdout = function(_, data)
-			if data then
-				vim.list_extend(result, data)
-			end
-		end,
-		on_stderr = function(_, data)
-			if data then
-				vim.list_extend(result, data)
-			end
-		end,
-		on_exit = function(_, code)
-			table.remove(result)
-			callback(result, code)
-		end,
-	})
-end, 2)
+	vim.fn.jobstart(
+		cmd,
+		vim.tbl_extend("force", opts or {}, {
+			stdout_buffered = true,
+			stderr_buffered = true,
+			on_stdout = function(_, data)
+				if data then
+					vim.list_extend(result, data)
+				end
+			end,
+			on_stderr = function(_, data)
+				if data then
+					vim.list_extend(result, data)
+				end
+			end,
+			on_exit = function(_, code)
+				table.remove(result)
+				callback(result, code)
+			end,
+		})
+	)
+end, 3)
 
 ---If `fname` has a window open, do nothing.
 ---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
@@ -87,7 +92,7 @@ local runcommand = a.void(function(command)
 	}
 
 	local split_cmd = vim.fn.split(command) --[[@as string[] ]]
-	local result, code = runjob(split_cmd)
+	local result, code = runjob(split_cmd, { cwd = M.prev_dir })
 	if #result == 0 then
 		table.insert(buffer, "")
 	else
@@ -153,6 +158,7 @@ M.compile = a.void(function(param)
 	end
 
 	M.prev_command = command
+	M.prev_dir = vim.fn.getcwd()
 
 	runcommand(command)
 end)
