@@ -3,8 +3,13 @@
 ==============================================================================
 Table of Contents                             *compile-mode-table-of-contents*
 
+1. Introduction                                    |compile-mode-introduction|
+2. Installation                                    |compile-mode-installation|
+3. API                                                      |compile-mode-api|
+4. Commands                                            |compile-mode-commands|
 
-INTRODUCTION ~
+==============================================================================
+1. Introduction                                    *compile-mode-introduction*
 
 `compile-mode.nvim` is a Neovim plugin which emulates the features of Emacs’
 `Compilation Mode`. It allows you to run commands which are output into a
@@ -14,7 +19,8 @@ need. See Emacs Compilation Mode
 for more details.
 
 
-INSTALLATION ~
+==============================================================================
+2. Installation                                    *compile-mode-installation*
 
 Use your favorite plugin manager. `compile-mode.nvim` depends on
 `nvim-lua/plenary.nvim` and on `m00qek/baleia.nvim` (unless the
@@ -40,7 +46,8 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
 <
 
 
-API ~
+==============================================================================
+3. API                                                      *compile-mode-api*
 
 compile_mode.setup({opts})                    *compile-mode.setup()*
 
@@ -93,7 +100,7 @@ result. If `{param.args}` is not passed in, the user is prompted for a command
 using |vim.ui.input()|.
 
 
-PARAMETERS
+PARAMETERS ~
 
 - `{param}` (table) has a single field, `args`, which is the string of the command itself, or `nil` if the user should be prompted to enter a command (optional)
 
@@ -103,7 +110,8 @@ Reruns the last compiled command. If there isn’t one, the error is reported
 using |vim.notify()|.
 
 
-COMMANDS ~
+==============================================================================
+4. Commands                                            *compile-mode-commands*
 
 
                                                      *compile-mode-:Compile*
