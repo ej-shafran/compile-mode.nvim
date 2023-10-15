@@ -1,0 +1,5 @@
+#+title: compile-mode.nvim
+#+author: EJ Shafran
+
+* TODO Add goto error message outputs
+* TODO ? Add highlights for lines starting with `Text:`
