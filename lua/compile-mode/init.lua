@@ -32,7 +32,7 @@ end
 ---@type fun(opts: table): string
 local input = a.wrap(vim.ui.input, 2)
 
----@type fun(cmd: string[], bufnr: integer): integer, integer
+---@type fun(cmd: string, bufnr: integer): integer, integer
 local runjob = a.wrap(function(cmd, bufnr, callback)
 	local count = 0
 
@@ -117,8 +117,7 @@ local runcommand = a.void(function(command)
 		command,
 	})
 
-	local split_cmd = vim.fn.split(command) --[[@as string[] ]]
-	local count, code = runjob(split_cmd, bufnr)
+	local count, code = runjob(command, bufnr)
 	if count == 0 then
 		set_lines(bufnr, -1, -1, false, { "" })
 	end
