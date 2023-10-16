@@ -14,34 +14,42 @@ M.prev_dir = nil
 ---@type Config
 M.config = {}
 
+local baleia = nil
+
+---@param bufnr integer
+---@param start integer
+---@param end_ integer
+---@param flag boolean
+---@param lines string[]
+local function set_lines(bufnr, start, end_, flag, lines)
+	vim.api.nvim_buf_set_lines(bufnr, start, end_, flag, lines)
+	if not M.config.no_baleia_support then
+		assert(baleia)
+		baleia.once(bufnr)
+	end
+end
+
 ---@type fun(opts: table): string
 local input = a.wrap(vim.ui.input, 2)
 
----@type fun(cmd: string[], opts: table?): string[], integer
-local runjob = a.wrap(function(cmd, opts, callback)
-	local result = {}
+---@type fun(cmd: string[], bufnr: integer): integer, integer
+local runjob = a.wrap(function(cmd, bufnr, callback)
+	local count = 0
 
-	vim.fn.jobstart(
-		cmd,
-		vim.tbl_extend("force", opts or {}, {
-			stdout_buffered = true,
-			stderr_buffered = true,
-			on_stdout = function(_, data)
-				if data then
-					vim.list_extend(result, data)
-				end
-			end,
-			on_stderr = function(_, data)
-				if data then
-					vim.list_extend(result, data)
-				end
-			end,
-			on_exit = function(_, code)
-				table.remove(result)
-				callback(result, code)
-			end,
-		})
-	)
+	local function on_either(_, data)
+		if data and (#data > 1 or data[1] ~= "") then
+			count = count + #data
+			set_lines(bufnr, -2, -1, false, data)
+		end
+	end
+
+	vim.fn.jobstart(cmd, {
+		on_stdout = on_either,
+		on_stderr = on_either,
+		on_exit = function(_, code)
+			callback(count, code)
+		end,
+	})
 end, 3)
 
 ---If `fname` has a window open, do nothing.
@@ -84,19 +92,35 @@ end
 ---
 ---@type fun(command: string)
 local runcommand = a.void(function(command)
-	local buffer = {
+	local bufnr = split_unless_open("Compilation")
+	buf_set_opt(bufnr, "modifiable", true)
+	buf_set_opt(bufnr, "filetype", "compile")
+	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
+	vim.api.nvim_create_autocmd("ExitPre", {
+		group = vim.api.nvim_create_augroup("compile-mode", { clear = true }),
+		callback = function()
+			vim.api.nvim_buf_delete(bufnr, { force = true })
+		end,
+	})
+
+	if not M.config.no_baleia_support then
+		baleia = require("baleia").setup({ line_starts_at = 2 })
+	end
+
+	-- reset compilation buffer
+	set_lines(bufnr, 0, -1, false, {})
+
+	set_lines(bufnr, 0, 0, false, {
 		'-*- mode: compilation; default-directory: "' .. default_dir() .. '" -*-',
 		"Compilation started at " .. time(),
 		"",
 		command,
-	}
+	})
 
 	local split_cmd = vim.fn.split(command) --[[@as string[] ]]
-	local result, code = runjob(split_cmd, { cwd = M.prev_dir })
-	if #result == 0 then
-		table.insert(buffer, "")
-	else
-		vim.list_extend(buffer, result)
+	local count, code = runjob(split_cmd, bufnr)
+	if count == 0 then
+		set_lines(bufnr, -1, -1, false, { "" })
 	end
 
 	local simple_message
@@ -112,32 +136,14 @@ local runcommand = a.void(function(command)
 	end
 
 	local compliation_message = M.config.no_baleia_support and simple_message or finish_message
-	vim.list_extend(buffer, {
+	set_lines(bufnr, -1, -1, false, {
 		compliation_message .. " at " .. time(),
 		"",
 	})
 
-	local bufnr = split_unless_open("Compilation")
-
-	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
-	vim.api.nvim_create_autocmd("ExitPre", {
-		group = vim.api.nvim_create_augroup("compile-mode", { clear = true }),
-		callback = function()
-			vim.api.nvim_buf_delete(bufnr, { force = true })
-		end,
-	})
-
-	buf_set_opt(bufnr, "filetype", "compile")
-
-	buf_set_opt(bufnr, "modifiable", true)
-	if M.config.no_baleia_support then
-		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, buffer)
-	else
-		require("baleia").setup({}).buf_set_lines(bufnr, 0, -1, false, buffer)
-	end
-	buf_set_opt(bufnr, "modifiable", false)
-
 	vim.notify(simple_message)
+
+	buf_set_opt(bufnr, "modifiable", false)
 end)
 
 ---Prompt for (or get by parameter) a command and run it.
