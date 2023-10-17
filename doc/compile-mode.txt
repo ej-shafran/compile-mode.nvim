@@ -103,7 +103,7 @@ time_format                            The way to format the time displayed at t
 
 
 
-Table of options to pass into `baleia.setup()`. Defaults to an empty table
+Table of options to pass into `baleia.setup()`. Defaults to an empty table.
 
 
                                                *compile-mode-baleia_options*
