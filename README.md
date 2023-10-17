@@ -112,7 +112,7 @@ Defaults to: `"%a %b %e %H:%M:%S"`.
 
 <!-- panvimdoc-ignore-start -->
 
-### `baleia_options`
+#### `baleia_options`
 
 <!-- panvimdoc-ignore-end -->
 

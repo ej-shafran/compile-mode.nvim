@@ -93,11 +93,21 @@ default_command                        The string to show in the |compile-mode.c
 
 
 
+
+                                                  *compile-mode-time_format*
+
+
+time_format                            The way to format the time displayed at the top of the Compilation buffer. Passed into |strftime()|.
+                                       Defaults to: `"%a %b %e %H:%M:%S"`.
+
+
+
 compile_mode.compile({param})                   *compile-mode.compile()*
 
 Run a command and place its output in the compilation buffer, reporting on its
-result. If `{param.args}` is not passed in, the user is prompted for a command
-using |vim.ui.input()|.
+result. The command is run from the current working directory. If
+`{param.args}` is not passed in, the user is prompted for a command using
+|vim.ui.input()|.
 
 
 PARAMETERS ~
@@ -107,7 +117,8 @@ PARAMETERS ~
 compile_mode.recompile()                    *compile-mode.recompile()*
 
 Reruns the last compiled command. If there isn’t one, the error is reported
-using |vim.notify()|.
+using |vim.notify()|. The command is rerun from the directory in which it was
+originally run.
 
 
 ==============================================================================
@@ -118,6 +129,7 @@ using |vim.notify()|.
 
 
 :Compile                               Runs a command and places its output in the compilation buffer.
+                                       The command is run from the current working directory.
                                        If an argument is present, it is used as the command. Otherwise, the user is prompted using |vim.ui.input()|.
 
 
@@ -127,6 +139,7 @@ using |vim.notify()|.
 
 
 :Recompile                             Reruns the last compiled command. If there isn’t one, the error is reported using |vim.notify()|.
+                                       The command is rerun from the directory in which it was originally run.
 
 
 
