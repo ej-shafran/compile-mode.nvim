@@ -22,8 +22,9 @@ for more details.
 ==============================================================================
 2. Installation                                    *compile-mode-installation*
 
-Use your favorite plugin manager. `compile-mode.nvim` depends on
-`nvim-lua/plenary.nvim` and on `m00qek/baleia.nvim` (unless the
+Use your favorite plugin manager. `compile-mode.nvim` depends on plenary.nvim
+<https://github.com/nvim-lua/plenary.nvim> and on baleia.nvim
+<https://github.com/m00qek/baleia.nvim> (unless the
 |compile-mode-`no_baleia_support`| option is set).
 
 Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
