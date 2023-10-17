@@ -112,6 +112,22 @@ Defaults to: `"%a %b %e %H:%M:%S"`.
 
 <!-- panvimdoc-ignore-start -->
 
+### `baleia_options`
+
+<!-- panvimdoc-ignore-end -->
+
+Table of options to pass into `baleia.setup()`.
+Defaults to an empty table
+
+<!-- panvimdoc-include-comment
+baleia_options
+
+: Table of options to pass into `baleia.setup()`.
+Defaults to an empty table
+-->
+
+<!-- panvimdoc-ignore-start -->
+
 ### compile({param})
 
 <!-- panvimdoc-ignore-end -->

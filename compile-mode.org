@@ -2,4 +2,5 @@
 #+author: EJ Shafran
 
 * TODO Add goto error message outputs
-* TODO ? Add highlights for lines starting with `Text:`
+* DONE Add highlights for lines starting with `Text:`
+  CLOSED: [2023-10-17 Tue 03:13]

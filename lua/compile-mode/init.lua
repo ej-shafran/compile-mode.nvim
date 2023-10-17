@@ -1,5 +1,5 @@
 ---@alias CommandParam { args: string? }
----@alias Config { split_vertically: boolean?, no_baleia_support: boolean?, default_command: string?, time_format: string? }
+---@alias Config { split_vertically: boolean?, no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table? }
 
 local a = require("plenary.async")
 ---@diagnostic disable-next-line: undefined-field
@@ -14,7 +14,10 @@ M.prev_dir = nil
 ---@type Config
 M.config = {}
 
-local baleia = nil
+---@param line string
+local function convert_statement_colon(line)
+	return vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
+end
 
 ---@param bufnr integer
 ---@param start integer
@@ -23,10 +26,6 @@ local baleia = nil
 ---@param lines string[]
 local function set_lines(bufnr, start, end_, flag, lines)
 	vim.api.nvim_buf_set_lines(bufnr, start, end_, flag, lines)
-	if not M.config.no_baleia_support then
-		assert(baleia)
-		baleia.once(bufnr)
-	end
 end
 
 ---@type fun(opts: table): string
@@ -39,6 +38,10 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 	local function on_either(_, data)
 		if data and (#data > 1 or data[1] ~= "") then
 			count = count + #data
+			if not M.config.no_baleia_support then
+				data = vim.tbl_map(convert_statement_colon, data)
+			end
+
 			set_lines(bufnr, -2, -1, false, data)
 		end
 	end
@@ -104,7 +107,7 @@ local runcommand = a.void(function(command)
 	})
 
 	if not M.config.no_baleia_support then
-		baleia = require("baleia").setup({ line_starts_at = 2 })
+		require("baleia").setup(M.config.baleia_opts or {}).automatically(bufnr)
 	end
 
 	-- reset compilation buffer
@@ -142,7 +145,8 @@ local runcommand = a.void(function(command)
 
 	vim.notify(simple_message)
 
-	buf_set_opt(bufnr, "modifiable", false)
+	-- TODO: find some way to do this without clashing with Baleia
+	-- buf_set_opt(bufnr, "modifiable", false)
 end)
 
 ---Prompt for (or get by parameter) a command and run it.
