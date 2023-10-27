@@ -18,7 +18,6 @@ return {
   opts = {
     -- you can disable colors by uncommenting this line
     -- no_baleia_support = true,
-    split_vertically = true,
     default_command = "npm run build"
   }
 }
@@ -45,7 +44,6 @@ Usage:
 require("compile-mode").setup({
     -- you can disable colors by uncommenting this line
     -- no_baleia_support = true,
-    split_vertically = true,
     default_command = "npm run build"
 })
 ```
@@ -69,30 +67,17 @@ You can disable this behavior by setting this config option to `true`.
 
 <!-- panvimdoc-ignore-start -->
 
-#### `split_vertically`
-
-When set to `true`, the Compilation window will be opened using a vertical split (`:h :vsplit`) instead of a horizontal one (`:h :split`).
-
-<!-- panvimdoc-ignore-end -->
-<!-- panvimdoc-include-comment
-split_vertically
-
-: When set to `true`, the Compilation window will be opened using a vertical split (`:h :vsplit`) instead of a horizontal one (`:h :split`).
--->
-
-<!-- panvimdoc-ignore-start -->
-
 #### `default_command`
 
-The string to show in the `compile()` prompt as a default.
+The string to show in the `compile()` prompt as a default. You can set it to `""` for an empty prompt.
 Defaults to: `"make -k "`.
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
 default_command
 
-: The string to show in the |compile-mode.compile()| prompt as a default.
-Defaults to: `"make -k "`
+: The string to show in the |compile-mode.compile()| prompt as a default. You can set it to `""` for an empty prompt.
+Defaults to: `"make -k "`.
 -->
 
 <!-- panvimdoc-ignore-start -->
@@ -139,15 +124,18 @@ compile_mode.compile({param})					*compile-mode.compile()*
 
 Run a command and place its output in the compilation buffer, reporting on its result.
 The command is run from the current working directory.
-If `{param.args}` is not passed in, the user is prompted for a command using `:h vim.ui.input()`.
+The compliation buffer is opened in a new split if it isn't already opened. You can pass {param.smods.vertical} to split the window vertically.
+If {param.args} is not passed in, the user is prompted for a command using `:h vim.ui.input()`.
 
 #### Parameters
 
-- `{param}` (table) has a single field, `args`, which is the string of the command itself, or `nil` if the user should be prompted to enter a command (optional)
+- {param} (table) a table, identical to the tables passed into Neovim commands (optional)
+  - {param.args}: the string of the command itself, or `nil` if the user should be prompted to enter a command
+  - {param.smods}: the only field which is respected is {param.smods.vertical}, which makes the window split vertically if the compilation buffer is not yet open
 
 <!-- panvimdoc-ignore-start -->
 
-### recompile()
+### recompile({param})
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
@@ -157,7 +145,13 @@ compile_mode.recompile()					*compile-mode.recompile()*
 -->
 
 Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
+The compliation buffer is opened in a new split if it isn't already opened. You can pass {param.smods.vertical} to split the window vertically.
 The command is rerun from the directory in which it was originally run.
+
+#### Parameters
+
+- {param} (table) a table, identical to the tables passed into Neovim commands (optional)
+  - {param.smods}: the only field which is respected is {param.smods.vertical}, which makes the window split vertically if the compilation buffer is not yet open
 
 ## Commands
 
@@ -167,6 +161,7 @@ The command is rerun from the directory in which it was originally run.
 
 Runs a command and places its output in the compilation buffer.
 The command is run from the current working directory.
+The compliation buffer is opened in a new split if it isn't already opened. You can run the command using `:h :vert` to split the window vertically.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
 
 <!-- panvimdoc-ignore-end -->
@@ -174,6 +169,7 @@ If an argument is present, it is used as the command. Otherwise, the user is pro
 :Compile
 : Runs a command and places its output in the compilation buffer.
 The command is run from the current working directory.
+The compliation buffer is opened in a new split if it isn't already opened. You can run the command using `:h :vert` to split the window vertically.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
 
 -->
@@ -183,6 +179,7 @@ If an argument is present, it is used as the command. Otherwise, the user is pro
 ### `:Recompile`
 
 Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
+The compliation buffer is opened in a new split if it isn't already opened. You can run the command using `:h :vert` to split the window vertically.
 The command is rerun from the directory in which it was originally run.
 
 <!-- panvimdoc-ignore-end -->
@@ -190,6 +187,7 @@ The command is rerun from the directory in which it was originally run.
 :Recompile
 
 : Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
+The compliation buffer is opened in a new split if it isn't already opened. You can run the command using `:h :vert` to split the window vertically.
 The command is rerun from the directory in which it was originally run.
 -->
 

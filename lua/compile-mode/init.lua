@@ -1,5 +1,5 @@
----@alias CommandParam { args: string? }
----@alias Config { split_vertically: boolean?, no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table? }
+---@alias CommandParam { args: string?, smods: { vertical: boolean }? }
+---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table? }
 
 local a = require("plenary.async")
 ---@diagnostic disable-next-line: undefined-field
@@ -60,13 +60,14 @@ end, 3)
 ---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
 ---
 ---@param fname string
+---@param vertical boolean
 ---@return integer bufnr the identifier of the buffer for `fname`
-local function split_unless_open(fname)
+local function split_unless_open(fname, vertical)
 	local bufnum = vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
 	local winnum = vim.fn.bufwinnr(bufnum)
 
 	if winnum == -1 then
-		if M.config.split_vertically then
+		if vertical then
 			vim.cmd.vsplit(fname)
 		else
 			vim.cmd.split(fname)
@@ -94,9 +95,9 @@ end
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
----@type fun(command: string)
-local runcommand = a.void(function(command)
-	local bufnr = split_unless_open("Compilation")
+---@type fun(command: string, vertical: boolean)
+local runcommand = a.void(function(command, vertical)
+	local bufnr = split_unless_open("Compilation", vertical)
 	buf_set_opt(bufnr, "modifiable", true)
 	buf_set_opt(bufnr, "filetype", "compile")
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
@@ -170,13 +171,14 @@ M.compile = a.void(function(param)
 	M.prev_command = command
 	M.prev_dir = vim.fn.getcwd()
 
-	runcommand(command)
+	runcommand(command, param.smods and param.smods.vertical or false)
 end)
 
 ---Rerun the last command.
-M.recompile = a.void(function()
+---@param param CommandParam
+M.recompile = a.void(function(param)
 	if M.prev_command then
-		runcommand(M.prev_command)
+		runcommand(M.prev_command, param.smods and param.smods.vertical or false)
 	else
 		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
 	end
