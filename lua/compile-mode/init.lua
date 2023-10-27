@@ -47,6 +47,7 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 	end
 
 	vim.fn.jobstart(cmd, {
+		cwd = M.prev_dir,
 		on_stdout = on_either,
 		on_stderr = on_either,
 		on_exit = function(_, code)
