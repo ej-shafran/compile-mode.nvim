@@ -21,3 +21,5 @@
   CLOSED: [2023-10-29 Sun 01:49]
 * DONE Add highlights for lines starting with `Text:`
   CLOSED: [2023-10-17 Tue 03:13]
+* TODO Update README/docs
+* TODO ? Add tests, at some point
