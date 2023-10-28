@@ -9,7 +9,8 @@ local buf_set_opt = vim.api.nvim_buf_set_option
 local M = {}
 
 ---@type string|nil
-M.prev_command = nil
+vim.g.compile_command = nil
+
 ---@type string|nil
 M.prev_dir = nil
 ---@type Config
@@ -257,7 +258,7 @@ M.compile = a.void(function(param)
 	local command = param.args ~= "" and param.args
 		or input({
 			prompt = "Compile command: ",
-			default = M.prev_command or M.config.default_command or "make -k ",
+			default = vim.g.compile_command or M.config.default_command or "make -k ",
 			completion = "shellcmd",
 		})
 
@@ -265,7 +266,7 @@ M.compile = a.void(function(param)
 		return
 	end
 
-	M.prev_command = command
+	vim.g.compile_command = command
 	M.prev_dir = vim.fn.getcwd()
 
 	runcommand(command, param.smods or {})
@@ -274,8 +275,8 @@ end)
 ---Rerun the last command.
 ---@param param CommandParam
 M.recompile = a.void(function(param)
-	if M.prev_command then
-		runcommand(M.prev_command, param.smods or {})
+	if vim.g.compile_command then
+		runcommand(vim.g.compile_command, param.smods or {})
 	else
 		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
 	end

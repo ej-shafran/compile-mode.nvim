@@ -3,7 +3,8 @@
 
 * DONE Add goto error message outputs
   CLOSED: [2023-10-29 Sun 01:30]
-* TODO Place previous command in vim.o or vim.g
+* DONE Place previous command in vim.o or vim.g
+  CLOSED: [2023-10-29 Sun 01:36]
 * TODO Support split modifier
 * TODO Add option not to split at all if more than certain amount of windows
   Maybe `window_threshold`, or something of the sort
