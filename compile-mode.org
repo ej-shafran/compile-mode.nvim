@@ -3,6 +3,10 @@
 
 * DONE Add goto error message outputs
   CLOSED: [2023-10-29 Sun 01:30]
+* TODO Place previous command in vim.o or vim.g
+* TODO Configure compilation buffer name
+* TODO Configure highlight colors
+* TODO Use Baleia for coloring instead of personally coding the escape sequences
 * TODO Goto error - patterns for different compilation types
 * TODO Goto error - next error and previous error
 * TODO Goto error - customize patterns
