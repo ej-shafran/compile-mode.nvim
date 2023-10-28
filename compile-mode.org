@@ -4,6 +4,9 @@
 * DONE Add goto error message outputs
   CLOSED: [2023-10-29 Sun 01:30]
 * TODO Place previous command in vim.o or vim.g
+* TODO Support split modifier
+* TODO Add option not to split at all if more than certain amount of windows
+  Maybe `window_threshold`, or something of the sort
 * TODO Configure compilation buffer name
 * TODO Configure highlight colors
 * TODO Use Baleia for coloring instead of personally coding the escape sequences
