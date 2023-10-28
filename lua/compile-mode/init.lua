@@ -150,8 +150,9 @@ local runcommand = a.void(function(command, smods)
 		vim.notify(simple_message)
 	end
 
-	-- TODO: find some way to do this without clashing with Baleia
-	-- buf_set_opt(bufnr, "modifiable", false)
+	vim.schedule(function()
+		buf_set_opt(bufnr, "modifiable", false)
+	end)
 end)
 
 ---Prompt for (or get by parameter) a command and run it.

@@ -11,6 +11,7 @@ Here's an example of a [Lazy](https://github.com/folke/lazy.nvim) config for `co
 ```lua
 return {
   "ej-shafran/compile-mode.nvim",
+  tag = "latest", -- or a specific version
   dependencies = {
     "nvim-lua/plenary.nvim",
     { "m00qek/baleia.nvim", tag = "v1.3.0" },

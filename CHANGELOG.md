@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2]
+
+### Fixed
+
+- The compilation buffer is no longer modifiable by default
+
 ### Added
 
 - The ability to use `:silent` with the `:Compile` and `:Recompile` commands
@@ -28,5 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The ability to use `:vert` with the `:Compile` and `:Recompile` commands
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the API functions
 
-[unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/v1.0.1...HEAD
+[unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...HEAD
+[1.0.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v1.0.0...v1.0.1
