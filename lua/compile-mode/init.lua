@@ -60,6 +60,9 @@ end
 ---@type fun(opts: table): string
 local input = a.wrap(vim.ui.input, 2)
 
+---@type fun()
+local wait = a.wrap(vim.schedule, 1)
+
 ---@type fun(cmd: string, bufnr: integer): integer, integer
 local runjob = a.wrap(function(cmd, bufnr, callback)
 	local count = 0
@@ -157,18 +160,16 @@ local runcommand = a.void(function(command, smods)
 				})
 				dir = dir:gsub("/$", "")
 
+				wait()
+
 				if not vim.fn.isdirectory(dir) then
-					vim.schedule(function()
-						vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
-					end)
+					vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
 					return
 				end
 
 				local nested_filename = dir .. "/" .. filename
 				if vim.fn.filereadable(nested_filename) == 0 then
-					vim.schedule(function()
-						vim.notify(filename .. " does not exist in " .. dir, vim.log.levels.ERROR)
-					end)
+					vim.notify(filename .. " does not exist in " .. dir, vim.log.levels.ERROR)
 					return
 				end
 
