@@ -1,4 +1,5 @@
----@alias CommandParam { args: string?, smods: { vertical: boolean }? }
+---@alias SMods { vertical: boolean, silent: boolean }
+---@alias CommandParam { args: string?, smods: SMods? }
 ---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table? }
 
 local a = require("plenary.async")
@@ -95,9 +96,9 @@ end
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
----@type fun(command: string, vertical: boolean)
-local runcommand = a.void(function(command, vertical)
-	local bufnr = split_unless_open("Compilation", vertical)
+---@type fun(command: string, smods: SMods)
+local runcommand = a.void(function(command, smods)
+	local bufnr = split_unless_open("Compilation", smods.vertical)
 	buf_set_opt(bufnr, "modifiable", true)
 	buf_set_opt(bufnr, "filetype", "compile")
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
@@ -145,7 +146,9 @@ local runcommand = a.void(function(command, vertical)
 		"",
 	})
 
-	vim.notify(simple_message)
+	if not smods.silent then
+		vim.notify(simple_message)
+	end
 
 	-- TODO: find some way to do this without clashing with Baleia
 	-- buf_set_opt(bufnr, "modifiable", false)
@@ -171,14 +174,14 @@ M.compile = a.void(function(param)
 	M.prev_command = command
 	M.prev_dir = vim.fn.getcwd()
 
-	runcommand(command, param.smods and param.smods.vertical or false)
+	runcommand(command, param.smods or {})
 end)
 
 ---Rerun the last command.
 ---@param param CommandParam
 M.recompile = a.void(function(param)
 	if M.prev_command then
-		runcommand(M.prev_command, param.smods and param.smods.vertical or false)
+		runcommand(M.prev_command, param.smods or {})
 	else
 		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
 	end

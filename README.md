@@ -124,14 +124,16 @@ compile_mode.compile({param})					*compile-mode.compile()*
 
 Run a command and place its output in the compilation buffer, reporting on its result.
 The command is run from the current working directory.
-The compliation buffer is opened in a new split if it isn't already opened. You can pass {param.smods.vertical} to split the window vertically.
+The compliation buffer is opened in a new split if it isn't already opened.
 If {param.args} is not passed in, the user is prompted for a command using `:h vim.ui.input()`.
 
 #### Parameters
 
 - {param} (table) a table, identical to the tables passed into Neovim commands (optional)
   - {param.args}: the string of the command itself, or `nil` if the user should be prompted to enter a command
-  - {param.smods}: the only field which is respected is {param.smods.vertical}, which makes the window split vertically if the compilation buffer is not yet open
+  - {param.smods}: a table
+    - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
+    - {param.smods.silent}: does not print any information
 
 <!-- panvimdoc-ignore-start -->
 
@@ -145,13 +147,15 @@ compile_mode.recompile()					*compile-mode.recompile()*
 -->
 
 Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
-The compliation buffer is opened in a new split if it isn't already opened. You can pass {param.smods.vertical} to split the window vertically.
+The compliation buffer is opened in a new split if it isn't already opened.
 The command is rerun from the directory in which it was originally run.
 
 #### Parameters
 
 - {param} (table) a table, identical to the tables passed into Neovim commands (optional)
-  - {param.smods}: the only field which is respected is {param.smods.vertical}, which makes the window split vertically if the compilation buffer is not yet open
+  - {param.smods}: a table
+    - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
+    - {param.smods.silent}: does not print any information
 
 ## Commands
 
@@ -161,16 +165,21 @@ The command is rerun from the directory in which it was originally run.
 
 Runs a command and places its output in the compilation buffer.
 The command is run from the current working directory.
-The compliation buffer is opened in a new split if it isn't already opened. You can run the command using `:h :vert` to split the window vertically.
+The compliation buffer is opened in a new split if it isn't already opened.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
+
+You can run the command using `:h :vert` to split the window vertically.
+You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
 :Compile
 : Runs a command and places its output in the compilation buffer.
 The command is run from the current working directory.
-The compliation buffer is opened in a new split if it isn't already opened. You can run the command using `:h :vert` to split the window vertically.
+The compliation buffer is opened in a new split if it isn't already opened.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
+You can run the command using `:h :vert` to split the window vertically.
+You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
 
 -->
 
@@ -179,16 +188,21 @@ If an argument is present, it is used as the command. Otherwise, the user is pro
 ### `:Recompile`
 
 Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
-The compliation buffer is opened in a new split if it isn't already opened. You can run the command using `:h :vert` to split the window vertically.
+The compliation buffer is opened in a new split if it isn't already opened.
 The command is rerun from the directory in which it was originally run.
+
+You can run the command using `:h :vert` to split the window vertically.
+You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
 
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
 :Recompile
 
 : Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
-The compliation buffer is opened in a new split if it isn't already opened. You can run the command using `:h :vert` to split the window vertically.
+The compliation buffer is opened in a new split if it isn't already opened.
 The command is rerun from the directory in which it was originally run.
+You can run the command using `:h :vert` to split the window vertically.
+You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
 -->
 
 <!-- panvimdoc-ignore-start -->
