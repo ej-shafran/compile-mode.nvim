@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- "Goto error" logic like in Emacs' Compilation Mode
+  - The error-path syntax is highlighted
+  - When the cursor is on a line that begins with an error-path syntax, pressing `<CR>` will go to that error's file, row and column
+  - If the error's file is not found within the current path, the user is prompted to enter the directory to search within
+
 ## [1.0.2] - 2023-10-29
 
 ### Fixed

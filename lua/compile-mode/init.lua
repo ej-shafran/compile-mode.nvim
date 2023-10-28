@@ -15,9 +15,37 @@ M.prev_dir = nil
 ---@type Config
 M.config = {}
 
+local error_pattern = "^\\([^:]\\+\\):\\(\\d\\+\\):\\(\\d\\+\\)"
+local error_re = vim.regex(error_pattern) --[[@as any]]
+
 ---@param line string
-local function convert_statement_colon(line)
-	return vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
+local function color_statement_prefix(line)
+	local normal = "\x1b[0m"
+	local red_bold_underline = "\x1b[31;1;4m"
+	local green_underline = "\x1b[32;4m"
+	local normal_underline = "\x1b[0;4m"
+	local blue = "\x1b[34m"
+
+	if error_re:match_str(line) then
+		return vim.fn.substitute(
+			line,
+			error_pattern,
+			red_bold_underline
+				.. "\\1"
+				.. normal_underline
+				.. ":"
+				.. green_underline
+				.. "\\2"
+				.. normal_underline
+				.. ":"
+				.. normal_underline
+				.. "\\3"
+				.. normal,
+			""
+		) --[[@as string]]
+	else
+		return vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", blue .. "\\1" .. normal .. ":", "") --[[@as string]]
+	end
 end
 
 ---@param bufnr integer
@@ -40,7 +68,7 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 		if data and (#data > 1 or data[1] ~= "") then
 			count = count + #data
 			if not M.config.no_baleia_support then
-				data = vim.tbl_map(convert_statement_colon, data)
+				data = vim.tbl_map(color_statement_prefix, data)
 			end
 
 			set_lines(bufnr, -2, -1, false, data)
@@ -102,6 +130,58 @@ local runcommand = a.void(function(command, smods)
 	buf_set_opt(bufnr, "modifiable", true)
 	buf_set_opt(bufnr, "filetype", "compile")
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
+
+	vim.keymap.set("n", "<CR>", function()
+		a.run(function()
+			local line = vim.api.nvim_get_current_line()
+
+			if not error_re:match_str(line) then
+				vim.notify("No error here")
+				return
+			end
+
+			local error_pattern_greedy = error_pattern .. ".*$"
+			local filename = vim.fn.substitute(line, error_pattern_greedy, "\\1", "")
+			local r = tonumber(vim.fn.substitute(line, error_pattern_greedy, "\\2", ""))
+			local c = tonumber(vim.fn.substitute(line, error_pattern_greedy, "\\3", ""))
+
+			local file_exists = vim.fn.filereadable(filename) ~= 0
+
+			if file_exists then
+				vim.cmd.e(filename)
+				vim.api.nvim_win_set_cursor(0, { r, c })
+			else
+				local dir = input({
+					prompt = "Find this error in: ",
+					completion = "file",
+				})
+				dir = dir:gsub("/$", "")
+
+				if not vim.fn.isdirectory(dir) then
+					vim.schedule(function()
+						vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
+					end)
+					return
+				end
+
+				filename = dir .. "/" .. filename
+				if vim.fn.filereadable(filename) == 0 then
+					vim.schedule(function()
+						vim.notify(filename .. " does not exist in " .. dir, vim.log.levels.ERROR)
+					end)
+					return
+				end
+
+				vim.cmd.e(filename)
+				c = c - 1
+				if c < 0 then
+					c = 0
+				end
+				vim.api.nvim_win_set_cursor(0, { r, c })
+			end
+		end)
+	end, { silent = true, buffer = bufnr })
+
 	vim.api.nvim_create_autocmd("ExitPre", {
 		group = vim.api.nvim_create_augroup("compile-mode", { clear = true }),
 		callback = function()
@@ -120,7 +200,7 @@ local runcommand = a.void(function(command, smods)
 		'-*- mode: compilation; default-directory: "' .. default_dir() .. '" -*-',
 		"Compilation started at " .. time(),
 		"",
-		command,
+		color_statement_prefix(command),
 	})
 
 	local count, code = runjob(command, bufnr)

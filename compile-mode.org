@@ -1,6 +1,12 @@
 #+title: compile-mode.nvim
 #+author: EJ Shafran
 
-* TODO Add goto error message outputs
+* DONE Add goto error message outputs
+  CLOSED: [2023-10-29 Sun 01:30]
+* TODO Goto error - patterns for different compilation types
+* TODO Goto error - next error and previous error
+* TODO Goto error - customize patterns
+* TODO Refactoring - use plenary async for vim.schedule
+* TODO Refactoring - extract keymap handler for <CR>
 * DONE Add highlights for lines starting with `Text:`
   CLOSED: [2023-10-17 Tue 03:13]
