@@ -164,15 +164,15 @@ local runcommand = a.void(function(command, smods)
 					return
 				end
 
-				filename = dir .. "/" .. filename
-				if vim.fn.filereadable(filename) == 0 then
+				local nested_filename = dir .. "/" .. filename
+				if vim.fn.filereadable(nested_filename) == 0 then
 					vim.schedule(function()
 						vim.notify(filename .. " does not exist in " .. dir, vim.log.levels.ERROR)
 					end)
 					return
 				end
 
-				vim.cmd.e(filename)
+				vim.cmd.e(nested_filename)
 				c = c - 1
 				if c < 0 then
 					c = 0
