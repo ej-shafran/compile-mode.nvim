@@ -30,17 +30,14 @@ local function color_statement_prefix(line)
 		return vim.fn.substitute(
 			line,
 			error_pattern,
-			red_bold_underline
-				.. "\\1"
-				.. normal_underline
-				.. ":"
-				.. green_underline
-				.. "\\2"
-				.. normal_underline
-				.. ":"
-				.. normal_underline
-				.. "\\3"
-				.. normal,
+			string.format(
+				"%s\\1%s:%s\\2%s:\\3%s",
+				red_bold_underline,
+				normal_underline,
+				green_underline,
+				normal_underline,
+				normal
+			),
 			""
 		) --[[@as string]]
 	else
