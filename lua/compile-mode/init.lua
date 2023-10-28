@@ -1,4 +1,5 @@
----@alias SMods { vertical: boolean, silent: boolean }
+---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
+---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
 ---@alias CommandParam { args: string?, smods: SMods? }
 ---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table? }
 
@@ -90,19 +91,26 @@ end, 3)
 ---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
 ---
 ---@param fname string
----@param vertical boolean
+---@param smods SMods
 ---@return integer bufnr the identifier of the buffer for `fname`
-local function split_unless_open(fname, vertical)
+local function split_unless_open(fname, smods)
 	local bufnum = vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
 	local winnum = vim.fn.bufwinnr(bufnum)
 
+	local cmd = fname
 	if winnum == -1 then
-		if vertical then
-			vim.cmd.vsplit(fname)
+		if smods.vertical then
+			cmd = "split " .. cmd
 		else
-			vim.cmd.split(fname)
+			cmd = "vsplit " .. cmd
+		end
+
+		if smods.split and smods.split ~= "" then
+			cmd = smods.split .. " " .. cmd
 		end
 	end
+
+	vim.cmd(cmd)
 
 	return vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
 end
@@ -190,7 +198,7 @@ end)
 ---
 ---@type fun(command: string, smods: SMods)
 local runcommand = a.void(function(command, smods)
-	local bufnr = split_unless_open("Compilation", smods.vertical)
+	local bufnr = split_unless_open("Compilation", smods)
 	buf_set_opt(bufnr, "modifiable", true)
 	buf_set_opt(bufnr, "filetype", "compile")
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
