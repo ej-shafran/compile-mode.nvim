@@ -125,20 +125,34 @@ local function default_dir()
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
 
----Go to the error on the current line
----@type fun()
-local error_on_line = a.void(function()
-	local line = vim.api.nvim_get_current_line()
-
+---Parses error syntax from a given line.
+---@param line string the line to parse
+---@return boolean ok whether there is an error here
+---@return nil|string filename the filename for the error
+---@return nil|integer r the row of the error
+---@return nil|integer c the column of the error
+local function parse_error(line)
 	if not error_re:match_str(line) then
-		vim.notify("No error here")
-		return
+		return false, nil, nil, nil
 	end
 
 	local error_pattern_greedy = error_pattern .. ".*$"
 	local filename = vim.fn.substitute(line, error_pattern_greedy, "\\1", "")
 	local r = tonumber(vim.fn.substitute(line, error_pattern_greedy, "\\2", ""))
 	local c = tonumber(vim.fn.substitute(line, error_pattern_greedy, "\\3", ""))
+	return true, filename, r, c
+end
+
+---Go to the error on the current line
+---@type fun()
+local error_on_line = a.void(function()
+	local line = vim.api.nvim_get_current_line()
+	local ok, filename, r, c = parse_error(line)
+
+	if not ok then
+		vim.notify("No error here")
+		return
+	end
 
 	local file_exists = vim.fn.filereadable(filename) ~= 0
 
