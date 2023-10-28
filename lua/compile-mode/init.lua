@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
 ---@alias CommandParam { args: string?, smods: SMods? }
----@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table? }
+---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string? }
 
 local a = require("plenary.async")
 ---@diagnostic disable-next-line: undefined-field
@@ -198,7 +198,7 @@ end)
 ---
 ---@type fun(command: string, smods: SMods)
 local runcommand = a.void(function(command, smods)
-	local bufnr = split_unless_open("Compilation", smods)
+	local bufnr = split_unless_open(M.config.buffer_name or "Compilation", smods)
 	buf_set_opt(bufnr, "modifiable", true)
 	buf_set_opt(bufnr, "filetype", "compile")
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })

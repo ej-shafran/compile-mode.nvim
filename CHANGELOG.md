@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - If the error's file is not found within the current path, the user is prompted to enter the directory to search within
 - The ability to use `:aboveleft`, `:belowright`, `:topleft` and `:botright` with the `:Compile` and `:Recompile` commands
   - Also the ability to pass `smods.split` to the API functions
+- Configuration option for the compilation buffer name (`buffer_name`)
 
 ## [1.0.2] - 2023-10-29
 
