@@ -116,6 +116,22 @@ Defaults to an empty table
 
 <!-- panvimdoc-ignore-start -->
 
+#### `buffer_name`
+
+<!-- panvimdoc-ignore-end -->
+
+The name for the compilation buffer.
+Defaults to: `"Compilation"`.
+
+<!-- panvimdoc-include-comment
+buffer_name
+
+: The name for the compilation buffer.
+Defaults to: `"Compilation"`.
+-->
+
+<!-- panvimdoc-ignore-start -->
+
 ### compile({param})
 
 <!-- panvimdoc-ignore-end -->
