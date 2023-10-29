@@ -17,22 +17,34 @@ M.prev_dir = nil
 ---@type Config
 M.config = {}
 
-local error_pattern = "^\\([^:]\\+\\):\\(\\d\\+\\):\\(\\d\\+\\)"
-local error_re = vim.regex(error_pattern) --[[@as any]]
+---TODO: document
+---(REGEXP FILE [LINE COLUMN TYPE HYPERLINK HIGHLIGHT...])
+---@type table<string, { [1]: string, [2]: integer, [3]: integer|nil, [4]: integer|nil, [5]: nil|0|1|2 }>
+local error_regexp_table = {
+	-- TODO: use the actual alist from Emacs
+	-- TODO: should be the `gnu` key
+	default = { "^\\([^:]\\+\\):\\(\\d\\+\\):\\(\\d\\+\\)", 1, 2, 3, nil },
+}
 
 ---@param line string
 local function color_statement_prefix(line)
+	-- TODO: allow customizing these
 	local normal = "\x1b[0m"
 	local red_bold_underline = "\x1b[31;1;4m"
 	local green_underline = "\x1b[32;4m"
 	local normal_underline = "\x1b[0;4m"
 	local blue = "\x1b[34m"
 
-	if error_re:match_str(line) then
+	-- TODO: check the type of the command, and use the appropriate matcher
+	local matcher = error_regexp_table["default"]
+	local regex = matcher[1]
+
+	if vim.fn.match(line, regex) then
 		return vim.fn.substitute(
 			line,
-			error_pattern,
+			regex,
 			string.format(
+				-- TODO: use a HIGHLIGHT option here
 				"%s\\1%s:%s\\2%s:\\3%s",
 				red_bold_underline,
 				normal_underline,
@@ -43,6 +55,7 @@ local function color_statement_prefix(line)
 			""
 		) --[[@as string]]
 	else
+		-- TODO: place this somewhere else
 		return vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", blue .. "\\1" .. normal .. ":", "") --[[@as string]]
 	end
 end
@@ -138,14 +151,28 @@ end
 ---@return nil|integer r the row of the error
 ---@return nil|integer c the column of the error
 local function parse_error(line)
-	if not error_re:match_str(line) then
+	local matcher = error_regexp_table["default"]
+	local regex = matcher[1]
+	local result = vim.fn.matchlist(line, regex)
+	if not result or result[1] == "" then
 		return false, nil, nil, nil
 	end
 
-	local error_pattern_greedy = error_pattern .. ".*$"
-	local filename = vim.fn.substitute(line, error_pattern_greedy, "\\1", "")
-	local r = tonumber(vim.fn.substitute(line, error_pattern_greedy, "\\2", ""))
-	local c = tonumber(vim.fn.substitute(line, error_pattern_greedy, "\\3", ""))
+	local file_index = matcher[2] + 1
+	local filename = result[file_index]
+
+	if not matcher[3] then
+		return true, filename, 1, 1
+	end
+	local r_index = matcher[3] + 1
+	local r = tonumber(result[r_index])
+
+	if not matcher[4] then
+		return true, filename, r, 1
+	end
+	local c_index = matcher[4] + 1
+	local c = tonumber(result[c_index])
+
 	return true, filename, r, c
 end
 
@@ -170,6 +197,9 @@ local error_on_line = a.void(function()
 			prompt = "Find this error in: ",
 			completion = "file",
 		})
+		if not dir then
+			return
+		end
 		dir = dir:gsub("/$", "")
 
 		wait()
