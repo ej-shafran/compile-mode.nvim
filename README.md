@@ -134,9 +134,10 @@ If {param.args} is not passed in, the user is prompted for a command using `:h v
 
 - {param} (table) a table, identical to the tables passed into Neovim commands (optional)
   - {param.args}: the string of the command itself, or `nil` if the user should be prompted to enter a command
-  - {param.smods}: a table
+  - {param.smods}: a table - see the mods field of `:h nvim_parse_cmd()` for more
     - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
     - {param.smods.silent}: does not print any information
+    - {param.smods.split}: modifications for the placement of the split
 
 <!-- panvimdoc-ignore-start -->
 
@@ -156,9 +157,10 @@ The command is rerun from the directory in which it was originally run.
 #### Parameters
 
 - {param} (table) a table, identical to the tables passed into Neovim commands (optional)
-  - {param.smods}: a table
+  - {param.smods}: a table - see the mods field of `:h nvim_parse_cmd()` for more
     - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
     - {param.smods.silent}: does not print any information
+    - {param.smods.split}: modifications for the placement of the split
 
 ## Commands
 
@@ -171,7 +173,7 @@ The command is run from the current working directory.
 The compliation buffer is opened in a new split if it isn't already opened.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
 
-You can run the command using `:h :vert` to split the window vertically.
+You can run the command using `:h :vert` to split the window vertically. `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright` also modify the split.
 You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
 
 <!-- panvimdoc-ignore-end -->
@@ -181,7 +183,7 @@ You can run the command using `:h :silent` to get rid of the "Compilation finish
 The command is run from the current working directory.
 The compliation buffer is opened in a new split if it isn't already opened.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
-You can run the command using `:h :vert` to split the window vertically.
+You can run the command using `:h :vert` to split the window vertically. `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright` also modify the split.
 You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
 
 -->
@@ -194,7 +196,7 @@ Reruns the last compiled command. If there isn't one, the error is reported usin
 The compliation buffer is opened in a new split if it isn't already opened.
 The command is rerun from the directory in which it was originally run.
 
-You can run the command using `:h :vert` to split the window vertically.
+You can run the command using `:h :vert` to split the window vertically. `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright` also modify the split.
 You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
 
 <!-- panvimdoc-ignore-end -->
@@ -204,7 +206,7 @@ You can run the command using `:h :silent` to get rid of the "Compilation finish
 : Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
 The compliation buffer is opened in a new split if it isn't already opened.
 The command is rerun from the directory in which it was originally run.
-You can run the command using `:h :vert` to split the window vertically.
+You can run the command using `:h :vert` to split the window vertically. `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright` also modify the split.
 You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
 -->
 
