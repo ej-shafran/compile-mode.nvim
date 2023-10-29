@@ -15,6 +15,32 @@ M.error_regexp_table = {
 	},
 }
 
+---TODO: this probably needs to return a string
+---TODO: this should be more flexible
+---Given a `:h matchlist()` result and a capture-group matcher, return the relevant capture group.
+---
+---@param result string[]
+---@param group integer|IntByInt|nil
+---@return integer|nil
+local function parse_matcher_group(result, group)
+	if not group then
+		return nil
+	elseif type(group) == "number" then
+		return result[group + 1] ~= "" and tonumber(result[group + 1]) or nil
+	elseif type(group) == "table" then
+		local first = group[1] + 1
+		local second = group[2] + 1
+
+		if result[first] and result[first] ~= "" then
+			return tonumber(result[first])
+		elseif result[second] and result[second] ~= "" then
+			return tonumber(result[second])
+		else
+			return nil
+		end
+	end
+end
+
 ---Parses error syntax from a given line.
 ---@param line string the line to parse
 ---@return boolean ok whether there is an error here
@@ -23,63 +49,18 @@ M.error_regexp_table = {
 ---@return nil|integer c the column of the error
 function M.parse(line)
 	local matcher = M.error_regexp_table["gnu"]
+
 	local regex = matcher[1]
 	local result = vim.fn.matchlist(line, regex)
 	if not result or #result == 0 or result[1] == "" then
 		return false, nil, nil, nil
 	end
 
-	local file_index = matcher[2] + 1
-	local filename = result[file_index]
+	local filename = result[matcher[2] + 1]
+	local r = parse_matcher_group(result, matcher[3])
+	local c = parse_matcher_group(result, matcher[4])
 
-	local r
-	local r_indices = matcher[3]
-	if type(r_indices) == "number" then
-		if result[r_indices + 1] and result[r_indices + 1] ~= "" then
-			r = result[r_indices + 1]
-		else
-			return true, filename, 1, 1
-		end
-	elseif type(r_indices) == "table" then
-		local first = r_indices[1] + 1
-		local second = r_indices[2] + 1
-
-		if result[first] and result[first] ~= "" then
-			r = tonumber(result[first])
-		elseif result[second] and result[second] ~= "" then
-			r = tonumber(result[second])
-		else
-			return true, filename, 1, 1
-		end
-	else
-		return true, filename, 1, 1
-	end
-
-	local c
-	local c_indices = matcher[4]
-	if type(c_indices) == "number" then
-		if result[c_indices + 1] and result[c_indices + 1] ~= "" then
-			c = result[c_indices + 1]
-		else
-			return true, filename, r, 1
-		end
-	elseif type(c_indices) == "table" then
-		local first = c_indices[1] + 1
-		local second = c_indices[2] + 1
-
-		if result[first] and result[first] ~= "" then
-			c = tonumber(result[first])
-		elseif result[second] and result[second] ~= "" then
-			c = tonumber(result[second])
-		else
-			return true, filename, r, 1
-		end
-	else
-		return true, filename, r, 1
-	end
-
-	return true, filename, r, c
+	return true, filename, r or 1, c or 1
 end
-
 
 return M
