@@ -107,6 +107,17 @@ baleia_options                         Table of options to pass into `baleia.set
 
 
 
+The name for the compilation buffer. Defaults to: `"Compilation"`.
+
+
+                                                  *compile-mode-buffer_name*
+
+
+buffer_name                            The name for the compilation buffer.
+                                       Defaults to: `"Compilation"`.
+
+
+
 compile_mode.compile({param})                   *compile-mode.compile()*
 
 Run a command and place its output in the compilation buffer, reporting on its
