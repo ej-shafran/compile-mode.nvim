@@ -17,34 +17,9 @@ M.prev_dir = nil
 ---@type Config
 M.config = {}
 
-local error_pattern = "^\\([^:]\\+\\):\\(\\d\\+\\):\\(\\d\\+\\)"
-local error_re = vim.regex(error_pattern) --[[@as any]]
-
 ---@param line string
-local function color_statement_prefix(line)
-	local normal = "\x1b[0m"
-	local red_bold_underline = "\x1b[31;1;4m"
-	local green_underline = "\x1b[32;4m"
-	local normal_underline = "\x1b[0;4m"
-	local blue = "\x1b[34m"
-
-	if error_re:match_str(line) then
-		return vim.fn.substitute(
-			line,
-			error_pattern,
-			string.format(
-				"%s\\1%s:%s\\2%s:\\3%s",
-				red_bold_underline,
-				normal_underline,
-				green_underline,
-				normal_underline,
-				normal
-			),
-			""
-		) --[[@as string]]
-	else
-		return vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", blue .. "\\1" .. normal .. ":", "") --[[@as string]]
-	end
+local function convert_statement_colon(line)
+	return vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
 end
 
 ---@param bufnr integer
@@ -70,7 +45,7 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 		if data and (#data > 1 or data[1] ~= "") then
 			count = count + #data
 			if not M.config.no_baleia_support then
-				data = vim.tbl_map(color_statement_prefix, data)
+				data = vim.tbl_map(convert_statement_colon, data)
 			end
 
 			set_lines(bufnr, -2, -1, false, data)
@@ -131,69 +106,6 @@ local function default_dir()
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
 
----Parses error syntax from a given line.
----@param line string the line to parse
----@return boolean ok whether there is an error here
----@return nil|string filename the filename for the error
----@return nil|integer r the row of the error
----@return nil|integer c the column of the error
-local function parse_error(line)
-	if not error_re:match_str(line) then
-		return false, nil, nil, nil
-	end
-
-	local error_pattern_greedy = error_pattern .. ".*$"
-	local filename = vim.fn.substitute(line, error_pattern_greedy, "\\1", "")
-	local r = tonumber(vim.fn.substitute(line, error_pattern_greedy, "\\2", ""))
-	local c = tonumber(vim.fn.substitute(line, error_pattern_greedy, "\\3", ""))
-	return true, filename, r, c
-end
-
----Go to the error on the current line
----@type fun()
-local error_on_line = a.void(function()
-	local line = vim.api.nvim_get_current_line()
-	local ok, filename, r, c = parse_error(line)
-
-	if not ok then
-		vim.notify("No error here")
-		return
-	end
-
-	local file_exists = vim.fn.filereadable(filename) ~= 0
-
-	if file_exists then
-		vim.cmd.e(filename)
-		vim.api.nvim_win_set_cursor(0, { r, c })
-	else
-		local dir = input({
-			prompt = "Find this error in: ",
-			completion = "file",
-		})
-		dir = dir:gsub("/$", "")
-
-		wait()
-
-		if not vim.fn.isdirectory(dir) then
-			vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
-			return
-		end
-
-		local nested_filename = dir .. "/" .. filename
-		if vim.fn.filereadable(nested_filename) == 0 then
-			vim.notify(filename .. " does not exist in " .. dir, vim.log.levels.ERROR)
-			return
-		end
-
-		vim.cmd.e(nested_filename)
-		c = c - 1
-		if c < 0 then
-			c = 0
-		end
-		vim.api.nvim_win_set_cursor(0, { r, c })
-	end
-end)
-
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
 ---@type fun(command: string, smods: SMods)
@@ -202,8 +114,6 @@ local runcommand = a.void(function(command, smods)
 	buf_set_opt(bufnr, "modifiable", true)
 	buf_set_opt(bufnr, "filetype", "compile")
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
-	vim.keymap.set("n", "<CR>", error_on_line, { silent = true, buffer = bufnr })
-
 	vim.api.nvim_create_autocmd("ExitPre", {
 		group = vim.api.nvim_create_augroup("compile-mode", { clear = true }),
 		callback = function()
@@ -222,7 +132,7 @@ local runcommand = a.void(function(command, smods)
 		'-*- mode: compilation; default-directory: "' .. default_dir() .. '" -*-',
 		"Compilation started at " .. time(),
 		"",
-		color_statement_prefix(command),
+		command,
 	})
 
 	local count, code = runjob(command, bufnr)
