@@ -1,6 +1,8 @@
 #+title: compile-mode.nvim
 #+author: EJ Shafran
 
+* DONE Add goto error message outputs
+  CLOSED: [2023-10-29 Sun 01:30]
 * DONE Place previous command in vim.o or vim.g
   CLOSED: [2023-10-29 Sun 01:36]
 * DONE Support split modifier
@@ -17,7 +19,6 @@
   CLOSED: [2023-10-29 Sun 01:49]
 * DONE Refactoring - extract keymap handler for <CR>
   CLOSED: [2023-10-29 Sun 01:49]
-* TODO Add goto error message outputs
 * DONE Add highlights for lines starting with `Text:`
   CLOSED: [2023-10-17 Tue 03:13]
 * TODO Update README/docs
