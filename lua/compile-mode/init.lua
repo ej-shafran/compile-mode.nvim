@@ -75,9 +75,9 @@ local function split_unless_open(fname, smods)
 	local cmd = fname
 	if winnum == -1 then
 		if smods.vertical then
-			cmd = "split " .. cmd
-		else
 			cmd = "vsplit " .. cmd
+		else
+			cmd = "split " .. cmd
 		end
 
 		if smods.split and smods.split ~= "" then

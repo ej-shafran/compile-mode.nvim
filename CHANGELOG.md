@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `:vert` having the opposite effect on commands and API functions
+
 ## [1.0.4] - 2023-10-29
 
 ### Fixed
