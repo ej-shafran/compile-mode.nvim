@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - When the cursor is on a line that begins with an error-path syntax, pressing `<CR>` will go to that error's file, row and column
   - If the error's file is not found within the current path, the user is prompted to enter the directory to search within
 
+## [1.0.6] - 2023-11-01
+
+### Fixed
+
+- The behavior of the compilation buffer
+  - It now always shows up as `nomodified`
+  - It no longer tries to call `nvim_api_delete_buf` with an invalid buffer
+- Error with trying to call "Compilation" command
+
 ## [1.0.5] - 2023-10-31
 
 ### Fixed
@@ -62,6 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[1.0.6]: https://github.com/ej-shafran/compile-mode.nvim/compare/v1.0.5...v1.0.6
 [1.0.5]: https://github.com/ej-shafran/compile-mode.nvim/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/ej-shafran/compile-mode.nvim/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/ej-shafran/compile-mode.nvim/compare/v1.0.2...v1.0.3
