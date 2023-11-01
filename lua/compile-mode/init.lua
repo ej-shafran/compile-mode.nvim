@@ -72,8 +72,8 @@ local function split_unless_open(fname, smods)
 	local bufnum = vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
 	local winnum = vim.fn.bufwinnr(bufnum)
 
-	local cmd = fname
 	if winnum == -1 then
+		local cmd = fname
 		if smods.vertical then
 			cmd = "vsplit " .. cmd
 		else
@@ -83,9 +83,9 @@ local function split_unless_open(fname, smods)
 		if smods.split and smods.split ~= "" then
 			cmd = smods.split .. " " .. cmd
 		end
-	end
 
-	vim.cmd(cmd)
+		vim.cmd(cmd)
+	end
 
 	return vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
 end
