@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The behavior of the compilation buffer
+  - It now always shows up as `nomodified`
+  - It no longer tries to call `nvim_api_delete_buf` with an invalid buffer
+
 ## [1.0.5] - 2023-10-31
 
 ### Fixed

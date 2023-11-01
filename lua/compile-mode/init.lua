@@ -117,7 +117,9 @@ local runcommand = a.void(function(command, smods)
 	vim.api.nvim_create_autocmd("ExitPre", {
 		group = vim.api.nvim_create_augroup("compile-mode", { clear = true }),
 		callback = function()
-			vim.api.nvim_buf_delete(bufnr, { force = true })
+			if vim.api.nvim_buf_is_valid(bufnr) then
+				vim.api.nvim_buf_delete(bufnr, { force = true })
+			end
 		end,
 	})
 
@@ -164,6 +166,7 @@ local runcommand = a.void(function(command, smods)
 
 	vim.schedule(function()
 		buf_set_opt(bufnr, "modifiable", false)
+		buf_set_opt(bufnr, "modified", false)
 	end)
 end)
 
