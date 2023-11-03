@@ -37,10 +37,10 @@ local function parse_matcher_group(result, group)
 	if not group then
 		return nil
 	elseif type(group) == "number" then
-		return result[group] ~= nil and result[group] or nil
+		return result[group + 1] ~= nil and result[group + 1] or nil
 	elseif type(group) == "table" then
-		local first = group[1]
-		local second = group[2]
+		local first = group[1] + 1
+		local second = group[2] + 1
 
 		if result[first] and result[first] ~= "" then
 			return result[first]
@@ -63,18 +63,18 @@ local function matchlistpos(input, pattern)
 
 	local latest_index = vim.fn.match(input, pattern)
 	for i, capture in ipairs(list) do
-		if i ~= 1 then
-			if capture == "" then
-				result[i - 1] = nil
-			else
-				local start, end_ = string.find(input, capture, latest_index, true)
-				assert(start and end_)
+		if capture == "" then
+			result[i] = nil
+		else
+			local start, end_ = string.find(input, capture, latest_index, true)
+			assert(start and end_)
+			if i ~= 1 then
 				latest_index = end_ + 1
-				result[i - 1] = {
-					start = start,
-					end_ = end_,
-				}
 			end
+			result[i] = {
+				start = start,
+				end_ = end_,
+			}
 		end
 	end
 
@@ -93,7 +93,7 @@ function M.parse(line)
 		return nil
 	end
 
-	local filename_range = result[matcher[2]]
+	local filename_range = result[matcher[2] + 1]
 	if not filename_range then
 		return nil
 	end
