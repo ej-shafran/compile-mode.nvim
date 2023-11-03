@@ -40,7 +40,9 @@ local function color_statement_prefix(line)
 	-- local matcher = error_regexp_table["gnu"]
 	-- local regex = matcher[1]
 
-	local start, end_ = unpack(error.filename_range)
+	local start = error.filename_range.start
+	local end_ = error.filename_range.end_
+
 	line = line:sub(1, start - 1) .. red_bold_underline .. error.filename .. normal .. line:sub(end_ + 1, -1)
 
 	return line

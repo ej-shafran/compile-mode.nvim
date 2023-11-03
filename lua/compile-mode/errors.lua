@@ -1,5 +1,13 @@
+---@alias StringRange { start: integer, end_: integer }
 ---@alias Error
----| { filename: string, filename_range: IntByInt, row: integer?, row_range: IntByInt?, col: integer?, col_range: IntByInt? }
+---| { filename: string, filename_range: StringRange, row: integer?, row_range: StringRange?, col: integer?, col_range: StringRange? }
+
+-- local function print_range(input, range)
+-- 	if range ~= nil then
+-- 		print(input)
+-- 		print(string.rep(" ", range[1] - 1) .. string.rep("^", range[2] - range[1] + 1))
+-- 	end
+-- end
 
 local M = {}
 
@@ -22,9 +30,9 @@ M.error_regexp_table = {
 ---TODO: this should be more flexible
 ---Given a `:h matchlist()` result and a capture-group matcher, return the relevant capture group.
 ---
----@param result (IntByInt|nil)[]
+---@param result (StringRange|nil)[]
 ---@param group integer|IntByInt|nil
----@return IntByInt|nil
+---@return StringRange|nil
 local function parse_matcher_group(result, group)
 	if not group then
 		return nil
@@ -46,7 +54,7 @@ end
 
 ---@param input string
 ---@param pattern string
----@return ({ [1]: integer, [2]: integer }|nil)[]
+---@return (StringRange|nil)[]
 local function matchlistpos(input, pattern)
 	local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
 
@@ -62,7 +70,10 @@ local function matchlistpos(input, pattern)
 				local start, end_ = string.find(input, capture, latest_index, true)
 				assert(start and end_)
 				latest_index = end_ + 1
-				result[i - 1] = { start, end_ }
+				result[i - 1] = {
+					start = start,
+					end_ = end_,
+				}
 			end
 		end
 	end
@@ -92,11 +103,11 @@ function M.parse(line)
 
 	---@type Error
 	return {
-		filename = string.sub(line, filename_range[1], filename_range[2]),
+		filename = line:sub(filename_range.start, filename_range.end_),
 		filename_range = filename_range,
-		row = row_range and tonumber(string.sub(line, row_range[1], row_range[2])) or nil,
+		row = row_range and tonumber(line:sub(row_range.start, row_range.end_)) or nil,
 		row_range = row_range,
-		col = col_range and tonumber(string.sub(line, col_range[1], col_range[2])) or nil,
+		col = col_range and tonumber(line:sub(col_range.start, col_range.end_)) or nil,
 		col_range = col_range,
 	}
 end
