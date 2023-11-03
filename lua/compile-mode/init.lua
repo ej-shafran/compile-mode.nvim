@@ -112,21 +112,55 @@ local function default_dir()
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
 
+---@param filename string
+---@param error Error
+local function goto_file(filename, error)
+	local row = error.row and error.row.value or 1
+	local end_row = error.end_row and error.end_row.value
+
+	local col = (error.col and error.col.value or 1) - 1
+	if col < 0 then
+		col = 0
+	end
+	local end_col = error.end_col and error.end_col.value - 1
+	if end_col and end_col < 0 then
+		end_col = 0
+	end
+
+	vim.cmd.e(filename)
+	vim.api.nvim_win_set_cursor(0, { row, col })
+
+	if end_row or end_col then
+		local cmd = ""
+		if not error.col then
+			cmd = cmd .. "V"
+		else
+			cmd = cmd .. "v"
+		end
+
+		if end_row then
+			cmd = cmd .. tostring(end_row - row) .. "j"
+		end
+
+		if end_col then
+			cmd = cmd .. tostring(end_col - col) .. "l"
+		end
+
+		-- TODO: maybe use select mode by doing:
+		-- cmd = cmd .. "gh"
+
+		vim.cmd.normal(cmd)
+	end
+end
+
 ---@type fun(error: Error)
 local goto_error = a.void(
 	---@param error Error
 	function(error)
-		local row = error.row and error.row.value or 1
-		local col = (error.col and error.col.value or 1) - 1
-		if col < 0 then
-			col = 0
-		end
-
 		local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
 
 		if file_exists then
-			vim.cmd.e(error.filename.value)
-			vim.api.nvim_win_set_cursor(0, { row, col })
+			goto_file(error.filename.value, error)
 		else
 			local dir = input({
 				prompt = "Find this error in: ",
@@ -150,8 +184,7 @@ local goto_error = a.void(
 				return
 			end
 
-			vim.cmd.e(nested_filename)
-			vim.api.nvim_win_set_cursor(0, { row, col })
+			goto_file(nested_filename, error)
 		end
 	end
 )
