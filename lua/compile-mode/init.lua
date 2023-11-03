@@ -21,7 +21,7 @@ M.config = {}
 
 ---@param line string
 local function color_statement_prefix(line)
-	local ok, filename, r, c = errors.parse(line)
+	local error = errors.parse(line)
 
 	-- TODO: allow customizing these
 	local normal = "\x1b[0m"
@@ -30,7 +30,7 @@ local function color_statement_prefix(line)
 	-- local normal_underline = "\x1b[0;4m"
 	local blue = "\x1b[34m"
 
-	if not ok or not filename or not r or not c then
+	if not error then
 		-- TODO: place this somewhere else
 		-- Also, maybe do this more properly
 		return vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", blue .. "\\1" .. normal .. ":", "") --[[@as string]]
@@ -40,10 +40,8 @@ local function color_statement_prefix(line)
 	-- local matcher = error_regexp_table["gnu"]
 	-- local regex = matcher[1]
 
-	local start, end_ = string.find(line, filename)
-	if start ~= nil and end_ ~= nil then
-		line = line:sub(1, start - 1) .. red_bold_underline .. filename .. normal .. line:sub(end_ + 1, -1)
-	end
+	local start, end_ = unpack(error.filename_range)
+	line = line:sub(1, start - 1) .. red_bold_underline .. error.filename .. normal .. line:sub(end_ + 1, -1)
 
 	return line
 end
@@ -136,18 +134,23 @@ end
 ---@type fun()
 local error_on_line = a.void(function()
 	local line = vim.api.nvim_get_current_line()
-	local ok, filename, r, c = errors.parse(line)
+	local error = errors.parse(line)
 
-	if not ok then
+	if not error then
 		vim.notify("No error here")
 		return
 	end
 
-	local file_exists = vim.fn.filereadable(filename) ~= 0
+	local c = (error.col or 1) - 1
+	if c < 0 then
+		c = 0
+	end
+
+	local file_exists = vim.fn.filereadable(error.filename) ~= 0
 
 	if file_exists then
-		vim.cmd.e(filename)
-		vim.api.nvim_win_set_cursor(0, { r, c })
+		vim.cmd.e(error.filename)
+		vim.api.nvim_win_set_cursor(0, { error.row, c })
 	else
 		local dir = input({
 			prompt = "Find this error in: ",
@@ -165,18 +168,14 @@ local error_on_line = a.void(function()
 			return
 		end
 
-		local nested_filename = dir .. "/" .. filename
+		local nested_filename = dir .. "/" .. error.filename
 		if vim.fn.filereadable(nested_filename) == 0 then
-			vim.notify(filename .. " does not exist in " .. dir, vim.log.levels.ERROR)
+			vim.notify(error.filename .. " does not exist in " .. dir, vim.log.levels.ERROR)
 			return
 		end
 
 		vim.cmd.e(nested_filename)
-		c = c - 1
-		if c < 0 then
-			c = 0
-		end
-		vim.api.nvim_win_set_cursor(0, { r, c })
+		vim.api.nvim_win_set_cursor(0, { error.row, c })
 	end
 end)
 

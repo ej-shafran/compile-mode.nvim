@@ -1,3 +1,6 @@
+---@alias Error
+---| { filename: string, filename_range: IntByInt, row: integer?, row_range: IntByInt?, col: integer?, col_range: IntByInt? }
+
 local M = {}
 
 ---TODO: document
@@ -19,48 +22,83 @@ M.error_regexp_table = {
 ---TODO: this should be more flexible
 ---Given a `:h matchlist()` result and a capture-group matcher, return the relevant capture group.
 ---
----@param result string[]
+---@param result (IntByInt|nil)[]
 ---@param group integer|IntByInt|nil
----@return integer|nil
+---@return IntByInt|nil
 local function parse_matcher_group(result, group)
 	if not group then
 		return nil
 	elseif type(group) == "number" then
-		return result[group + 1] ~= "" and tonumber(result[group + 1]) or nil
+		return result[group] ~= nil and result[group] or nil
 	elseif type(group) == "table" then
-		local first = group[1] + 1
-		local second = group[2] + 1
+		local first = group[1]
+		local second = group[2]
 
 		if result[first] and result[first] ~= "" then
-			return tonumber(result[first])
+			return result[first]
 		elseif result[second] and result[second] ~= "" then
-			return tonumber(result[second])
+			return result[second]
 		else
 			return nil
 		end
 	end
 end
 
+---@param input string
+---@param pattern string
+---@return ({ [1]: integer, [2]: integer }|nil)[]
+local function matchlistpos(input, pattern)
+	local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
+
+	---@type (IntByInt|nil)[]
+	local result = {}
+
+	local latest_index = vim.fn.match(input, pattern)
+	for i, capture in ipairs(list) do
+		if i ~= 1 then
+			if capture == "" then
+				result[i - 1] = nil
+			else
+				local start, end_ = string.find(input, capture, latest_index, true)
+				assert(start and end_)
+				latest_index = end_ + 1
+				result[i - 1] = { start, end_ }
+			end
+		end
+	end
+
+	return result
+end
+
 ---Parses error syntax from a given line.
 ---@param line string the line to parse
----@return boolean ok whether there is an error here
----@return nil|string filename the filename for the error
----@return nil|integer r the row of the error
----@return nil|integer c the column of the error
+---@return Error|nil
 function M.parse(line)
 	local matcher = M.error_regexp_table["gnu"]
 
 	local regex = matcher[1]
-	local result = vim.fn.matchlist(line, regex)
-	if not result or #result == 0 or result[1] == "" then
-		return false, nil, nil, nil
+	local result = matchlistpos(line, regex)
+	if not result then
+		return nil
 	end
 
-	local filename = result[matcher[2] + 1]
-	local r = parse_matcher_group(result, matcher[3])
-	local c = parse_matcher_group(result, matcher[4])
+	local filename_range = result[matcher[2]]
+	if not filename_range then
+		return nil
+	end
 
-	return true, filename, r or 1, c or 1
+	local row_range = parse_matcher_group(result, matcher[3])
+	local col_range = parse_matcher_group(result, matcher[4])
+
+	---@type Error
+	return {
+		filename = string.sub(line, filename_range[1], filename_range[2]),
+		filename_range = filename_range,
+		row = row_range and tonumber(string.sub(line, row_range[1], row_range[2])) or nil,
+		row_range = row_range,
+		col = col_range and tonumber(string.sub(line, col_range[1], col_range[2])) or nil,
+		col_range = col_range,
+	}
 end
 
 return M
