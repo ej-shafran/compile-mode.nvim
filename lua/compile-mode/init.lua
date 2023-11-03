@@ -112,6 +112,50 @@ local function default_dir()
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
 
+---@type fun(error: Error)
+local goto_error = a.void(
+	---@param error Error
+	function(error)
+		local row = error.row and error.row.value or 1
+		local col = (error.col and error.col.value or 1) - 1
+		if col < 0 then
+			col = 0
+		end
+
+		local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
+
+		if file_exists then
+			vim.cmd.e(error.filename.value)
+			vim.api.nvim_win_set_cursor(0, { row, col })
+		else
+			local dir = input({
+				prompt = "Find this error in: ",
+				completion = "file",
+			})
+			if not dir then
+				return
+			end
+			dir = dir:gsub("/$", "")
+
+			wait()
+
+			if not vim.fn.isdirectory(dir) then
+				vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
+				return
+			end
+
+			local nested_filename = dir .. "/" .. error.filename.value
+			if vim.fn.filereadable(nested_filename) == 0 then
+				vim.notify(error.filename.value .. " does not exist in " .. dir, vim.log.levels.ERROR)
+				return
+			end
+
+			vim.cmd.e(nested_filename)
+			vim.api.nvim_win_set_cursor(0, { row, col })
+		end
+	end
+)
+
 ---Go to the error on the current line
 ---@type fun()
 local error_on_line = a.void(function()
@@ -123,43 +167,7 @@ local error_on_line = a.void(function()
 		return
 	end
 
-	local r = error.row and error.row.value or 1
-	local c = (error.col and error.col.value or 1) - 1
-	if c < 0 then
-		c = 0
-	end
-
-	local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
-
-	if file_exists then
-		vim.cmd.e(error.filename.value)
-		vim.api.nvim_win_set_cursor(0, { r, c })
-	else
-		local dir = input({
-			prompt = "Find this error in: ",
-			completion = "file",
-		})
-		if not dir then
-			return
-		end
-		dir = dir:gsub("/$", "")
-
-		wait()
-
-		if not vim.fn.isdirectory(dir) then
-			vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
-			return
-		end
-
-		local nested_filename = dir .. "/" .. error.filename.value
-		if vim.fn.filereadable(nested_filename) == 0 then
-			vim.notify(error.filename.value .. " does not exist in " .. dir, vim.log.levels.ERROR)
-			return
-		end
-
-		vim.cmd.e(nested_filename)
-		vim.api.nvim_win_set_cursor(0, { r, c })
-	end
+	goto_error(error)
 end)
 
 ---Run `command` and place the results in the "Compilation" buffer.
