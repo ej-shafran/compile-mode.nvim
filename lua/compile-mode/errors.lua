@@ -157,4 +157,52 @@ function M.parse(line)
 	return nil
 end
 
+local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
+
+---@param bufnr integer
+---@param hlname string
+---@param linenum integer
+---@param range StringRange
+local function add_highlight(bufnr, hlname, linenum, range)
+	vim.api.nvim_buf_add_highlight(bufnr, compile_mode_ns, hlname, linenum - 1, range.start - 1, range.end_)
+end
+
+function M.highlight(bufnr)
+	for linenum, error in pairs(M.error_list) do
+		local full_range = error.full
+		add_highlight(bufnr, "CompileModeError", linenum, full_range)
+
+		local hlgroup = "CompileMode"
+		if error.level == M.level.WARNING then
+			hlgroup = hlgroup .. "Warning"
+		elseif error.level == M.level.INFO then
+			hlgroup = hlgroup .. "Info"
+		else
+			hlgroup = hlgroup .. "Error"
+		end
+		hlgroup = hlgroup .. "Filename"
+
+		local filename_range = error.filename.range
+		add_highlight(bufnr, hlgroup, linenum, filename_range)
+
+		local row_range = error.row and error.row.range
+		if row_range then
+			add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
+		end
+		local end_row_range = error.end_row and error.end_row.range
+		if end_row_range then
+			add_highlight(bufnr, "CompileModeErrorRow", linenum, end_row_range)
+		end
+
+		local col_range = error.col and error.col.range
+		if col_range then
+			add_highlight(bufnr, "CompileModeErrorCol", linenum, col_range)
+		end
+		local end_col_range = error.end_col and error.end_col.range
+		if end_col_range then
+			add_highlight(bufnr, "CompileModeErrorCol", linenum, end_col_range)
+		end
+	end
+end
+
 return M
