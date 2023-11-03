@@ -1,6 +1,6 @@
 ---@alias StringRange { start: integer, end_: integer }
 ---@alias Error
----| { level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }? }
+---| { level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }? }
 
 local M = {}
 
@@ -33,6 +33,7 @@ M.error_regexp_table = {
 ---@param result (StringRange|nil)[]
 ---@param group integer|IntByInt|nil
 ---@return StringRange|nil
+---@return StringRange|nil
 local function parse_matcher_group(result, group)
 	if not group then
 		return nil
@@ -42,13 +43,7 @@ local function parse_matcher_group(result, group)
 		local first = group[1] + 1
 		local second = group[2] + 1
 
-		if result[first] and result[first] ~= "" then
-			return result[first]
-		elseif result[second] and result[second] ~= "" then
-			return result[second]
-		else
-			return nil
-		end
+		return result[first], result[second]
 	end
 end
 
@@ -102,8 +97,8 @@ local function parse_matcher(matcher, line)
 		return nil
 	end
 
-	local row_range = parse_matcher_group(result, matcher[3])
-	local col_range = parse_matcher_group(result, matcher[4])
+	local row_range, end_row_range = parse_matcher_group(result, matcher[3])
+	local col_range, end_col_range = parse_matcher_group(result, matcher[4])
 
 	local error_level
 	if not matcher[5] then
@@ -133,10 +128,18 @@ local function parse_matcher(matcher, line)
 			value = tonumber(line:sub(row_range.start, row_range.end_)),
 			range = row_range,
 		} or nil,
+		end_row = end_row_range and {
+			value = tonumber(line:sub(end_row_range.start, end_row_range.end_)),
+			range = end_row_range,
+		} or nil,
 		col = col_range and {
 			value = tonumber(line:sub(col_range.start, col_range.end_)),
 			range = col_range,
 		},
+		end_col = end_col_range and {
+			value = tonumber(line:sub(end_col_range.start, end_col_range.end_)),
+			range = end_col_range,
+		} or nil,
 	}
 end
 

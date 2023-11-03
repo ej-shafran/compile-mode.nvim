@@ -55,10 +55,18 @@ local function set_lines(bufnr, start, end_, flag, lines)
 		if row_range then
 			add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
 		end
+		local end_row_range = error.end_row and error.end_row.range
+		if end_row_range then
+			add_highlight(bufnr, "CompileModeErrorRow", linenum, end_row_range)
+		end
 
 		local col_range = error.col and error.col.range
 		if col_range then
 			add_highlight(bufnr, "CompileModeErrorCol", linenum, col_range)
+		end
+		local end_col_range = error.end_col and error.end_col.range
+		if end_col_range then
+			add_highlight(bufnr, "CompileModeErrorCol", linenum, end_col_range)
 		end
 	end
 end
