@@ -81,12 +81,7 @@ local function matchlistpos(input, pattern)
 	return result
 end
 
----Parses error syntax from a given line.
----@param line string the line to parse
----@return Error|nil
-function M.parse(line)
-	local matcher = M.error_regexp_table["gnu"]
-
+local function parse_matcher(matcher, line)
 	local regex = matcher[1]
 	local result = matchlistpos(line, regex)
 	if not result then
@@ -116,6 +111,20 @@ function M.parse(line)
 			range = col_range,
 		},
 	}
+end
+
+---Parses error syntax from a given line.
+---@param line string the line to parse
+---@return Error|nil
+function M.parse(line)
+	for _, matcher in pairs(M.error_regexp_table) do
+		local result = parse_matcher(matcher, line)
+		if result then
+			return result
+		end
+	end
+
+	return nil
 end
 
 return M
