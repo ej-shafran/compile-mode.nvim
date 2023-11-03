@@ -11,39 +11,20 @@ local buf_set_opt = vim.api.nvim_buf_set_option
 
 local M = {}
 
+local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
+
+---@param bufnr integer
+---@param hlname string
+---@param linenum integer
+---@param range StringRange
+local function add_highlight(bufnr, hlname, linenum, range)
+	vim.api.nvim_buf_add_highlight(bufnr, compile_mode_ns, hlname, linenum - 1, range.start - 1, range.end_)
+end
+
 ---@type string|nil
 M.prev_dir = nil
 ---@type Config
 M.config = {}
-
----@param line string
-local function color_statement_prefix(line)
-	local error = errors.parse(line)
-
-	-- TODO: allow customizing these
-	local normal = "\x1b[0m"
-	local red_bold_underline = "\x1b[31;1;4m"
-	-- local green_underline = "\x1b[32;4m"
-	-- local normal_underline = "\x1b[0;4m"
-	local blue = "\x1b[34m"
-
-	if not error then
-		-- TODO: place this somewhere else
-		-- Also, maybe do this more properly
-		return vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", blue .. "\\1" .. normal .. ":", "") --[[@as string]]
-	end
-
-	-- TODO: check the type of the command, and use the appropriate matcher
-	-- local matcher = error_regexp_table["gnu"]
-	-- local regex = matcher[1]
-
-	local start = error.filename.range.start
-	local end_ = error.filename.range.end_
-
-	line = line:sub(1, start - 1) .. red_bold_underline .. error.filename.value .. normal .. line:sub(end_ + 1, -1)
-
-	return line
-end
 
 ---@param bufnr integer
 ---@param start integer
@@ -52,6 +33,19 @@ end
 ---@param lines string[]
 local function set_lines(bufnr, start, end_, flag, lines)
 	vim.api.nvim_buf_set_lines(bufnr, start, end_, flag, lines)
+
+	for linenum, error in pairs(errors.error_list) do
+		local full_range = error.full
+		add_highlight(bufnr, "CompileModeError", linenum, full_range)
+
+		local filename_range = error.filename.range
+		add_highlight(bufnr, "CompileModeErrorFilename", linenum, filename_range)
+
+		local row_range = error.row and error.row.range
+		if row_range then
+			add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
+		end
+	end
 end
 
 ---@type fun(opts: table): string
@@ -67,8 +61,18 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 	local function on_either(_, data)
 		if data and (#data > 1 or data[1] ~= "") then
 			count = count + #data
-			if not M.config.no_baleia_support then
-				data = vim.tbl_map(color_statement_prefix, data)
+
+			local linecount = vim.api.nvim_buf_line_count(bufnr)
+			for i, line in ipairs(data) do
+				local error = errors.parse(line)
+				if error then
+					errors.error_list[linecount + i - 1] = error
+				elseif not M.config.no_baleia_support then
+					local normal = "\x1b[0m"
+					local blue = "\x1b[34m"
+
+					data[i] = vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", blue .. "\\1" .. normal .. ":", "") --[[@as string]]
+				end
 			end
 
 			set_lines(bufnr, -2, -1, false, data)
@@ -132,8 +136,8 @@ end
 ---Go to the error on the current line
 ---@type fun()
 local error_on_line = a.void(function()
-	local line = vim.api.nvim_get_current_line()
-	local error = errors.parse(line)
+	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
+	local error = errors.error_list[linenum]
 
 	if not error then
 		vim.notify("No error here")
@@ -209,7 +213,8 @@ local runcommand = a.void(function(command, smods)
 		'-*- mode: compilation; default-directory: "' .. default_dir() .. '" -*-',
 		"Compilation started at " .. time(),
 		"",
-		color_statement_prefix(command),
+		-- TODO: parse error for command itself
+		command,
 	})
 
 	local count, code = runjob(command, bufnr)
@@ -283,6 +288,9 @@ end)
 ---@param config Config
 function M.setup(config)
 	M.config = config
+	vim.cmd("highlight default CompileModeError gui=underline")
+	vim.cmd("highlight default CompileModeErrorFilename guifg=red gui=bold,underline")
+	vim.cmd("highlight default CompileModeErrorRow guifg=green gui=underline")
 end
 
 return M

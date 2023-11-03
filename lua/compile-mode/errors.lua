@@ -1,6 +1,6 @@
 ---@alias StringRange { start: integer, end_: integer }
 ---@alias Error
----| { filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }? }
+---| { full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }? }
 
 -- local function print_range(input, range)
 -- 	if range ~= nil then
@@ -10,6 +10,9 @@
 -- end
 
 local M = {}
+
+---@type table<integer, Error>
+M.error_list = {}
 
 ---TODO: document
 ---(REGEXP FILE [LINE COLUMN TYPE HYPERLINK HIGHLIGHT...])
@@ -97,6 +100,7 @@ local function parse_matcher(matcher, line)
 
 	---@type Error
 	return {
+		full = result[1],
 		filename = {
 			value = line:sub(filename_range.start, filename_range.end_),
 			range = filename_range,
