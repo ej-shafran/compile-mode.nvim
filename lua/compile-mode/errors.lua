@@ -1,8 +1,18 @@
 ---@alias StringRange { start: integer, end_: integer }
----@alias Error
----| { level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }? }
+---@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }? }
+
+local utils = require("compile-mode.utils")
 
 local M = {}
+
+---@enum level
+local level = {
+	ERROR = 2,
+	WARNING = 1,
+	INFO = 0,
+}
+
+M.level = level
 
 ---@type table<integer, Error>
 M.error_list = {}
@@ -27,8 +37,7 @@ M.error_regexp_table = {
 	},
 }
 
----TODO: this should be more flexible
----Given a `matchlistpos` result and a capture-group matcher, return the relevant capture group.
+---Given a `matchlistpos` result and a capture-group matcher, return the location of the relevant capture group(s).
 ---
 ---@param result (StringRange|nil)[]
 ---@param group integer|IntByInt|nil
@@ -47,47 +56,32 @@ local function parse_matcher_group(result, group)
 	end
 end
 
----@param input string
----@param pattern string
----@return (StringRange|nil)[]
-local function matchlistpos(input, pattern)
-	local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
 
-	---@type (IntByInt|nil)[]
-	local result = {}
-
-	local latest_index = vim.fn.match(input, pattern)
-	for i, capture in ipairs(list) do
-		if capture == "" then
-			result[i] = nil
-		else
-			local start, end_ = string.find(input, capture, latest_index, true)
-			assert(start and end_)
-			if i ~= 1 then
-				latest_index = end_ + 1
-			end
-			result[i] = {
-				start = start,
-				end_ = end_,
-			}
-		end
-	end
-
-	return result
+local function range_and_value(line, range)
+	return {
+		value = line:sub(range.start, range.end_),
+		range = range,
+	}
 end
 
----@enum level
-local level = {
-	ERROR = 2,
-	WARNING = 1,
-	INFO = 0,
-}
+local function numeric_range_and_value(line, range)
+	if not range then
+		return nil
+	end
 
-M.level = level
+	local raw = range_and_value(line, range)
+
+	raw.value = tonumber(raw.value)
+	if not raw.value then
+		return nil
+	end
+
+	return raw
+end
 
 local function parse_matcher(matcher, line)
 	local regex = matcher[1]
-	local result = matchlistpos(line, regex)
+	local result = utils.matchlistpos(line, regex)
 	if not result then
 		return nil
 	end
@@ -116,30 +110,15 @@ local function parse_matcher(matcher, line)
 		end
 	end
 
-	---@type Error
 	return {
+		highlighted = false,
 		level = error_level,
 		full = result[1],
-		filename = {
-			value = line:sub(filename_range.start, filename_range.end_),
-			range = filename_range,
-		},
-		row = row_range and {
-			value = tonumber(line:sub(row_range.start, row_range.end_)),
-			range = row_range,
-		} or nil,
-		end_row = end_row_range and {
-			value = tonumber(line:sub(end_row_range.start, end_row_range.end_)),
-			range = end_row_range,
-		} or nil,
-		col = col_range and {
-			value = tonumber(line:sub(col_range.start, col_range.end_)),
-			range = col_range,
-		},
-		end_col = end_col_range and {
-			value = tonumber(line:sub(end_col_range.start, end_col_range.end_)),
-			range = end_col_range,
-		} or nil,
+		filename = range_and_value(line, filename_range),
+		row = numeric_range_and_value(line, row_range),
+		col = numeric_range_and_value(line, col_range),
+		end_row = numeric_range_and_value(line, end_row_range),
+		end_col = numeric_range_and_value(line, end_col_range),
 	}
 end
 
@@ -157,50 +136,44 @@ function M.parse(line)
 	return nil
 end
 
-local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
-
----@param bufnr integer
----@param hlname string
----@param linenum integer
----@param range StringRange
-local function add_highlight(bufnr, hlname, linenum, range)
-	vim.api.nvim_buf_add_highlight(bufnr, compile_mode_ns, hlname, linenum - 1, range.start - 1, range.end_)
-end
-
 function M.highlight(bufnr)
 	for linenum, error in pairs(M.error_list) do
-		local full_range = error.full
-		add_highlight(bufnr, "CompileModeError", linenum, full_range)
+		if not error.highlighted then
+			error.highlighted = true
 
-		local hlgroup = "CompileMode"
-		if error.level == M.level.WARNING then
-			hlgroup = hlgroup .. "Warning"
-		elseif error.level == M.level.INFO then
-			hlgroup = hlgroup .. "Info"
-		else
-			hlgroup = hlgroup .. "Error"
-		end
-		hlgroup = hlgroup .. "Filename"
+			local full_range = error.full
+			utils.add_highlight(bufnr, "CompileModeError", linenum, full_range)
 
-		local filename_range = error.filename.range
-		add_highlight(bufnr, hlgroup, linenum, filename_range)
+			local hlgroup = "CompileMode"
+			if error.level == M.level.WARNING then
+				hlgroup = hlgroup .. "Warning"
+			elseif error.level == M.level.INFO then
+				hlgroup = hlgroup .. "Info"
+			else
+				hlgroup = hlgroup .. "Error"
+			end
+			hlgroup = hlgroup .. "Filename"
 
-		local row_range = error.row and error.row.range
-		if row_range then
-			add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
-		end
-		local end_row_range = error.end_row and error.end_row.range
-		if end_row_range then
-			add_highlight(bufnr, "CompileModeErrorRow", linenum, end_row_range)
-		end
+			local filename_range = error.filename.range
+			utils.add_highlight(bufnr, hlgroup, linenum, filename_range)
 
-		local col_range = error.col and error.col.range
-		if col_range then
-			add_highlight(bufnr, "CompileModeErrorCol", linenum, col_range)
-		end
-		local end_col_range = error.end_col and error.end_col.range
-		if end_col_range then
-			add_highlight(bufnr, "CompileModeErrorCol", linenum, end_col_range)
+			local row_range = error.row and error.row.range
+			if row_range then
+				utils.add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
+			end
+			local end_row_range = error.end_row and error.end_row.range
+			if end_row_range then
+				utils.add_highlight(bufnr, "CompileModeErrorRow", linenum, end_row_range)
+			end
+
+			local col_range = error.col and error.col.range
+			if col_range then
+				utils.add_highlight(bufnr, "CompileModeErrorCol", linenum, col_range)
+			end
+			local end_col_range = error.end_col and error.end_col.range
+			if end_col_range then
+				utils.add_highlight(bufnr, "CompileModeErrorCol", linenum, end_col_range)
+			end
 		end
 	end
 end
