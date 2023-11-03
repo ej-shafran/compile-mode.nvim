@@ -1,6 +1,6 @@
 ---@alias StringRange { start: integer, end_: integer }
 ---@alias Error
----| { filename: string, filename_range: StringRange, row: integer?, row_range: StringRange?, col: integer?, col_range: StringRange? }
+---| { filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }? }
 
 -- local function print_range(input, range)
 -- 	if range ~= nil then
@@ -103,12 +103,18 @@ function M.parse(line)
 
 	---@type Error
 	return {
-		filename = line:sub(filename_range.start, filename_range.end_),
-		filename_range = filename_range,
-		row = row_range and tonumber(line:sub(row_range.start, row_range.end_)) or nil,
-		row_range = row_range,
-		col = col_range and tonumber(line:sub(col_range.start, col_range.end_)) or nil,
-		col_range = col_range,
+		filename = {
+			value = line:sub(filename_range.start, filename_range.end_),
+			range = filename_range,
+		},
+		row = row_range and {
+			value = tonumber(line:sub(row_range.start, row_range.end_)),
+			range = row_range,
+		} or nil,
+		col = col_range and {
+			value = tonumber(line:sub(col_range.start, col_range.end_)),
+			range = col_range,
+		},
 	}
 end
 

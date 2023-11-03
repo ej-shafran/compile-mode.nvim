@@ -40,10 +40,10 @@ local function color_statement_prefix(line)
 	-- local matcher = error_regexp_table["gnu"]
 	-- local regex = matcher[1]
 
-	local start = error.filename_range.start
-	local end_ = error.filename_range.end_
+	local start = error.filename.range.start
+	local end_ = error.filename.range.end_
 
-	line = line:sub(1, start - 1) .. red_bold_underline .. error.filename .. normal .. line:sub(end_ + 1, -1)
+	line = line:sub(1, start - 1) .. red_bold_underline .. error.filename.value .. normal .. line:sub(end_ + 1, -1)
 
 	return line
 end
@@ -143,16 +143,17 @@ local error_on_line = a.void(function()
 		return
 	end
 
-	local c = (error.col or 1) - 1
+	local r = error.row and error.row.value or 1
+	local c = (error.col and error.col.value or 1) - 1
 	if c < 0 then
 		c = 0
 	end
 
-	local file_exists = vim.fn.filereadable(error.filename) ~= 0
+	local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
 
 	if file_exists then
-		vim.cmd.e(error.filename)
-		vim.api.nvim_win_set_cursor(0, { error.row, c })
+		vim.cmd.e(error.filename.value)
+		vim.api.nvim_win_set_cursor(0, { r, c })
 	else
 		local dir = input({
 			prompt = "Find this error in: ",
@@ -170,14 +171,14 @@ local error_on_line = a.void(function()
 			return
 		end
 
-		local nested_filename = dir .. "/" .. error.filename
+		local nested_filename = dir .. "/" .. error.filename.value
 		if vim.fn.filereadable(nested_filename) == 0 then
-			vim.notify(error.filename .. " does not exist in " .. dir, vim.log.levels.ERROR)
+			vim.notify(error.filename.value .. " does not exist in " .. dir, vim.log.levels.ERROR)
 			return
 		end
 
 		vim.cmd.e(nested_filename)
-		vim.api.nvim_win_set_cursor(0, { error.row, c })
+		vim.api.nvim_win_set_cursor(0, { r, c })
 	end
 end)
 
