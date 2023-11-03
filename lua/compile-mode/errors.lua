@@ -26,9 +26,8 @@ M.error_regexp_table = {
 	},
 }
 
----TODO: this probably needs to return a string
 ---TODO: this should be more flexible
----Given a `:h matchlist()` result and a capture-group matcher, return the relevant capture group.
+---Given a `matchlistpos` result and a capture-group matcher, return the relevant capture group.
 ---
 ---@param result (StringRange|nil)[]
 ---@param group integer|IntByInt|nil
