@@ -12,9 +12,6 @@ local buf_set_opt = vim.api.nvim_buf_set_option
 local M = {}
 
 ---@type string|nil
-vim.g.compile_command = nil
-
----@type string|nil
 M.prev_dir = nil
 ---@type Config
 M.config = {}
