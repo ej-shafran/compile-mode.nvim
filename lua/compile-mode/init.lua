@@ -45,6 +45,11 @@ local function set_lines(bufnr, start, end_, flag, lines)
 		if row_range then
 			add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
 		end
+
+		local col_range = error.col and error.col.range
+		if col_range then
+			add_highlight(bufnr, "CompileModeErrorCol", linenum, col_range)
+		end
 	end
 end
 
@@ -291,6 +296,7 @@ function M.setup(config)
 	vim.cmd("highlight default CompileModeError gui=underline")
 	vim.cmd("highlight default CompileModeErrorFilename guifg=red gui=bold,underline")
 	vim.cmd("highlight default CompileModeErrorRow guifg=green gui=underline")
+	vim.cmd("highlight default CompileModeErrorCol guifg=gray gui=underline")
 end
 
 return M
