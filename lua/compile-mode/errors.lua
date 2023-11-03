@@ -27,6 +27,12 @@ M.error_regexp_table = {
 		-- TODO: implement this
 		nil,
 	},
+	oracle = {
+		"^\\%(Semantic error\\|Error\\|PCC-[0-9]\\+:\\).* line \\([0-9]\\+\\)\\%(\\%(,\\| at\\)\\? column \\([0-9]\\+\\)\\)\\?\\%(,\\| in\\| of\\)\\? file \\(.\\{-}\\):\\?$",
+		3,
+		1,
+		2
+	}
 }
 
 ---TODO: this should be more flexible
