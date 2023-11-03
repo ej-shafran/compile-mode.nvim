@@ -38,8 +38,18 @@ local function set_lines(bufnr, start, end_, flag, lines)
 		local full_range = error.full
 		add_highlight(bufnr, "CompileModeError", linenum, full_range)
 
+		local hlgroup = "CompileMode"
+		if error.level == errors.level.WARNING then
+			hlgroup = hlgroup .. "Warning"
+		elseif error.level == errors.level.INFO then
+			hlgroup = hlgroup .. "Info"
+		else
+			hlgroup = hlgroup .. "Error"
+		end
+		hlgroup = hlgroup .. "Filename"
+
 		local filename_range = error.filename.range
-		add_highlight(bufnr, "CompileModeErrorFilename", linenum, filename_range)
+		add_highlight(bufnr, hlgroup, linenum, filename_range)
 
 		local row_range = error.row and error.row.range
 		if row_range then
@@ -293,10 +303,14 @@ end)
 ---@param config Config
 function M.setup(config)
 	M.config = config
+
 	vim.cmd("highlight default CompileModeError gui=underline")
-	vim.cmd("highlight default CompileModeErrorFilename guifg=red gui=bold,underline")
 	vim.cmd("highlight default CompileModeErrorRow guifg=green gui=underline")
 	vim.cmd("highlight default CompileModeErrorCol guifg=gray gui=underline")
+
+	vim.cmd("highlight default CompileModeErrorFilename guifg=red gui=bold,underline")
+	vim.cmd("highlight default CompileModeWarningFilename guifg=yellow gui=underline")
+	vim.cmd("highlight default CompileModeInfoFilename guifg=cyan gui=underline")
 end
 
 return M

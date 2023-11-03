@@ -1,13 +1,6 @@
 ---@alias StringRange { start: integer, end_: integer }
 ---@alias Error
----| { full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }? }
-
--- local function print_range(input, range)
--- 	if range ~= nil then
--- 		print(input)
--- 		print(string.rep(" ", range[1] - 1) .. string.rep("^", range[2] - range[1] + 1))
--- 	end
--- end
+---| { level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }? }
 
 local M = {}
 
@@ -16,23 +9,22 @@ M.error_list = {}
 
 ---TODO: document
 ---(REGEXP FILE [LINE COLUMN TYPE HYPERLINK HIGHLIGHT...])
----@type table<string, { [1]: string, [2]: integer, [3]: integer|IntByInt|nil, [4]: integer|IntByInt|nil, [5]: nil|0|1|2 }>
+---@type table<string, { [1]: string, [2]: integer, [3]: integer|IntByInt|nil, [4]: integer|IntByInt|nil, [5]: nil|0|1|2|IntByInt }>
 M.error_regexp_table = {
 	-- TODO: use the actual alist from Emacs
 	gnu = {
 		"^\\%([[:alpha:]][-[:alnum:].]\\+: \\?\\|[ 	]\\%(in \\| from\\)\\)\\?\\(\\%([0-9]*[^0-9\\n]\\)\\%([^\\n :]\\| [^-/\\n]\\|:[^ \\n]\\)\\{-}\\)\\%(: \\?\\)\\([0-9]\\+\\)\\%(-\\([0-9]\\+\\)\\%(\\.\\([0-9]\\+\\)\\)\\?\\|[.:]\\([0-9]\\+\\)\\%(-\\%(\\([0-9]\\+\\)\\.\\)\\([0-9]\\+\\)\\)\\?\\)\\?:\\%( *\\(\\%(FutureWarning\\|RuntimeWarning\\|W\\%(arning\\)\\|warning\\)\\)\\| *\\([Ii]nfo\\%(\\>\\|formationa\\?l\\?\\)\\|I:\\|\\[ skipping .\\+ ]\\|instantiated from\\|required from\\|[Nn]ote\\)\\| *\\%([Ee]rror\\)\\|\\%([0-9]\\?\\)\\%([^0-9\\n]\\|$\\)\\|[0-9][0-9][0-9]\\)",
 		1,
-		{ 2, 4 },
-		{ 3, 5 },
-		-- TODO: implement this
-		nil,
+		{ 2, 3 },
+		{ 5, 4 },
+		{ 8, 9 },
 	},
 	oracle = {
 		"^\\%(Semantic error\\|Error\\|PCC-[0-9]\\+:\\).* line \\([0-9]\\+\\)\\%(\\%(,\\| at\\)\\? column \\([0-9]\\+\\)\\)\\?\\%(,\\| in\\| of\\)\\? file \\(.\\{-}\\):\\?$",
 		3,
 		1,
-		2
-	}
+		2,
+	},
 }
 
 ---TODO: this should be more flexible
@@ -45,7 +37,7 @@ local function parse_matcher_group(result, group)
 	if not group then
 		return nil
 	elseif type(group) == "number" then
-		return result[group + 1] ~= nil and result[group + 1] or nil
+		return result[group + 1]
 	elseif type(group) == "table" then
 		local first = group[1] + 1
 		local second = group[2] + 1
@@ -89,6 +81,15 @@ local function matchlistpos(input, pattern)
 	return result
 end
 
+---@enum level
+local level = {
+	ERROR = 2,
+	WARNING = 1,
+	INFO = 0,
+}
+
+M.level = level
+
 local function parse_matcher(matcher, line)
 	local regex = matcher[1]
 	local result = matchlistpos(line, regex)
@@ -104,8 +105,25 @@ local function parse_matcher(matcher, line)
 	local row_range = parse_matcher_group(result, matcher[3])
 	local col_range = parse_matcher_group(result, matcher[4])
 
+	local error_level
+	if not matcher[5] then
+		error_level = level.ERROR
+	elseif type(matcher[5]) == "number" then
+		level = matcher[5]
+	elseif type(matcher[5]) == "table" then
+		print(vim.inspect(matcher[5]))
+		if result[matcher[5][1] + 1] then
+			error_level = level.WARNING
+		elseif result[matcher[5][2] + 1] then
+			error_level = level.INFO
+		else
+			error_level = level.ERROR
+		end
+	end
+
 	---@type Error
 	return {
+		level = error_level,
 		full = result[1],
 		filename = {
 			value = line:sub(filename_range.start, filename_range.end_),
