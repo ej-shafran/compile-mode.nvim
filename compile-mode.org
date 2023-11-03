@@ -18,7 +18,8 @@
   CLOSED: [2023-11-03 Fri 21:08]
 * TODO Goto error - next error and previous error
 * TODO Goto error - customize patterns
-* TODO Goto error - use less ugly colors
+* DONE Goto error - use less ugly colors
+  CLOSED: [2023-11-03 Fri 23:16]
 * DONE Refactoring - use plenary async for vim.schedule
   CLOSED: [2023-10-29 Sun 01:49]
 * DONE Refactoring - extract keymap handler for <CR>

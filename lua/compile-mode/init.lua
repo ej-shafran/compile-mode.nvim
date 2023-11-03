@@ -313,7 +313,7 @@ function M.setup(config)
 	vim.cmd("highlight default CompileModeErrorRow guifg=green gui=underline")
 	vim.cmd("highlight default CompileModeErrorCol guifg=gray gui=underline")
 
-	vim.cmd("highlight default CompileModeErrorFilename guifg=red gui=bold,underline")
+	vim.cmd("highlight default CompileModeErrorFilename guifg=darkred gui=bold,underline")
 	vim.cmd("highlight default CompileModeWarningFilename guifg=yellow gui=underline")
 	vim.cmd("highlight default CompileModeInfoFilename guifg=cyan gui=underline")
 end
