@@ -18,6 +18,7 @@
   CLOSED: [2023-11-03 Fri 21:08]
 * TODO Goto error - next error and previous error
 * TODO Goto error - customize patterns
+* TODO Goto error - use less ugly colors
 * DONE Refactoring - use plenary async for vim.schedule
   CLOSED: [2023-10-29 Sun 01:49]
 * DONE Refactoring - extract keymap handler for <CR>
@@ -25,5 +26,8 @@
 * DONE Add highlights for lines starting with `Text:`
   CLOSED: [2023-10-17 Tue 03:13]
 * TODO Update README/docs
+** TODO Add `Compilation Buffer` section
+** TODO Add `Goto Error` section
+* TODO Organize code
 * TODO ? Add tests, at some point
 * TODO Add compilation-hidden-output
