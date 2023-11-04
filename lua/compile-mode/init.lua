@@ -10,6 +10,7 @@ local colors = require("compile-mode.colors")
 
 local M = {}
 
+local current_error = 0
 ---@type string|nil
 local prev_dir = nil
 ---@type Config
@@ -221,6 +222,42 @@ M.recompile = a.void(function(param)
 	else
 		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
 	end
+end)
+
+---Jump to the next error in the error list.
+M.next_error = a.void(function()
+	local lowest_above = nil
+	for line, _ in pairs(errors.error_list) do
+		if line > current_error and (not lowest_above or lowest_above > line) then
+			lowest_above = line
+		end
+	end
+
+	if not lowest_above then
+		vim.notify("Moved past last error")
+		return
+	end
+
+	current_error = lowest_above
+	utils.jump_to_error(errors.error_list[lowest_above])
+end)
+
+---Jump to the previous error in the error list.
+M.prev_error = a.void(function()
+	local highest_below = nil
+	for line, _ in pairs(errors.error_list) do
+		if line < current_error and (not highest_below or highest_below > line) then
+			highest_below = line
+		end
+	end
+
+	if not highest_below then
+		vim.notify("Moved past first error")
+		return
+	end
+
+	current_error = highest_below
+	utils.jump_to_error(errors.error_list[highest_below])
 end)
 
 return M
