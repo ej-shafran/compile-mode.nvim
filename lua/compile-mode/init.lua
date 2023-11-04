@@ -11,20 +11,20 @@ local colors = require("compile-mode.colors")
 local M = {}
 
 ---@type string|nil
-M.prev_dir = nil
+local prev_dir = nil
 ---@type Config
-M.config = {
+local config = {
 	error_highlights = colors.default_highlights,
 }
 
 ---Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
 ---
----@param config Config
-function M.setup(config)
-	M.config = vim.tbl_deep_extend("force", M.config, config)
+---@param opts Config
+function M.setup(opts)
+	config = vim.tbl_deep_extend("force", config, opts)
 
-	if M.config.error_highlights then
-		colors.setup_highlights(M.config.error_highlights)
+	if config.error_highlights then
+		colors.setup_highlights(config.error_highlights)
 	end
 end
 
@@ -45,7 +45,7 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 
 			if error then
 				errors.error_list[linecount + i - 1] = error
-			elseif not M.config.no_baleia_support then
+			elseif not config.no_baleia_support then
 				data[i] = vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
 			end
 		end
@@ -56,7 +56,7 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 	end)
 
 	local id = vim.fn.jobstart(cmd, {
-		cwd = M.prev_dir,
+		cwd = prev_dir,
 		on_stdout = on_either,
 		on_stderr = on_either,
 		on_exit = function(_, code)
@@ -80,8 +80,8 @@ end, 3)
 ---Get the current time, formatted.
 local function time()
 	local format = "%a %b %e %H:%M:%S"
-	if M.config.time_format then
-		format = M.config.time_format
+	if config.time_format then
+		format = config.time_format
 	end
 
 	return vim.fn.strftime(format)
@@ -110,7 +110,7 @@ end
 ---
 ---@type fun(command: string, smods: SMods)
 local runcommand = a.void(function(command, smods)
-	local bufnr = utils.split_unless_open(M.config.buffer_name or "Compilation", smods)
+	local bufnr = utils.split_unless_open(config.buffer_name or "Compilation", smods)
 
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
@@ -127,8 +127,8 @@ local runcommand = a.void(function(command, smods)
 		end,
 	})
 
-	if not M.config.no_baleia_support then
-		local baleia = require("baleia").setup(M.config.baleia_opts or {})
+	if not config.no_baleia_support then
+		local baleia = require("baleia").setup(config.baleia_opts or {})
 		baleia.automatically(bufnr)
 		vim.api.nvim_create_user_command("BaleiaLogs", function()
 			baleia.logger.show()
@@ -143,7 +143,7 @@ local runcommand = a.void(function(command, smods)
 	local error = errors.parse(command)
 	if error then
 		errors.error_list[4] = error
-	elseif not M.config.no_baleia_support then
+	elseif not config.no_baleia_support then
 		rendered_command = vim.fn.substitute(command, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
 	end
 
@@ -174,7 +174,7 @@ local runcommand = a.void(function(command, smods)
 			.. "\x1b[0m"
 	end
 
-	local compliation_message = M.config.no_baleia_support and simple_message or finish_message
+	local compliation_message = config.no_baleia_support and simple_message or finish_message
 	vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {
 		compliation_message .. " at " .. time(),
 		"",
@@ -199,7 +199,7 @@ M.compile = a.void(function(param)
 	local command = param.args ~= "" and param.args
 		or utils.input({
 			prompt = "Compile command: ",
-			default = vim.g.compile_command or M.config.default_command or "make -k ",
+			default = vim.g.compile_command or config.default_command or "make -k ",
 			completion = "shellcmd",
 		})
 
@@ -208,7 +208,7 @@ M.compile = a.void(function(param)
 	end
 
 	vim.g.compile_command = command
-	M.prev_dir = vim.fn.getcwd()
+	prev_dir = vim.fn.getcwd()
 
 	runcommand(command, param.smods or {})
 end)

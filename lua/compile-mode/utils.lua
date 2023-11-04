@@ -122,41 +122,39 @@ local function goto_file(filename, error)
 	end
 end
 
+---@param error Error
 ---@type fun(error: Error)
-M.jump_to_error = a.void(
-	---@param error Error
-	function(error)
-		local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
+M.jump_to_error = a.void(function(error)
+	local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
 
-		if file_exists then
-			goto_file(error.filename.value, error)
-			return
-		end
-
-		local dir = M.input({
-			prompt = "Find this error in: ",
-			completion = "file",
-		})
-		if not dir then
-			return
-		end
-		dir = dir:gsub("/$", "")
-
-		M.wait()
-
-		if not vim.fn.isdirectory(dir) then
-			vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
-			return
-		end
-
-		local nested_filename = vim.fs.normalize(dir .. "/" .. error.filename.value)
-		if vim.fn.filereadable(nested_filename) == 0 then
-			vim.notify(error.filename.value .. " does not exist in " .. dir, vim.log.levels.ERROR)
-			return
-		end
-
-		goto_file(nested_filename, error)
+	if file_exists then
+		goto_file(error.filename.value, error)
+		return
 	end
-)
+
+	local dir = M.input({
+		prompt = "Find this error in: ",
+		completion = "file",
+	})
+	if not dir then
+		return
+	end
+	dir = dir:gsub("/$", "")
+
+	M.wait()
+
+	if not vim.fn.isdirectory(dir) then
+		vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
+		return
+	end
+
+	local nested_filename = vim.fs.normalize(dir .. "/" .. error.filename.value)
+	if vim.fn.filereadable(nested_filename) == 0 then
+		vim.notify(error.filename.value .. " does not exist in " .. dir, vim.log.levels.ERROR)
+		return
+	end
+
+	goto_file(nested_filename, error)
+end)
 
 return M

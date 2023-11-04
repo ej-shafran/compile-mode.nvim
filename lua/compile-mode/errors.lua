@@ -12,8 +12,6 @@ local level = {
 	INFO = 0,
 }
 
-M.level = level
-
 ---@type table<integer, Error>
 M.error_list = {}
 
@@ -55,7 +53,6 @@ local function parse_matcher_group(result, group)
 		return result[first], result[second]
 	end
 end
-
 
 local function range_and_value(line, range)
 	return {
@@ -135,45 +132,57 @@ function M.parse(line)
 	return nil
 end
 
+---Highlight a single error in the compilation buffer.
+---@param bufnr integer
+---@param error Error
+---@param linenum integer
+local function highlight_error(bufnr, error, linenum)
+	if error.highlighted then
+		return
+	end
+
+	error.highlighted = true
+
+	local full_range = error.full
+	utils.add_highlight(bufnr, "CompileModeError", linenum, full_range)
+
+	local hlgroup = "CompileMode"
+	if error.level == level.WARNING then
+		hlgroup = hlgroup .. "Warning"
+	elseif error.level == level.INFO then
+		hlgroup = hlgroup .. "Info"
+	else
+		hlgroup = hlgroup .. "Error"
+	end
+	hlgroup = hlgroup .. "Filename"
+
+	local filename_range = error.filename.range
+	utils.add_highlight(bufnr, hlgroup, linenum, filename_range)
+
+	local row_range = error.row and error.row.range
+	if row_range then
+		utils.add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
+	end
+	local end_row_range = error.end_row and error.end_row.range
+	if end_row_range then
+		utils.add_highlight(bufnr, "CompileModeErrorRow", linenum, end_row_range)
+	end
+
+	local col_range = error.col and error.col.range
+	if col_range then
+		utils.add_highlight(bufnr, "CompileModeErrorCol", linenum, col_range)
+	end
+	local end_col_range = error.end_col and error.end_col.range
+	if end_col_range then
+		utils.add_highlight(bufnr, "CompileModeErrorCol", linenum, end_col_range)
+	end
+end
+
+---Highlight all errors in the compilation buffer.
+---@param bufnr integer
 function M.highlight(bufnr)
 	for linenum, error in pairs(M.error_list) do
-		if not error.highlighted then
-			error.highlighted = true
-
-			local full_range = error.full
-			utils.add_highlight(bufnr, "CompileModeError", linenum, full_range)
-
-			local hlgroup = "CompileMode"
-			if error.level == M.level.WARNING then
-				hlgroup = hlgroup .. "Warning"
-			elseif error.level == M.level.INFO then
-				hlgroup = hlgroup .. "Info"
-			else
-				hlgroup = hlgroup .. "Error"
-			end
-			hlgroup = hlgroup .. "Filename"
-
-			local filename_range = error.filename.range
-			utils.add_highlight(bufnr, hlgroup, linenum, filename_range)
-
-			local row_range = error.row and error.row.range
-			if row_range then
-				utils.add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
-			end
-			local end_row_range = error.end_row and error.end_row.range
-			if end_row_range then
-				utils.add_highlight(bufnr, "CompileModeErrorRow", linenum, end_row_range)
-			end
-
-			local col_range = error.col and error.col.range
-			if col_range then
-				utils.add_highlight(bufnr, "CompileModeErrorCol", linenum, col_range)
-			end
-			local end_col_range = error.end_col and error.end_col.range
-			if end_col_range then
-				utils.add_highlight(bufnr, "CompileModeErrorCol", linenum, end_col_range)
-			end
-		end
+		highlight_error(bufnr, error, linenum)
 	end
 end
 
