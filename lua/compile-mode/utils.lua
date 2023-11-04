@@ -1,4 +1,3 @@
----@alias HighlightStyle { background: string?, foreground: string?, gui: string? }
 ---@alias IntByInt { [1]: integer, [2]: integer }
 
 local a = require("plenary.async")
@@ -6,36 +5,6 @@ local a = require("plenary.async")
 local M = {}
 
 local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
-
----If the given highlight group is not defined, define it.
----@param group_name string
----@param styles HighlightStyle
-function M.create_hlgroup(group_name, styles)
-	---@diagnostic disable-next-line: undefined-field
-	local success, existing = pcall(vim.api.nvim_get_hl_by_name, group_name, true)
-
-	if not success or not existing.foreground or not existing.background then
-		local hlgroup = "default " .. group_name
-
-		if styles.background then
-			hlgroup = hlgroup .. " guibg=" .. styles.background
-		end
-
-		if styles.foreground then
-			hlgroup = hlgroup .. " guifg=" .. styles.foreground
-		end
-
-		if styles.gui then
-			hlgroup = hlgroup .. " gui=" .. styles.gui
-		end
-
-		if not styles.background and not styles.gui and not styles.foreground then
-			hlgroup = hlgroup .. " guifg=NONE"
-		end
-
-		vim.cmd.highlight(hlgroup)
-	end
-end
 
 ---@param bufnr integer
 ---@param hlname string
@@ -132,7 +101,7 @@ local function goto_file(filename, error)
 
 	if end_row or end_col then
 		local cmd = ""
-		if not error.col then
+		if not error.col and not error.end_col then
 			cmd = cmd .. "V"
 		else
 			cmd = cmd .. "v"
@@ -180,7 +149,7 @@ M.jump_to_error = a.void(
 			return
 		end
 
-		local nested_filename = dir .. "/" .. error.filename.value
+		local nested_filename = vim.fs.normalize(dir .. "/" .. error.filename.value)
 		if vim.fn.filereadable(nested_filename) == 0 then
 			vim.notify(error.filename.value .. " does not exist in " .. dir, vim.log.levels.ERROR)
 			return

@@ -6,80 +6,25 @@
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
 local utils = require("compile-mode.utils")
+local colors = require("compile-mode.colors")
 
 local M = {}
-
-local default_colors = {
-	[0] = "Black",
-	[1] = "DarkRed",
-	[2] = "DarkGreen",
-	[3] = "DarkYellow",
-	[4] = "DarkBlue",
-	[5] = "DarkMagenta",
-	[6] = "DarkCyan",
-	[7] = "LightGrey",
-	[8] = "DarkGrey",
-	[9] = "LightRed",
-	[10] = "LightGreen",
-	[11] = "LightYellow",
-	[12] = "LightBlue",
-	[13] = "LightMagenta",
-	[14] = "LightCyan",
-	[15] = "White",
-}
-
-local theme_colors = {}
-
-for index = 0, 255 do
-	local color = vim.g["terminal_color_" .. index]
-	theme_colors[index] = color or default_colors[index]
-end
 
 ---@type string|nil
 M.prev_dir = nil
 ---@type Config
 M.config = {
-	error_highlights = {
-		error = {
-			gui = "underline",
-		},
-		error_row = {
-			gui = "underline",
-			foreground = theme_colors[2],
-		},
-		error_col = {
-			gui = "underline",
-			foreground = theme_colors[8],
-		},
-		error_filename = {
-			gui = "bold,underline",
-			foreground = theme_colors[9],
-		},
-		warning_filename = {
-			gui = "underline",
-			foreground = theme_colors[3],
-		},
-		info_filename = {
-			gui = "underline",
-			foreground = theme_colors[14],
-		},
-	},
+	error_highlights = colors.default_highlights,
 }
 
----Configure `compile-mode.nvim`.
+---Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
 ---
 ---@param config Config
 function M.setup(config)
 	M.config = vim.tbl_deep_extend("force", M.config, config)
 
 	if M.config.error_highlights then
-		utils.create_hlgroup("CompileModeError", M.config.error_highlights.error or {})
-		utils.create_hlgroup("CompileModeErrorRow", M.config.error_highlights.error_row or {})
-		utils.create_hlgroup("CompileModeErrorCol", M.config.error_highlights.error_col or {})
-
-		utils.create_hlgroup("CompileModeErrorFilename", M.config.error_highlights.error_filename or {})
-		utils.create_hlgroup("CompileModeWarningFilename", M.config.error_highlights.warning_filename or {})
-		utils.create_hlgroup("CompileModeInfoFilename", M.config.error_highlights.info_filename or {})
+		colors.setup_highlights(M.config.error_highlights)
 	end
 end
 

@@ -100,7 +100,6 @@ local function parse_matcher(matcher, line)
 	elseif type(matcher[5]) == "number" then
 		level = matcher[5]
 	elseif type(matcher[5]) == "table" then
-		print(vim.inspect(matcher[5]))
 		if result[matcher[5][1] + 1] then
 			error_level = level.WARNING
 		elseif result[matcher[5][2] + 1] then
