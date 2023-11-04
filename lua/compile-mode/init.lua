@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
 ---@alias CommandParam { args: string?, smods: SMods? }
----@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>? }
+---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -23,6 +23,8 @@ local config = {
 ---@param opts Config
 function M.setup(opts)
 	config = vim.tbl_deep_extend("force", config, opts)
+
+	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, config.error_regexp_table or {})
 
 	if config.error_highlights then
 		colors.setup_highlights(config.error_highlights)

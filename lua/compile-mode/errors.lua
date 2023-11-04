@@ -1,5 +1,6 @@
 ---@alias StringRange { start: integer, end_: integer }
 ---@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }? }
+---@alias ErrorRegexpTable table<string, { [1]: string, [2]: integer, [3]: integer|IntByInt|nil, [4]: integer|IntByInt|nil, [5]: nil|0|1|2|IntByInt }>
 
 local utils = require("compile-mode.utils")
 
@@ -17,7 +18,7 @@ M.error_list = {}
 
 ---TODO: document
 ---(REGEXP FILE [LINE COLUMN TYPE HYPERLINK HIGHLIGHT...])
----@type table<string, { [1]: string, [2]: integer, [3]: integer|IntByInt|nil, [4]: integer|IntByInt|nil, [5]: nil|0|1|2|IntByInt }>
+---@type ErrorRegexpTable
 M.error_regexp_table = {
 	-- TODO: use the actual alist from Emacs
 	gnu = {

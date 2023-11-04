@@ -13,7 +13,8 @@
   CLOSED: [2023-10-29 Sun 01:48]
 * DONE Configure highlight colors
   CLOSED: [2023-11-04 Sat 19:40]
-* TODO Configure highlight of text that starts with `:`
+* DONE Configure highlight of text that starts with `:`
+  CLOSED: [2023-11-04 Sat 19:43]
 * DONE Goto error - patterns for different compilation types
   CLOSED: [2023-11-03 Fri 21:08]
 * DONE Goto error - go to a certain line and column

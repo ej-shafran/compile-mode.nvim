@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The errors can be specified to have different levels, and are highlighted accordingly
   - The colors for errors can be customized, and default to using Neovim's current color theme
   - The `NextError` and `PrevError` commands can be used (along with matching API functions) to jump between parsed errors
+  - The error regular-expression table can be altered using `setup()`
 
 ## [1.0.6] - 2023-11-01
 
