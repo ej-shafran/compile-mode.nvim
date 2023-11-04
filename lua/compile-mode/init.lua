@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
 ---@alias CommandParam { args: string?, smods: SMods? }
----@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string? }
+---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -9,24 +9,78 @@ local utils = require("compile-mode.utils")
 
 local M = {}
 
+local default_colors = {
+	[0] = "Black",
+	[1] = "DarkRed",
+	[2] = "DarkGreen",
+	[3] = "DarkYellow",
+	[4] = "DarkBlue",
+	[5] = "DarkMagenta",
+	[6] = "DarkCyan",
+	[7] = "LightGrey",
+	[8] = "DarkGrey",
+	[9] = "LightRed",
+	[10] = "LightGreen",
+	[11] = "LightYellow",
+	[12] = "LightBlue",
+	[13] = "LightMagenta",
+	[14] = "LightCyan",
+	[15] = "White",
+}
+
+local theme_colors = {}
+
+for index = 0, 255 do
+	local color = vim.g["terminal_color_" .. index]
+	theme_colors[index] = color or default_colors[index]
+end
+
 ---@type string|nil
 M.prev_dir = nil
 ---@type Config
-M.config = {}
+M.config = {
+	error_highlights = {
+		error = {
+			gui = "underline",
+		},
+		error_row = {
+			gui = "underline",
+			foreground = theme_colors[2],
+		},
+		error_col = {
+			gui = "underline",
+			foreground = theme_colors[8],
+		},
+		error_filename = {
+			gui = "bold,underline",
+			foreground = theme_colors[9],
+		},
+		warning_filename = {
+			gui = "underline",
+			foreground = theme_colors[3],
+		},
+		info_filename = {
+			gui = "underline",
+			foreground = theme_colors[14],
+		},
+	},
+}
 
 ---Configure `compile-mode.nvim`.
 ---
 ---@param config Config
 function M.setup(config)
-	M.config = config
+	M.config = vim.tbl_deep_extend("force", M.config, config)
 
-	vim.cmd("highlight default CompileModeError gui=underline")
-	vim.cmd("highlight default CompileModeErrorRow guifg=green gui=underline")
-	vim.cmd("highlight default CompileModeErrorCol guifg=gray gui=underline")
+	if M.config.error_highlights then
+		utils.create_hlgroup("CompileModeError", M.config.error_highlights.error or {})
+		utils.create_hlgroup("CompileModeErrorRow", M.config.error_highlights.error_row or {})
+		utils.create_hlgroup("CompileModeErrorCol", M.config.error_highlights.error_col or {})
 
-	vim.cmd("highlight default CompileModeErrorFilename guifg=darkred gui=bold,underline")
-	vim.cmd("highlight default CompileModeWarningFilename guifg=darkyellow gui=underline")
-	vim.cmd("highlight default CompileModeInfoFilename guifg=cyan gui=underline")
+		utils.create_hlgroup("CompileModeErrorFilename", M.config.error_highlights.error_filename or {})
+		utils.create_hlgroup("CompileModeWarningFilename", M.config.error_highlights.warning_filename or {})
+		utils.create_hlgroup("CompileModeInfoFilename", M.config.error_highlights.info_filename or {})
+	end
 end
 
 ---@type fun(cmd: string, bufnr: integer): integer, integer
@@ -129,7 +183,11 @@ local runcommand = a.void(function(command, smods)
 	})
 
 	if not M.config.no_baleia_support then
-		require("baleia").setup(M.config.baleia_opts or {}).automatically(bufnr)
+		local baleia = require("baleia").setup(M.config.baleia_opts or {})
+		baleia.automatically(bufnr)
+		vim.api.nvim_create_user_command("BaleiaLogs", function()
+			baleia.logger.show()
+		end, {})
 	end
 
 	-- reset compilation buffer
