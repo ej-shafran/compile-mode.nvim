@@ -18,6 +18,8 @@ local config = {
 	error_highlights = colors.default_highlights,
 }
 
+M.level = errors.level
+
 ---Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
 ---
 ---@param opts Config
