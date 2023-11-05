@@ -1,6 +1,6 @@
 ---@alias StringRange { start: integer, end_: integer }
 ---@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }? }
----@alias RegexpMatcher { [1]: string, [2]: integer, [3]: integer|IntByInt|nil, [4]: integer|IntByInt|nil, [5]: nil|0|1|2|IntByInt }
+---@alias RegexpMatcher { regex: string, filename: integer, row: integer|IntByInt|nil, col: integer|IntByInt|nil, type: nil|level|IntByInt }
 ---@alias ErrorRegexpTable table<string, RegexpMatcher>
 
 local utils = require("compile-mode.utils")
@@ -8,7 +8,7 @@ local utils = require("compile-mode.utils")
 local M = {}
 
 ---@enum level
-local level = {
+M.level = {
 	ERROR = 2,
 	WARNING = 1,
 	INFO = 0,
@@ -26,279 +26,258 @@ M.ignore_file_list = {
 ---@type ErrorRegexpTable
 M.error_regexp_table = {
 	absoft = {
-		'^\\%([Ee]rror on \\|[Ww]arning on\\( \\)\\)\\?[Ll]ine[ 	]\\+\\([0-9]\\+\\)[ 	]\\+of[ 	]\\+"\\?\\([a-zA-Z]\\?:\\?[^":\n]\\+\\)"\\?:',
-		3,
-		2,
-		nil,
-		{ 1 },
+		regex = '^\\%([Ee]rror on \\|[Ww]arning on\\( \\)\\)\\?[Ll]ine[ 	]\\+\\([0-9]\\+\\)[ 	]\\+of[ 	]\\+"\\?\\([a-zA-Z]\\?:\\?[^":\n]\\+\\)"\\?:',
+		filename = 3,
+		row = 2,
+		type = { 1 },
 	},
 	ada = {
-		"\\(warning: .*\\)\\? at \\([^ \n]\\+\\):\\([0-9]\\+\\)$",
-		2,
-		3,
-		nil,
-		{ 1 },
+		regex = "\\(warning: .*\\)\\? at \\([^ \n]\\+\\):\\([0-9]\\+\\)$",
+		filename = 2,
+		row = 3,
+		type = { 1 },
 	},
 	aix = {
-		" in line \\([0-9]\\+\\) of file \\([^ \n]\\+[^. \n]\\)\\.\\? ",
-		2,
-		1,
+		regex = " in line \\([0-9]\\+\\) of file \\([^ \n]\\+[^. \n]\\)\\.\\? ",
+		filename = 2,
+		row = 1,
 	},
 	ant = {
-		"^[ 	]*\\%(\\[[^] \n]\\+\\][ 	]*\\)\\{1,2\\}\\(\\%([A-Za-z]:\\)\\?[^: \n]\\+\\):\\([0-9]\\+\\):\\%(\\([0-9]\\+\\):\\([0-9]\\+\\):\\([0-9]\\+\\):\\)\\?\\( warning\\)\\?",
-		1,
-		{ 2, 4 },
-		{ 3, 5 },
-		{ 6 },
+		regex = "^[ 	]*\\%(\\[[^] \n]\\+\\][ 	]*\\)\\{1,2\\}\\(\\%([A-Za-z]:\\)\\?[^: \n]\\+\\):\\([0-9]\\+\\):\\%(\\([0-9]\\+\\):\\([0-9]\\+\\):\\([0-9]\\+\\):\\)\\?\\( warning\\)\\?",
+		filename = 1,
+		row = { 2, 4 },
+		col = { 3, 5 },
+		type = { 6 },
 	},
 	bash = {
-		"^\\([^: \n	]\\+\\): line \\([0-9]\\+\\):",
-		1,
-		2,
+		regex = "^\\([^: \n	]\\+\\): line \\([0-9]\\+\\):",
+		filename = 1,
+		row = 2,
 	},
 	borland = {
-		"^\\%(Error\\|Warnin\\(g\\)\\) \\%([FEW][0-9]\\+ \\)\\?\\([a-zA-Z]\\?:\\?[^:( 	\n]\\+\\) \\([0-9]\\+\\)\\%([) 	]\\|:[^0-9\n]\\)",
-		2,
-		3,
-		nil,
-		{ 1 },
+		regex = "^\\%(Error\\|Warnin\\(g\\)\\) \\%([FEW][0-9]\\+ \\)\\?\\([a-zA-Z]\\?:\\?[^:( 	\n]\\+\\) \\([0-9]\\+\\)\\%([) 	]\\|:[^0-9\n]\\)",
+		filename = 2,
+		row = 3,
+		type = { 1 },
 	},
 	python_tracebacks_and_caml = {
-		'^[ 	]*File \\("\\?\\)\\([^," \n	<>]\\+\\)\\1, lines\\? \\([0-9]\\+\\)-\\?\\([0-9]\\+\\)\\?\\%($\\|,\\%( characters\\? \\([0-9]\\+\\)-\\?\\([0-9]\\+\\)\\?:\\)\\?\\([ \n]Warning\\%( [0-9]\\+\\)\\?:\\)\\?\\)',
-		2,
-		{ 3, 4 },
-		{ 5, 6 },
-		{ 7 },
+		regex = '^[ 	]*File \\("\\?\\)\\([^," \n	<>]\\+\\)\\1, lines\\? \\([0-9]\\+\\)-\\?\\([0-9]\\+\\)\\?\\%($\\|,\\%( characters\\? \\([0-9]\\+\\)-\\?\\([0-9]\\+\\)\\?:\\)\\?\\([ \n]Warning\\%( [0-9]\\+\\)\\?:\\)\\?\\)',
+		filename = 2,
+		row = { 3, 4 },
+		col = { 5, 6 },
+		type = { 7 },
 	},
 	cmake = {
-		"^CMake \\%(Error\\|\\(Warning\\)\\) at \\(.*\\):\\([1-9][0-9]*\\) ([^)]\\+):$",
-		2,
-		3,
-		nil,
-		{ 1 },
+		regex = "^CMake \\%(Error\\|\\(Warning\\)\\) at \\(.*\\):\\([1-9][0-9]*\\) ([^)]\\+):$",
+		filename = 2,
+		row = 3,
+		type = { 1 },
 	},
 	cmake_info = {
-		"^  \\%( \\*\\)\\?\\(.*\\):\\([1-9][0-9]*\\) ([^)]\\+)$",
-		1,
-		2,
-		nil,
-		0,
+		regex = "^  \\%( \\*\\)\\?\\(.*\\):\\([1-9][0-9]*\\) ([^)]\\+)$",
+		filename = 1,
+		row = 2,
+		type = M.level.INFO,
 	},
 	comma = {
-		'^"\\([^," \n	]\\+\\)", line \\([0-9]\\+\\)\\%([(. pos]\\+\\([0-9]\\+\\))\\?\\)\\?[:.,; (-]\\( warning:\\|[-0-9 ]*(W)\\)\\?',
-		1,
-		2,
-		3,
-		{ 4 },
+		regex = '^"\\([^," \n	]\\+\\)", line \\([0-9]\\+\\)\\%([(. pos]\\+\\([0-9]\\+\\))\\?\\)\\?[:.,; (-]\\( warning:\\|[-0-9 ]*(W)\\)\\?',
+		filename = 1,
+		row = 2,
+		col = 3,
+		type = { 4 },
 	},
 	cucumber = {
-		"\\%(^cucumber\\%( -p [^[:space:]]\\+\\)\\?\\|#\\)\\%( \\)\\([^(].*\\):\\([1-9][0-9]*\\)",
-		1,
-		2,
+		regex = "\\%(^cucumber\\%( -p [^[:space:]]\\+\\)\\?\\|#\\)\\%( \\)\\([^(].*\\):\\([1-9][0-9]*\\)",
+		filename = 1,
+		row = 2,
 	},
 	msft = {
-		"^ *\\([0-9]\\+>\\)\\?\\(\\%([a-zA-Z]:\\)\\?[^ :(	\n][^:(	\n]*\\)(\\([0-9]\\+\\)) \\?: \\%(see declaration\\|\\%(warnin\\(g\\)\\|[a-z ]\\+\\) C[0-9]\\+:\\)",
-		2,
-		3,
-		nil,
-		{ 4 },
+		regex = "^ *\\([0-9]\\+>\\)\\?\\(\\%([a-zA-Z]:\\)\\?[^ :(	\n][^:(	\n]*\\)(\\([0-9]\\+\\)) \\?: \\%(see declaration\\|\\%(warnin\\(g\\)\\|[a-z ]\\+\\) C[0-9]\\+:\\)",
+		filename = 2,
+		row = 3,
+		type = { 4 },
 	},
 	edg_1 = {
-		"^\\([^ \n]\\+\\)(\\([0-9]\\+\\)): \\%(error\\|warnin\\(g\\)\\|remar\\(k\\)\\)",
-		1,
-		2,
-		nil,
-		{ 3, 4 },
+		regex = "^\\([^ \n]\\+\\)(\\([0-9]\\+\\)): \\%(error\\|warnin\\(g\\)\\|remar\\(k\\)\\)",
+		filename = 1,
+		row = 2,
+		type = { 3, 4 },
 	},
 	edg_2 = {
-		'at line \\([0-9]\\+\\) of "\\([^ \n]\\+\\)"$',
-		2,
-		1,
-		nil,
-		0,
+		regex = 'at line \\([0-9]\\+\\) of "\\([^ \n]\\+\\)"$',
+		filename = 2,
+		row = 1,
+		type = M.level.INFO,
 	},
 	epc = {
-		"^Error [0-9]\\+ at (\\([0-9]\\+\\):\\([^)\n]\\+\\))",
-		2,
-		1,
+		regex = "^Error [0-9]\\+ at (\\([0-9]\\+\\):\\([^)\n]\\+\\))",
+		filename = 2,
+		row = 1,
 	},
 	ftnchek = {
-		"\\(^Warning .*\\)\\? line[ \n]\\([0-9]\\+\\)[ \n]\\%(col \\([0-9]\\+\\)[ \n]\\)\\?file \\([^ :;\n]\\+\\)",
-		4,
-		2,
-		3,
-		{ 1 },
+		regex = "\\(^Warning .*\\)\\? line[ \n]\\([0-9]\\+\\)[ \n]\\%(col \\([0-9]\\+\\)[ \n]\\)\\?file \\([^ :;\n]\\+\\)",
+		filename = 4,
+		row = 2,
+		col = 3,
+		type = { 1 },
 	},
 	gradle_kotlin = {
-		"^\\%(\\(w\\)\\|.\\): *\\(\\%([A-Za-z]:\\)\\?[^:\n]\\+\\): *(\\([0-9]\\+\\), *\\([0-9]\\+\\))",
-		2,
-		3,
-		4,
-		{ 1 },
+		regex = "^\\%(\\(w\\)\\|.\\): *\\(\\%([A-Za-z]:\\)\\?[^:\n]\\+\\): *(\\([0-9]\\+\\), *\\([0-9]\\+\\))",
+		filename = 2,
+		row = 3,
+		col = 4,
+		type = { 1 },
 	},
 	iar = {
-		'^"\\(.*\\)",\\([0-9]\\+\\)\\s-\\+\\%(Error\\|Warnin\\(g\\)\\)\\[[0-9]\\+\\]:',
-		1,
-		2,
-		nil,
-		{ 3 },
+		regex = '^"\\(.*\\)",\\([0-9]\\+\\)\\s-\\+\\%(Error\\|Warnin\\(g\\)\\)\\[[0-9]\\+\\]:',
+		filename = 1,
+		row = 2,
+		type = { 3 },
 	},
 	ibm = {
-		"^\\([^( \n	]\\+\\)(\\([0-9]\\+\\):\\([0-9]\\+\\)) : \\%(warnin\\(g\\)\\|informationa\\(l\\)\\)\\?",
-		1,
-		2,
-		3,
-		{ 4, 5 },
+		regex = "^\\([^( \n	]\\+\\)(\\([0-9]\\+\\):\\([0-9]\\+\\)) : \\%(warnin\\(g\\)\\|informationa\\(l\\)\\)\\?",
+		filename = 1,
+		row = 2,
+		col = 3,
+		type = { 4, 5 },
 	},
 	irix = {
-		'^[-[:alnum:]_/ ]\\+: \\%(\\%([sS]evere\\|[eE]rror\\|[wW]arnin\\(g\\)\\|[iI]nf\\(o\\)\\)[0-9 ]*: \\)\\?\\([^," \n	]\\+\\)\\%(, line\\|:\\) \\([0-9]\\+\\):',
-		3,
-		4,
-		nil,
-		{ 1, 2 },
+		regex = '^[-[:alnum:]_/ ]\\+: \\%(\\%([sS]evere\\|[eE]rror\\|[wW]arnin\\(g\\)\\|[iI]nf\\(o\\)\\)[0-9 ]*: \\)\\?\\([^," \n	]\\+\\)\\%(, line\\|:\\) \\([0-9]\\+\\):',
+		filename = 3,
+		row = 4,
+		type = { 1, 2 },
 	},
 	java = {
-		"^\\%([ 	]\\+at \\|==[0-9]\\+== \\+\\%(at\\|b\\(y\\)\\)\\).\\+(\\([^()\n]\\+\\):\\([0-9]\\+\\))$",
-		2,
-		3,
-		nil,
-		{ 1 },
+		regex = "^\\%([ 	]\\+at \\|==[0-9]\\+== \\+\\%(at\\|b\\(y\\)\\)\\).\\+(\\([^()\n]\\+\\):\\([0-9]\\+\\))$",
+		filename = 2,
+		row = 3,
+		type = { 1 },
 	},
 	jikes_file = {
-		'^\\%(Found\\|Issued\\) .* compiling "\\(.\\+\\)":$',
-		1,
-		nil,
-		nil,
-		0,
+		regex = '^\\%(Found\\|Issued\\) .* compiling "\\(.\\+\\)":$',
+		filename = 1,
+		type = M.level.INFO,
 	},
 	maven = {
-		"^\\%(\\[\\%(ERROR\\|\\(WARNING\\)\\|\\(INFO\\)\\)] \\)\\?\\([^\n []\\%([^\n :]\\| [^\n/-]\\|:[^\n []\\)*\\):\\[\\([[:digit:]]\\+\\),\\([[:digit:]]\\+\\)] ",
-		3,
-		4,
-		5,
-		{ 1, 2 },
+		regex = "^\\%(\\[\\%(ERROR\\|\\(WARNING\\)\\|\\(INFO\\)\\)] \\)\\?\\([^\n []\\%([^\n :]\\| [^\n/-]\\|:[^\n []\\)*\\):\\[\\([[:digit:]]\\+\\),\\([[:digit:]]\\+\\)] ",
+		filename = 3,
+		row = 4,
+		col = 5,
+		type = { 1, 2 },
 	},
 	-- TODO: make this relevant with some sort of priority system
 	clang_include = {
-		"^In file included from \\([^\n:]\\+\\):\\([0-9]\\+\\):$",
-		1,
-		2,
-		nil,
-		0,
+		regex = "^In file included from \\([^\n:]\\+\\):\\([0-9]\\+\\):$",
+		filename = 1,
+		row = 2,
+		type = M.level.INFO,
 	},
 	gcc_include = {
-		"^\\%(In file included \\|                 \\|	\\)from \\([0-9]*[^0-9\n]\\%([^\n :]\\| [^-/\n]\\|:[^ \n]\\)\\{-}\\):\\([0-9]\\+\\)\\%(:\\([0-9]\\+\\)\\)\\?\\%(\\(:\\)\\|\\(,\\|$\\)\\)\\?",
-		1,
-		2,
-		3,
-		{ 4, 5 },
+		regex = "^\\%(In file included \\|                 \\|	\\)from \\([0-9]*[^0-9\n]\\%([^\n :]\\| [^-/\n]\\|:[^ \n]\\)\\{-}\\):\\([0-9]\\+\\)\\%(:\\([0-9]\\+\\)\\)\\?\\%(\\(:\\)\\|\\(,\\|$\\)\\)\\?",
+		filename = 1,
+		row = 2,
+		col = 3,
+		type = { 4, 5 },
 	},
 	["ruby_Test::Unit"] = {
-		"^    [[ ]\\?\\([^ (].*\\):\\([1-9][0-9]*\\)\\(\\]\\)\\?:in ",
-		1,
-		2,
+		regex = "^    [[ ]\\?\\([^ (].*\\):\\([1-9][0-9]*\\)\\(\\]\\)\\?:in ",
+		filename = 1,
+		row = 2,
 	},
 	gmake = {
-		": \\*\\*\\* \\[\\%(\\(.\\{-1,}\\):\\([0-9]\\+\\): .\\+\\)\\]",
-		1,
-		2,
-		nil,
-		0,
+		regex = ": \\*\\*\\* \\[\\%(\\(.\\{-1,}\\):\\([0-9]\\+\\): .\\+\\)\\]",
+		filename = 1,
+		row = 2,
+		type = M.level.INFO,
 	},
 	gnu = {
-		"^\\%([[:alpha:]][-[:alnum:].]\\+: \\?\\|[ 	]\\%(in \\| from\\)\\)\\?\\(\\%([0-9]*[^0-9\\n]\\)\\%([^\\n :]\\| [^-/\\n]\\|:[^ \\n]\\)\\{-}\\)\\%(: \\?\\)\\([0-9]\\+\\)\\%(-\\([0-9]\\+\\)\\%(\\.\\([0-9]\\+\\)\\)\\?\\|[.:]\\([0-9]\\+\\)\\%(-\\%(\\([0-9]\\+\\)\\.\\)\\([0-9]\\+\\)\\)\\?\\)\\?:\\%( *\\(\\%(FutureWarning\\|RuntimeWarning\\|W\\%(arning\\)\\|warning\\)\\)\\| *\\([Ii]nfo\\%(\\>\\|formationa\\?l\\?\\)\\|I:\\|\\[ skipping .\\+ ]\\|instantiated from\\|required from\\|[Nn]ote\\)\\| *\\%([Ee]rror\\)\\|\\%([0-9]\\?\\)\\%([^0-9\\n]\\|$\\)\\|[0-9][0-9][0-9]\\)",
-		1,
-		{ 2, 3 },
-		{ 5, 4 },
-		{ 8, 9 },
+		regex = "^\\%([[:alpha:]][-[:alnum:].]\\+: \\?\\|[ 	]\\%(in \\| from\\)\\)\\?\\(\\%([0-9]*[^0-9\\n]\\)\\%([^\\n :]\\| [^-/\\n]\\|:[^ \\n]\\)\\{-}\\)\\%(: \\?\\)\\([0-9]\\+\\)\\%(-\\([0-9]\\+\\)\\%(\\.\\([0-9]\\+\\)\\)\\?\\|[.:]\\([0-9]\\+\\)\\%(-\\%(\\([0-9]\\+\\)\\.\\)\\([0-9]\\+\\)\\)\\?\\)\\?:\\%( *\\(\\%(FutureWarning\\|RuntimeWarning\\|W\\%(arning\\)\\|warning\\)\\)\\| *\\([Ii]nfo\\%(\\>\\|formationa\\?l\\?\\)\\|I:\\|\\[ skipping .\\+ ]\\|instantiated from\\|required from\\|[Nn]ote\\)\\| *\\%([Ee]rror\\)\\|\\%([0-9]\\?\\)\\%([^0-9\\n]\\|$\\)\\|[0-9][0-9][0-9]\\)",
+		filename = 1,
+		row = { 2, 3 },
+		col = { 5, 4 },
+		type = { 8, 9 },
 	},
 	lcc = {
-		"^\\%(E\\|\\(W\\)\\), \\([^(\n]\\+\\)(\\([0-9]\\+\\),[ 	]*\\([0-9]\\+\\)",
-		2,
-		3,
-		4,
-		{ 1 },
+		regex = "^\\%(E\\|\\(W\\)\\), \\([^(\n]\\+\\)(\\([0-9]\\+\\),[ 	]*\\([0-9]\\+\\)",
+		filename = 2,
+		row = 3,
+		col = 4,
+		type = { 1 },
 	},
 	makepp = {
-		"^makepp\\%(\\%(: warning\\(:\\).\\{-}\\|\\(: Scanning\\|: [LR]e\\?l\\?oading makefile\\|: Imported\\|log:.\\{-}\\) \\|: .\\{-}\\)`\\(\\(\\S \\{-1,}\\)\\%(:\\([0-9]\\+\\)\\)\\?\\)['(]\\)",
-		4,
-		5,
-		nil,
-		{ 1, 2 },
+		regex = "^makepp\\%(\\%(: warning\\(:\\).\\{-}\\|\\(: Scanning\\|: [LR]e\\?l\\?oading makefile\\|: Imported\\|log:.\\{-}\\) \\|: .\\{-}\\)`\\(\\(\\S \\{-1,}\\)\\%(:\\([0-9]\\+\\)\\)\\?\\)['(]\\)",
+		filename = 4,
+		row = 5,
+		type = { 1, 2 },
 	},
 	mips_1 = {
-		" (\\([0-9]\\+\\)) in \\([^ \n]\\+\\)",
-		2,
-		1,
+		regex = " (\\([0-9]\\+\\)) in \\([^ \n]\\+\\)",
+		filename = 2,
+		row = 1,
 	},
 	mips_2 = {
-		" in \\([^()\n ]\\+\\)(\\([0-9]\\+\\))$",
-		1,
-		2,
+		regex = " in \\([^()\n ]\\+\\)(\\([0-9]\\+\\))$",
+		filename = 1,
+		row = 2,
 	},
 	omake = {
-		"^\\*\\*\\* omake: file \\(.*\\) changed",
-		1,
+		regex = "^\\*\\*\\* omake: file \\(.*\\) changed",
+		filename = 1,
 	},
 	oracle = {
-		"^\\%(Semantic error\\|Error\\|PCC-[0-9]\\+:\\).* line \\([0-9]\\+\\)\\%(\\%(,\\| at\\)\\? column \\([0-9]\\+\\)\\)\\?\\%(,\\| in\\| of\\)\\? file \\(.\\{-}\\):\\?$",
-		3,
-		1,
-		2,
+		regex = "^\\%(Semantic error\\|Error\\|PCC-[0-9]\\+:\\).* line \\([0-9]\\+\\)\\%(\\%(,\\| at\\)\\? column \\([0-9]\\+\\)\\)\\?\\%(,\\| in\\| of\\)\\? file \\(.\\{-}\\):\\?$",
+		filename = 3,
+		row = 1,
+		col = 2,
 	},
 	perl = {
-		" at \\([^ \n]\\+\\) line \\([0-9]\\+\\)\\%([,.]\\|$\\| during global destruction\\.$\\)",
-		1,
-		2,
+		regex = " at \\([^ \n]\\+\\) line \\([0-9]\\+\\)\\%([,.]\\|$\\| during global destruction\\.$\\)",
+		filename = 1,
+		row = 2,
 	},
 	php = {
-		"\\%(Parse\\|Fatal\\) error: \\(.*\\) in \\(.*\\) on line \\([0-9]\\+\\)",
-		2,
-		3,
-		nil,
-		nil,
+		regex = "\\%(Parse\\|Fatal\\) error: \\(.*\\) in \\(.*\\) on line \\([0-9]\\+\\)",
+		filename = 2,
+		row = 3,
 	},
 	-- TODO: support multi-line errors
 	rxp = {
-		"^\\%(Error\\|Warnin\\(g\\)\\):.*\n.* line \\([0-9]\\+\\) char \\([0-9]\\+\\) of file://\\(.\\+\\)",
-		4,
-		2,
-		3,
-		{ 1 },
+		regex = "^\\%(Error\\|Warnin\\(g\\)\\):.*\n.* line \\([0-9]\\+\\) char \\([0-9]\\+\\) of file://\\(.\\+\\)",
+		filename = 4,
+		row = 2,
+		col = 3,
+		type = { 1 },
 	},
 	sun = {
-		": \\%(ERROR\\|WARNIN\\(G\\)\\|REMAR\\(K\\)\\) \\%([[:alnum:] ]\\+, \\)\\?File = \\(.\\+\\), Line = \\([0-9]\\+\\)\\%(, Column = \\([0-9]\\+\\)\\)\\?",
-		3,
-		4,
-		5,
-		{ 1, 2 },
+		regex = ": \\%(ERROR\\|WARNIN\\(G\\)\\|REMAR\\(K\\)\\) \\%([[:alnum:] ]\\+, \\)\\?File = \\(.\\+\\), Line = \\([0-9]\\+\\)\\%(, Column = \\([0-9]\\+\\)\\)\\?",
+		filename = 3,
+		row = 4,
+		col = 5,
+		type = { 1, 2 },
 	},
 	sun_ada = {
-		"^\\([^, \n	]\\+\\), line \\([0-9]\\+\\), char \\([0-9]\\+\\)[:., (-]",
-		1,
-		2,
-		3,
+		regex = "^\\([^, \n	]\\+\\), line \\([0-9]\\+\\), char \\([0-9]\\+\\)[:., (-]",
+		filename = 1,
+		row = 2,
+		col = 3,
 	},
 	watcom = {
-		"^[ 	]*\\(\\%([a-zA-Z]:\\)\\?[^ :(	\n][^:(	\n]*\\)(\\([0-9]\\+\\)): \\?\\%(\\(Error! E[0-9]\\+\\)\\|\\(Warning! W[0-9]\\+\\)\\):",
-		1,
-		2,
-		nil,
-		{ 4 },
+		regex = "^[ 	]*\\(\\%([a-zA-Z]:\\)\\?[^ :(	\n][^:(	\n]*\\)(\\([0-9]\\+\\)): \\?\\%(\\(Error! E[0-9]\\+\\)\\|\\(Warning! W[0-9]\\+\\)\\):",
+		filename = 1,
+		row = 2,
+		type = { 4 },
 	},
 	["4bsd"] = {
-		"\\%(^\\|::  \\|\\S ( \\)\\(/[^ \n	()]\\+\\)(\\([0-9]\\+\\))\\%(: \\(warning:\\)\\?\\|$\\| ),\\)",
-		1,
-		2,
-		nil,
-		{ 3 },
+		regex = "\\%(^\\|::  \\|\\S ( \\)\\(/[^ \n	()]\\+\\)(\\([0-9]\\+\\))\\%(: \\(warning:\\)\\?\\|$\\| ),\\)",
+		filename = 1,
+		row = 2,
+		type = { 3 },
 	},
 	["perl__Pod::Checker"] = {
-		"^\\*\\*\\* \\%(ERROR\\|\\(WARNING\\)\\).* \\%(at\\|on\\) line \\([0-9]\\+\\) \\%(.* \\)\\?in file \\([^ 	\n]\\+\\)",
-		3,
-		2,
-		nil,
-		{ 1 },
+		regex = "^\\*\\*\\* \\%(ERROR\\|\\(WARNING\\)\\).* \\%(at\\|on\\) line \\([0-9]\\+\\) \\%(.* \\)\\?in file \\([^ 	\n]\\+\\)",
+		filename = 3,
+		row = 2,
+		type = { 1 },
 	},
 }
 
@@ -360,32 +339,32 @@ local function parse_matcher(matcher, line)
 		return nil
 	end
 
-	local regex = matcher[1]
+	local regex = matcher.regex
 	local result = utils.matchlistpos(line, regex)
 	if not result then
 		return nil
 	end
 
-	local filename_range = result[matcher[2] + 1]
+	local filename_range = result[matcher.filename + 1]
 	if not filename_range then
 		return nil
 	end
 
-	local row_range, end_row_range = parse_matcher_group(result, matcher[3])
-	local col_range, end_col_range = parse_matcher_group(result, matcher[4])
+	local row_range, end_row_range = parse_matcher_group(result, matcher.row)
+	local col_range, end_col_range = parse_matcher_group(result, matcher.col)
 
 	local error_level
-	if not matcher[5] then
-		error_level = level.ERROR
-	elseif type(matcher[5]) == "number" then
+	if not matcher.type then
+		error_level = M.level.ERROR
+	elseif type(matcher.type) == "number" then
 		error_level = matcher[5]
-	elseif type(matcher[5]) == "table" then
-		if result[matcher[5][1] + 1] then
-			error_level = level.WARNING
-		elseif matcher[5][2] and result[matcher[5][2] + 1] then
-			error_level = level.INFO
+	elseif type(matcher.type) == "table" then
+		if result[matcher.type[1] + 1] then
+			error_level = M.level.WARNING
+		elseif matcher.type[2] and result[matcher.type[2] + 1] then
+			error_level = M.level.INFO
 		else
-			error_level = level.ERROR
+			error_level = M.level.ERROR
 		end
 	end
 
@@ -438,9 +417,9 @@ local function highlight_error(bufnr, error, linenum)
 	utils.add_highlight(bufnr, "CompileModeError", linenum, full_range)
 
 	local hlgroup = "CompileMode"
-	if error.level == level.WARNING then
+	if error.level == M.level.WARNING then
 		hlgroup = hlgroup .. "Warning"
-	elseif error.level == level.INFO then
+	elseif error.level == M.level.INFO then
 		hlgroup = hlgroup .. "Info"
 	else
 		hlgroup = hlgroup .. "Error"
