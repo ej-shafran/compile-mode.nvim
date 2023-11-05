@@ -320,6 +320,10 @@ local function parse_matcher_group(result, group)
 	end
 end
 
+---Get the range and its value from a certain line
+---@param line string
+---@param range StringRange
+---@return { value: any, range: StringRange }
 local function range_and_value(line, range)
 	return {
 		value = line:sub(range.start, range.end_),
@@ -327,6 +331,10 @@ local function range_and_value(line, range)
 	}
 end
 
+---Get the range and its numeric value, if it contains a number.
+---@param line string
+---@param range StringRange|nil
+---@return ({ value: number, range: StringRange })|nil
 local function numeric_range_and_value(line, range)
 	if not range then
 		return nil
@@ -342,6 +350,10 @@ local function numeric_range_and_value(line, range)
 	return raw
 end
 
+---Parse a line for errors using a specific matcher from `error_regexp_table`.
+---@param matcher any
+---@param line string
+---@return Error|nil
 local function parse_matcher(matcher, line)
 	if not matcher then
 		return nil
