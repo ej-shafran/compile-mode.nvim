@@ -97,6 +97,10 @@ local function goto_file(filename, error)
 	end
 
 	vim.cmd.e(filename)
+	local last_row = vim.api.nvim_buf_line_count(0)
+	if row > last_row then
+		row = last_row
+	end
 	vim.api.nvim_win_set_cursor(0, { row, col })
 
 	if end_row or end_col then
@@ -139,12 +143,17 @@ M.jump_to_error = a.void(function(error)
 	if not dir then
 		return
 	end
-	dir = dir:gsub("/$", "")
+	dir = dir:gsub("(.)/$", "%1")
 
 	M.wait()
 
-	if not vim.fn.isdirectory(dir) then
-		vim.notify(dir .. " is not a directory", vim.log.levels.ERROR)
+	if vim.fn.isdirectory(dir) == 0 then
+		if vim.fn.filereadable(dir) == 0 then
+			vim.notify(dir .. " is not readable", vim.log.levels.ERROR)
+			return
+		end
+
+		goto_file(dir, error)
 		return
 	end
 
