@@ -16,11 +16,194 @@ local level = {
 ---@type table<integer, Error>
 M.error_list = {}
 
+M.ignore_file_list = {
+	"/bin/[a-z]*sh$",
+}
+
 ---TODO: document
 ---(REGEXP FILE [LINE COLUMN TYPE HYPERLINK HIGHLIGHT...])
 ---@type ErrorRegexpTable
 M.error_regexp_table = {
-	-- TODO: use the actual alist from Emacs
+	absoft = {
+		'^\\%([Ee]rror on \\|[Ww]arning on\\( \\)\\)\\?[Ll]ine[ 	]\\+\\([0-9]\\+\\)[ 	]\\+of[ 	]\\+"\\?\\([a-zA-Z]\\?:\\?[^":\n]\\+\\)"\\?:',
+		3,
+		2,
+		nil,
+		{ 1 },
+	},
+	ada = {
+		"\\(warning: .*\\)\\? at \\([^ \n]\\+\\):\\([0-9]\\+\\)$",
+		2,
+		3,
+		nil,
+		{ 1 },
+	},
+	aix = {
+		" in line \\([0-9]\\+\\) of file \\([^ \n]\\+[^. \n]\\)\\.\\? ",
+		2,
+		1,
+	},
+	ant = {
+		"^[ 	]*\\%(\\[[^] \n]\\+\\][ 	]*\\)\\{1,2\\}\\(\\%([A-Za-z]:\\)\\?[^: \n]\\+\\):\\([0-9]\\+\\):\\%(\\([0-9]\\+\\):\\([0-9]\\+\\):\\([0-9]\\+\\):\\)\\?\\( warning\\)\\?",
+		1,
+		{ 2, 4 },
+		{ 3, 5 },
+		{ 6 },
+	},
+	bash = {
+		"^\\([^: \n	]\\+\\): line \\([0-9]\\+\\):",
+		1,
+		2,
+	},
+	borland = {
+		"^\\%(Error\\|Warnin\\(g\\)\\) \\%([FEW][0-9]\\+ \\)\\?\\([a-zA-Z]\\?:\\?[^:( 	\n]\\+\\) \\([0-9]\\+\\)\\%([) 	]\\|:[^0-9\n]\\)",
+		2,
+		3,
+		nil,
+		{ 1 },
+	},
+	python_tracebacks_and_caml = {
+		'^[ 	]*File \\("\\?\\)\\([^," \n	<>]\\+\\)\\1, lines\\? \\([0-9]\\+\\)-\\?\\([0-9]\\+\\)\\?\\%($\\|,\\%( characters\\? \\([0-9]\\+\\)-\\?\\([0-9]\\+\\)\\?:\\)\\?\\([ \n]Warning\\%( [0-9]\\+\\)\\?:\\)\\?\\)',
+		2,
+		{ 3, 4 },
+		{ 5, 6 },
+		{ 7 },
+	},
+	cmake = {
+		"^CMake \\%(Error\\|\\(Warning\\)\\) at \\(.*\\):\\([1-9][0-9]*\\) ([^)]\\+):$",
+		2,
+		3,
+		nil,
+		{ 1 },
+	},
+	cmake_info = {
+		"^  \\%( \\*\\)\\?\\(.*\\):\\([1-9][0-9]*\\) ([^)]\\+)$",
+		1,
+		2,
+		nil,
+		0,
+	},
+	comma = {
+		'^"\\([^," \n	]\\+\\)", line \\([0-9]\\+\\)\\%([(. pos]\\+\\([0-9]\\+\\))\\?\\)\\?[:.,; (-]\\( warning:\\|[-0-9 ]*(W)\\)\\?',
+		1,
+		2,
+		3,
+		{ 4 },
+	},
+	cucumber = {
+		"\\%(^cucumber\\%( -p [^[:space:]]\\+\\)\\?\\|#\\)\\%( \\)\\([^(].*\\):\\([1-9][0-9]*\\)",
+		1,
+		2,
+	},
+	msft = {
+		"^ *\\([0-9]\\+>\\)\\?\\(\\%([a-zA-Z]:\\)\\?[^ :(	\n][^:(	\n]*\\)(\\([0-9]\\+\\)) \\?: \\%(see declaration\\|\\%(warnin\\(g\\)\\|[a-z ]\\+\\) C[0-9]\\+:\\)",
+		2,
+		3,
+		nil,
+		{ 4 },
+	},
+	edg_1 = {
+		"^\\([^ \n]\\+\\)(\\([0-9]\\+\\)): \\%(error\\|warnin\\(g\\)\\|remar\\(k\\)\\)",
+		1,
+		2,
+		nil,
+		{ 3, 4 },
+	},
+	edg_2 = {
+		'at line \\([0-9]\\+\\) of "\\([^ \n]\\+\\)"$',
+		2,
+		1,
+		nil,
+		0,
+	},
+	epc = {
+		"^Error [0-9]\\+ at (\\([0-9]\\+\\):\\([^)\n]\\+\\))",
+		2,
+		1,
+	},
+	ftnchek = {
+		"\\(^Warning .*\\)\\? line[ \n]\\([0-9]\\+\\)[ \n]\\%(col \\([0-9]\\+\\)[ \n]\\)\\?file \\([^ :;\n]\\+\\)",
+		4,
+		2,
+		3,
+		{ 1 },
+	},
+	gradle_kotlin = {
+		"^\\%(\\(w\\)\\|.\\): *\\(\\%([A-Za-z]:\\)\\?[^:\n]\\+\\): *(\\([0-9]\\+\\), *\\([0-9]\\+\\))",
+		2,
+		3,
+		4,
+		{ 1 },
+	},
+	iar = {
+		'^"\\(.*\\)",\\([0-9]\\+\\)\\s-\\+\\%(Error\\|Warnin\\(g\\)\\)\\[[0-9]\\+\\]:',
+		1,
+		2,
+		nil,
+		{ 3 },
+	},
+	ibm = {
+		"^\\([^( \n	]\\+\\)(\\([0-9]\\+\\):\\([0-9]\\+\\)) : \\%(warnin\\(g\\)\\|informationa\\(l\\)\\)\\?",
+		1,
+		2,
+		3,
+		{ 4, 5 },
+	},
+	irix = {
+		'^[-[:alnum:]_/ ]\\+: \\%(\\%([sS]evere\\|[eE]rror\\|[wW]arnin\\(g\\)\\|[iI]nf\\(o\\)\\)[0-9 ]*: \\)\\?\\([^," \n	]\\+\\)\\%(, line\\|:\\) \\([0-9]\\+\\):',
+		3,
+		4,
+		nil,
+		{ 1, 2 },
+	},
+	java = {
+		"^\\%([ 	]\\+at \\|==[0-9]\\+== \\+\\%(at\\|b\\(y\\)\\)\\).\\+(\\([^()\n]\\+\\):\\([0-9]\\+\\))$",
+		2,
+		3,
+		nil,
+		{ 1 },
+	},
+	jikes_file = {
+		'^\\%(Found\\|Issued\\) .* compiling "\\(.\\+\\)":$',
+		1,
+		nil,
+		nil,
+		0,
+	},
+	maven = {
+		"^\\%(\\[\\%(ERROR\\|\\(WARNING\\)\\|\\(INFO\\)\\)] \\)\\?\\([^\n []\\%([^\n :]\\| [^\n/-]\\|:[^\n []\\)*\\):\\[\\([[:digit:]]\\+\\),\\([[:digit:]]\\+\\)] ",
+		3,
+		4,
+		5,
+		{ 1, 2 },
+	},
+	-- TODO: make this relevant with some sort of priority system
+	clang_include = {
+		"^In file included from \\([^\n:]\\+\\):\\([0-9]\\+\\):$",
+		1,
+		2,
+		nil,
+		0,
+	},
+	gcc_include = {
+		"^\\%(In file included \\|                 \\|	\\)from \\([0-9]*[^0-9\n]\\%([^\n :]\\| [^-/\n]\\|:[^ \n]\\)\\{-}\\):\\([0-9]\\+\\)\\%(:\\([0-9]\\+\\)\\)\\?\\%(\\(:\\)\\|\\(,\\|$\\)\\)\\?",
+		1,
+		2,
+		3,
+		{ 4, 5 },
+	},
+	["ruby_Test::Unit"] = {
+		"^    [[ ]\\?\\([^ (].*\\):\\([1-9][0-9]*\\)\\(\\]\\)\\?:in ",
+		1,
+		2,
+	},
+	gmake = {
+		": \\*\\*\\* \\[\\%(\\(.\\{-1,}\\):\\([0-9]\\+\\): .\\+\\)\\]",
+		1,
+		2,
+		nil,
+		0,
+	},
 	gnu = {
 		"^\\%([[:alpha:]][-[:alnum:].]\\+: \\?\\|[ 	]\\%(in \\| from\\)\\)\\?\\(\\%([0-9]*[^0-9\\n]\\)\\%([^\\n :]\\| [^-/\\n]\\|:[^ \\n]\\)\\{-}\\)\\%(: \\?\\)\\([0-9]\\+\\)\\%(-\\([0-9]\\+\\)\\%(\\.\\([0-9]\\+\\)\\)\\?\\|[.:]\\([0-9]\\+\\)\\%(-\\%(\\([0-9]\\+\\)\\.\\)\\([0-9]\\+\\)\\)\\?\\)\\?:\\%( *\\(\\%(FutureWarning\\|RuntimeWarning\\|W\\%(arning\\)\\|warning\\)\\)\\| *\\([Ii]nfo\\%(\\>\\|formationa\\?l\\?\\)\\|I:\\|\\[ skipping .\\+ ]\\|instantiated from\\|required from\\|[Nn]ote\\)\\| *\\%([Ee]rror\\)\\|\\%([0-9]\\?\\)\\%([^0-9\\n]\\|$\\)\\|[0-9][0-9][0-9]\\)",
 		1,
@@ -28,11 +211,93 @@ M.error_regexp_table = {
 		{ 5, 4 },
 		{ 8, 9 },
 	},
+	lcc = {
+		"^\\%(E\\|\\(W\\)\\), \\([^(\n]\\+\\)(\\([0-9]\\+\\),[ 	]*\\([0-9]\\+\\)",
+		2,
+		3,
+		4,
+		{ 1 },
+	},
+	makepp = {
+		"^makepp\\%(\\%(: warning\\(:\\).\\{-}\\|\\(: Scanning\\|: [LR]e\\?l\\?oading makefile\\|: Imported\\|log:.\\{-}\\) \\|: .\\{-}\\)`\\(\\(\\S \\{-1,}\\)\\%(:\\([0-9]\\+\\)\\)\\?\\)['(]\\)",
+		4,
+		5,
+		nil,
+		{ 1, 2 },
+	},
+	mips_1 = {
+		" (\\([0-9]\\+\\)) in \\([^ \n]\\+\\)",
+		2,
+		1,
+	},
+	mips_2 = {
+		" in \\([^()\n ]\\+\\)(\\([0-9]\\+\\))$",
+		1,
+		2,
+	},
+	omake = {
+		"^\\*\\*\\* omake: file \\(.*\\) changed",
+		1,
+	},
 	oracle = {
 		"^\\%(Semantic error\\|Error\\|PCC-[0-9]\\+:\\).* line \\([0-9]\\+\\)\\%(\\%(,\\| at\\)\\? column \\([0-9]\\+\\)\\)\\?\\%(,\\| in\\| of\\)\\? file \\(.\\{-}\\):\\?$",
 		3,
 		1,
 		2,
+	},
+	perl = {
+		" at \\([^ \n]\\+\\) line \\([0-9]\\+\\)\\%([,.]\\|$\\| during global destruction\\.$\\)",
+		1,
+		2,
+	},
+	php = {
+		"\\%(Parse\\|Fatal\\) error: \\(.*\\) in \\(.*\\) on line \\([0-9]\\+\\)",
+		2,
+		3,
+		nil,
+		nil,
+	},
+	-- TODO: support multi-line errors
+	rxp = {
+		"^\\%(Error\\|Warnin\\(g\\)\\):.*\n.* line \\([0-9]\\+\\) char \\([0-9]\\+\\) of file://\\(.\\+\\)",
+		4,
+		2,
+		3,
+		{ 1 },
+	},
+	sun = {
+		": \\%(ERROR\\|WARNIN\\(G\\)\\|REMAR\\(K\\)\\) \\%([[:alnum:] ]\\+, \\)\\?File = \\(.\\+\\), Line = \\([0-9]\\+\\)\\%(, Column = \\([0-9]\\+\\)\\)\\?",
+		3,
+		4,
+		5,
+		{ 1, 2 },
+	},
+	sun_ada = {
+		"^\\([^, \n	]\\+\\), line \\([0-9]\\+\\), char \\([0-9]\\+\\)[:., (-]",
+		1,
+		2,
+		3,
+	},
+	watcom = {
+		"^[ 	]*\\(\\%([a-zA-Z]:\\)\\?[^ :(	\n][^:(	\n]*\\)(\\([0-9]\\+\\)): \\?\\%(\\(Error! E[0-9]\\+\\)\\|\\(Warning! W[0-9]\\+\\)\\):",
+		1,
+		2,
+		nil,
+		{ 4 },
+	},
+	["4bsd"] = {
+		"\\%(^\\|::  \\|\\S ( \\)\\(/[^ \n	()]\\+\\)(\\([0-9]\\+\\))\\%(: \\(warning:\\)\\?\\|$\\| ),\\)",
+		1,
+		2,
+		nil,
+		{ 3 },
+	},
+	["perl__Pod::Checker"] = {
+		"^\\*\\*\\* \\%(ERROR\\|\\(WARNING\\)\\).* \\%(at\\|on\\) line \\([0-9]\\+\\) \\%(.* \\)\\?in file \\([^ 	\n]\\+\\)",
+		3,
+		2,
+		nil,
+		{ 1 },
 	},
 }
 
@@ -78,6 +343,10 @@ local function numeric_range_and_value(line, range)
 end
 
 local function parse_matcher(matcher, line)
+	if not matcher then
+		return nil
+	end
+
 	local regex = matcher[1]
 	local result = utils.matchlistpos(line, regex)
 	if not result then
@@ -96,11 +365,11 @@ local function parse_matcher(matcher, line)
 	if not matcher[5] then
 		error_level = level.ERROR
 	elseif type(matcher[5]) == "number" then
-		level = matcher[5]
+		error_level = matcher[5]
 	elseif type(matcher[5]) == "table" then
 		if result[matcher[5][1] + 1] then
 			error_level = level.WARNING
-		elseif result[matcher[5][2] + 1] then
+		elseif matcher[5][2] and result[matcher[5][2] + 1] then
 			error_level = level.INFO
 		else
 			error_level = level.ERROR
@@ -123,9 +392,17 @@ end
 ---@param line string the line to parse
 ---@return Error|nil
 function M.parse(line)
+	-- TODO: add debug information for which group was parsed
 	for _, matcher in pairs(M.error_regexp_table) do
 		local result = parse_matcher(matcher, line)
+
 		if result then
+			for _, pattern in ipairs(M.ignore_file_list) do
+				if vim.fn.match(result.filename.value, pattern) ~= -1 then
+					return nil
+				end
+			end
+
 			return result
 		end
 	end
