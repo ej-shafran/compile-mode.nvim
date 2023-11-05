@@ -1,6 +1,7 @@
 ---@alias StringRange { start: integer, end_: integer }
 ---@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }? }
----@alias ErrorRegexpTable table<string, { [1]: string, [2]: integer, [3]: integer|IntByInt|nil, [4]: integer|IntByInt|nil, [5]: nil|0|1|2|IntByInt }>
+---@alias RegexpMatcher { [1]: string, [2]: integer, [3]: integer|IntByInt|nil, [4]: integer|IntByInt|nil, [5]: nil|0|1|2|IntByInt }
+---@alias ErrorRegexpTable table<string, RegexpMatcher>
 
 local utils = require("compile-mode.utils")
 
@@ -351,7 +352,7 @@ local function numeric_range_and_value(line, range)
 end
 
 ---Parse a line for errors using a specific matcher from `error_regexp_table`.
----@param matcher any
+---@param matcher RegexpMatcher|nil
 ---@param line string
 ---@return Error|nil
 local function parse_matcher(matcher, line)
