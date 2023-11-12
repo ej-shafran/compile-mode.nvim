@@ -142,6 +142,7 @@ local runcommand = a.void(function(command, smods)
 
 	-- reset compilation buffer
 	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
+	utils.wait()
 
 	local rendered_command = command
 
