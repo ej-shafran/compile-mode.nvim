@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  release:
+    name: Publish GitHub Release
+
+    if: github.event.repository.fork == false
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Setup security
+        uses: step-security/harden-runner@v1
+        with:
+          allowed-endpoints: api.github.com:443
+            github.com:443
+
+      - name: Get version from tag
+        id: tag_name
+        run: echo "current_version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - uses: mindsers/changelog-reader-action@v2
+        id: changelog_reader
+        with:
+          version: ${{ steps.tag_name.outputs.current_version }}
+
+      - uses: softprops/action-gh-release@v1
+        with:
+          body: ${{ steps.changelog_reader.outputs.changes }}
