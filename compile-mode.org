@@ -31,9 +31,12 @@
   CLOSED: [2023-10-29 Sun 01:49]
 * DONE Add highlights for lines starting with `Text:`
   CLOSED: [2023-10-17 Tue 03:13]
-* TODO Update README/docs
-** TODO Add `Compilation Buffer` section
-** TODO Add `Goto Error` section
+* DONE Update README/docs
+  CLOSED: [2023-11-13 Mon 22:47]
+** DONE Add `Compilation Buffer` section
+   CLOSED: [2023-11-13 Mon 22:47]
+** DONE Add `Goto Error` section
+   CLOSED: [2023-11-13 Mon 22:47]
 * DONE Organize code
   CLOSED: [2023-11-04 Sat 19:40]
 * DONE Add tests, at some point
