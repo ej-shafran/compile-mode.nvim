@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error logic like in Emacs' Compilation Mode
   - An error-regex table which defines errors and how they are highlighted
     - The error-regex table can be altered using `setup()` and the `error_regexp_table` option
+  -  An ignore-file regex list which defines files that should never be considered the source file for an error (`/bin/bash`, for example)
   - A `CompileGotoError` command within the compilation buffer that jumps to that error's file, row, and column
     - If the error's file is not found within the current path, the user is prompted to enter the directory to search within
   - The errors can be specified to have different levels (error, warning, info), and are highlighted accordingly
