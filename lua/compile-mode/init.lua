@@ -15,7 +15,10 @@ local current_error = 0
 local prev_dir = nil
 ---@type Config
 local config = {
+	buffer_name = "Compilation",
+	default_command = "make -k",
 	error_highlights = colors.default_highlights,
+	time_format = "%a %b %e %H:%M:%S",
 }
 
 M.level = errors.level
@@ -90,12 +93,7 @@ end, 4)
 
 ---Get the current time, formatted.
 local function time()
-	local format = "%a %b %e %H:%M:%S"
-	if config.time_format then
-		format = config.time_format
-	end
-
-	return vim.fn.strftime(format)
+	return vim.fn.strftime(config.time_format)
 end
 
 ---Get the default directory, formatted.
@@ -119,11 +117,11 @@ end
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
----@type fun(command: string, smods: SMods)
-local runcommand = a.void(function(command, smods)
+---@type fun(command: string, smods: SMods, sync: boolean | nil)
+local runcommand = a.void(function(command, smods, sync)
 	if vim.g.compile_job_id then
 
-		local bufnr = vim.fn.bufnr(config.buffer_name or "Compilation" --[[@as integer]]) --[[@as integer]]
+		local bufnr = vim.fn.bufnr(config.buffer_name --[[@as integer]]) --[[@as integer]]
 
 		local interrupt_message
 		if not config.no_baleia_support then
@@ -146,7 +144,7 @@ local runcommand = a.void(function(command, smods)
 		utils.delay(1000)
 	end
 
-	local bufnr = utils.split_unless_open(config.buffer_name or "Compilation", smods)
+	local bufnr = utils.split_unless_open(config.buffer_name, smods)
 
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
@@ -194,7 +192,7 @@ local runcommand = a.void(function(command, smods)
 	utils.wait()
 	errors.highlight(bufnr)
 
-	local count, code, job_id = runjob(command, bufnr)
+	local count, code, job_id = runjob(command, bufnr, sync)
 	if job_id ~= vim.g.compile_job_id then
 		return
 	end
@@ -241,7 +239,7 @@ M.compile = a.void(function(param)
 	local command = param.args ~= "" and param.args
 		or utils.input({
 			prompt = "Compile command: ",
-			default = vim.g.compile_command or config.default_command or "make -k ",
+			default = vim.g.compile_command or config.default_command,
 			completion = "shellcmd",
 		})
 
@@ -252,14 +250,14 @@ M.compile = a.void(function(param)
 	vim.g.compile_command = command
 	prev_dir = vim.fn.getcwd()
 
-	runcommand(command, param.smods or {})
+	runcommand(command, param.smods or {}, param.bang)
 end)
 
 ---Rerun the last command.
 ---@param param CommandParam
 M.recompile = a.void(function(param)
 	if vim.g.compile_command then
-		runcommand(vim.g.compile_command, param.smods or {})
+		runcommand(vim.g.compile_command, param.smods or {}, param.bang)
 	else
 		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
 	end
