@@ -17,7 +17,7 @@ describe(":Compile", function()
 	before_each(utils.setup_tests)
 
 	it("should run a command and create a buffer with the result", function()
-		vim.cmd.Compile("echo hello world")
+		vim.cmd("silent Compile echo hello world")
 
 		local bufnr = utils.get_bufnr("*compilation*")
 
@@ -33,7 +33,7 @@ describe(":Recompile", function()
 	before_each(utils.setup_tests)
 
 	it("should rerun the latest command", function()
-		vim.cmd.Compile("echo hello world")
+		vim.cmd("silent Compile echo hello world")
 
 		local bufnr = utils.get_bufnr("*compilation*")
 
@@ -47,7 +47,7 @@ describe(":Recompile", function()
 		local lines = get_compilation_lines(bufnr)
 		assert.are_not.same(expected, lines)
 
-		vim.cmd.Recompile()
+		vim.cmd("silent Recompile")
 
 		utils.wait()
 

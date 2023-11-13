@@ -13,10 +13,10 @@ describe("interrupting a compilation", function()
 	before_each(utils.setup_tests())
 
 	it("should show an interruption message", function()
-		vim.cmd.Compile("sleep 3")
+		vim.cmd("silent Compile sleep 3")
 		utils.wait()
 
-		vim.cmd.Compile("echo hello world")
+		vim.cmd("silent Compile echo hello world")
 		utils.wait()
 
 		local bufnr = utils.get_bufnr("*compilation*")
@@ -27,11 +27,11 @@ describe("interrupting a compilation", function()
 	end)
 
 	it("should make the job stop running", function()
-		vim.cmd.Compile("sleep 3")
+		vim.cmd("silent Compile sleep 3")
 		utils.wait()
 
 		local id = vim.g.compile_job_id
-		vim.cmd.Compile("echo hello world")
+		vim.cmd("silent Compile echo hello world")
 		utils.wait()
 
 		-- assert the id is now invalid

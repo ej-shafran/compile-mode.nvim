@@ -21,7 +21,8 @@
   CLOSED: [2023-11-03 Fri 21:08]
 * DONE Goto error - next error and previous error
   CLOSED: [2023-11-04 Sat 19:40]
-* TODO Goto error - customize patterns
+* DONE Goto error - customize patterns
+  CLOSED: [2023-11-13 Mon 21:56]
 * DONE Goto error - use less ugly colors
   CLOSED: [2023-11-03 Fri 23:16]
 * DONE Refactoring - use plenary async for vim.schedule
@@ -35,5 +36,6 @@
 ** TODO Add `Goto Error` section
 * DONE Organize code
   CLOSED: [2023-11-04 Sat 19:40]
-* TODO ? Add tests, at some point
+* DONE Add tests, at some point
+  CLOSED: [2023-11-13 Mon 21:56]
 * TODO Add compilation-hidden-output
