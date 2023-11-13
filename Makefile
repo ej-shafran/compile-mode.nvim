@@ -11,3 +11,12 @@ test:
 setup-ci:
 	@echo "===> Set Up CI"
 	nvim --headless --clean -u tests/configs/ci.vim -c "q"
+
+docs:
+	@echo "===> Build Docs"
+	./panvimdoc.sh \
+		--project-name compile-mode \
+		--shift-heading-level-by -1 \
+		--scripts-dir ./.panvimdoc/scripts \
+		--input-file README.md \
+		--vim-version 'NVIM v0.8.0' 
