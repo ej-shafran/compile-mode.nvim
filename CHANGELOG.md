@@ -19,10 +19,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - The colors for errors default to using Neovim's current color theme
   - The `NextError` and `PrevError` commands, which can be used (along with matching API functions) to jump between parsed errors
 - A `debug` option for `setup()` that prints additional information, useful for development
+- The ability to run `Compile` or `Recompile` synchronously via a `!` suffix
 
 ### Changed
 
 - **(Breaking)** The `setup` function is now mandatory, as it sets up several key features of the error logic
+- **(Breaking)** The default buffer name for the compilation buffer is now `*compilation*` instead of `Compilation`
 
 ### Fixed
 

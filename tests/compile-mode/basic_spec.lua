@@ -21,12 +21,11 @@ describe(":Compile", function()
 
 		local co = coroutine.running()
 		vim.defer_fn(function()
-			print(vim.g.compile_job_id)
 			coroutine.resume(co)
 		end, 100)
 		coroutine.yield(co)
 
-		local bufnr = get_bufnr("Compilation")
+		local bufnr = get_bufnr("*compilation*")
 
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
 		local expected = { "echo hello world", "hello world" }
