@@ -33,7 +33,7 @@ function M.setup(opts)
 	end
 end
 
----@type fun(cmd: string, bufnr: integer): integer, integer
+---@type fun(cmd: string, bufnr: integer): integer, integer, integer
 local runjob = a.wrap(function(cmd, bufnr, callback)
 	local count = 0
 
@@ -64,8 +64,8 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 		cwd = prev_dir,
 		on_stdout = on_either,
 		on_stderr = on_either,
-		on_exit = function(_, code)
-			callback(count, code)
+		on_exit = function(id, code)
+			callback(count, code, id)
 		end,
 	})
 
@@ -73,6 +73,8 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 		vim.notify("Failed to start job with command " .. cmd, vim.log.levels.ERROR)
 		return
 	end
+
+	vim.g.compile_job_id = id
 
 	vim.api.nvim_create_autocmd({ "BufDelete" }, {
 		buffer = bufnr,
@@ -115,6 +117,31 @@ end
 ---
 ---@type fun(command: string, smods: SMods)
 local runcommand = a.void(function(command, smods)
+	if vim.g.compile_job_id then
+
+		local bufnr = vim.fn.bufnr(config.buffer_name or "Compilation" --[[@as integer]]) --[[@as integer]]
+
+		local interrupt_message
+		if not config.no_baleia_support then
+			interrupt_message = "Compilation \x1b[31minterrupted\x1b[0m"
+		else
+			interrupt_message = "Compilation interrupted"
+		end
+
+		utils.buf_set_opt(bufnr, "modifiable", true)
+		vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {
+			"",
+			interrupt_message .. " at " .. time(),
+		})
+		utils.wait()
+		utils.buf_set_opt(bufnr, "modifiable", false)
+
+		vim.fn.jobstop(vim.g.compile_job_id)
+		vim.g.compile_job_id = nil
+
+		utils.delay(1000)
+	end
+
 	local bufnr = utils.split_unless_open(config.buffer_name or "Compilation", smods)
 
 	utils.buf_set_opt(bufnr, "modifiable", true)
@@ -163,7 +190,12 @@ local runcommand = a.void(function(command, smods)
 	utils.wait()
 	errors.highlight(bufnr)
 
-	local count, code = runjob(command, bufnr)
+	local count, code, job_id = runjob(command, bufnr)
+	if job_id ~= vim.g.compile_job_id then
+		return
+	end
+	vim.g.compile_job_id = nil
+
 	if count == 0 then
 		vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "" })
 	end
