@@ -33,8 +33,8 @@ function M.setup(opts)
 	end
 end
 
----@type fun(cmd: string, bufnr: integer): integer, integer, integer
-local runjob = a.wrap(function(cmd, bufnr, callback)
+---@type fun(cmd: string, bufnr: integer, sync: boolean | nil): integer, integer, integer
+local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 	local count = 0
 
 	local on_either = a.void(function(_, data)
@@ -76,13 +76,17 @@ local runjob = a.wrap(function(cmd, bufnr, callback)
 
 	vim.g.compile_job_id = id
 
+	if sync then
+		vim.fn.jobwait({ id })
+	end
+
 	vim.api.nvim_create_autocmd({ "BufDelete" }, {
 		buffer = bufnr,
 		callback = function()
 			vim.fn.jobstop(id)
 		end,
 	})
-end, 3)
+end, 4)
 
 ---Get the current time, formatted.
 local function time()

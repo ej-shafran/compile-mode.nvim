@@ -49,6 +49,11 @@ M.input = a.wrap(vim.ui.input, 2)
 ---@type fun()
 M.wait = a.wrap(vim.schedule, 1)
 
+---@type fun(ms: number)
+M.delay = a.wrap(function(timeout, callback)
+	vim.defer_fn(callback, timeout)
+end, 2)
+
 ---@type fun(bufnr: integer, opt: string, value: any)
 ---@diagnostic disable-next-line: undefined-field
 M.buf_set_opt = vim.api.nvim_buf_set_option
