@@ -38,4 +38,5 @@
   CLOSED: [2023-11-04 Sat 19:40]
 * DONE Add tests, at some point
   CLOSED: [2023-11-13 Mon 21:56]
-* TODO Add compilation-hidden-output
+* DONE Add compilation-hidden-output
+  CLOSED: [2023-11-13 Mon 22:15]

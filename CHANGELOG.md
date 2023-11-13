@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - The `NextError` and `PrevError` commands, which can be used (along with matching API functions) to jump between parsed errors
 - A `debug` option for `setup()` that prints additional information, useful for development
 - The ability to run `Compile` or `Recompile` synchronously via a `!` suffix
+- A `compilation_hidden_output` option, which allows for a regex or list of regexes that configure output to hide from the compilation buffer
 
 ### Changed
 

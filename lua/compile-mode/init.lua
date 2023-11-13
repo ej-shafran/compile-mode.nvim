@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
 ---@alias CommandParam { args: string?, smods: SMods?, bang: boolean? }
----@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]? }
+---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -64,10 +64,25 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 		for i, line in ipairs(data) do
 			local error = errors.parse(line)
 
+			if config.compilation_hidden_output then
+				local hide
+				if type(config.compilation_hidden_output) == "string" then
+					hide = { config.compilation_hidden_output }
+				else
+					hide = config.compilation_hidden_output --[[@as string[] ]]
+				end
+
+				for _, re in ipairs(hide) do
+					line = vim.fn.substitute(line, re, "", "") --[[@as string]]
+					data[i] = line
+				end
+			end
+
 			if error then
 				errors.error_list[linecount + i - 1] = error
 			elseif not config.no_baleia_support then
-				data[i] = vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
+				line = vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
+				data[i] = line
 			end
 		end
 
