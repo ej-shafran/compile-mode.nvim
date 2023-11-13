@@ -9,14 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- "Goto error" logic like in Emacs' Compilation Mode
+- Error logic like in Emacs' Compilation Mode
   - An error-regex table which defines errors and how they are highlighted
-  - When the cursor is on a line that begins with an error-path syntax, pressing `<CR>` will go to that error's file, row and column
-  - If the error's file is not found within the current path, the user is prompted to enter the directory to search within
-  - The errors can be specified to have different levels, and are highlighted accordingly
-  - The colors for errors can be customized, and default to using Neovim's current color theme
-  - The `NextError` and `PrevError` commands can be used (along with matching API functions) to jump between parsed errors
-  - The error regular-expression table can be altered using `setup()`
+    - The error-regex table can be altered using `setup()` and the `error_regexp_table` option
+  - A `CompileGotoError` command within the compilation buffer that jumps to that error's file, row, and column
+    - If the error's file is not found within the current path, the user is prompted to enter the directory to search within
+  - The errors can be specified to have different levels (error, warning, info), and are highlighted accordingly
+    - The colors for errors can be customized using `setup()` and the `error_highlights` option,
+    - The colors for errors default to using Neovim's current color theme
+  - The `NextError` and `PrevError` commands, which can be used (along with matching API functions) to jump between parsed errors
+- A `debug` option for `setup()` that prints additional information, useful for development
+
+### Changed
+
+- **(Breaking)** The `setup` function is now mandatory, as it sets up several key features of the error logic
+
+### Fixed
+
+- Running a compilation command while another one is in process kills the original process using `jobstop`, and reports this interruption in the compilation buffer
 
 ## [1.0.6] - 2023-11-01
 
