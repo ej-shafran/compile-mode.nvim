@@ -6,7 +6,7 @@ test:
 	@echo "===> Test"
 	nvim --headless --clean \
 		-u tests/configs/tests.vim \
-		-c "PlenaryBustedDirectory tests/compile-mode/ {minimal_init = 'tests/configs/tests.vim'}"
+		-c "PlenaryBustedDirectory tests/compile-mode/ {minimal_init = 'tests/configs/tests.vim', sequential = true}"
 
 setup-ci:
 	@echo "===> Set Up CI"

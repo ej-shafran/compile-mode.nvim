@@ -21,7 +21,7 @@ describe(":Compile", function()
 
 		local bufnr = utils.get_bufnr("*compilation*")
 
-		utils.halt_test(30)
+		utils.wait()
 
 		local lines = get_compilation_lines(bufnr)
 		local expected = { "echo hello world", "hello world" }
@@ -37,7 +37,7 @@ describe(":Recompile", function()
 
 		local bufnr = utils.get_bufnr("*compilation*")
 
-		utils.halt_test(10)
+		utils.wait()
 
 		local expected = vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
 
@@ -49,7 +49,7 @@ describe(":Recompile", function()
 
 		vim.cmd.Recompile()
 
-		utils.halt_test(10)
+		utils.wait()
 
 		lines = get_compilation_lines(bufnr)
 		assert.are.same(expected, lines)
