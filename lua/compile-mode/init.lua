@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
----@alias CommandParam { args: string?, smods: SMods? }
----@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable? }
+---@alias CommandParam { args: string?, smods: SMods?, bang: boolean? }
+---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -23,10 +23,18 @@ local config = {
 
 M.level = errors.level
 
+local debug = a.void(function(...)
+	if config.debug == true then
+		utils.wait()
+		print(...)
+	end
+end)
+
 ---Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
 ---
 ---@param opts Config
 function M.setup(opts)
+	debug("== setup() ==")
 	config = vim.tbl_deep_extend("force", config, opts)
 
 	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, config.error_regexp_table or {})
@@ -34,10 +42,14 @@ function M.setup(opts)
 	if config.error_highlights then
 		colors.setup_highlights(config.error_highlights)
 	end
+
+	debug("config = " .. vim.inspect(config))
 end
 
 ---@type fun(cmd: string, bufnr: integer, sync: boolean | nil): integer, integer, integer
 local runjob = a.wrap(function(cmd, bufnr, sync, callback)
+	debug("== runjob() ==")
+
 	local count = 0
 
 	local on_either = a.void(function(_, data)
@@ -63,7 +75,8 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 		errors.highlight(bufnr)
 	end)
 
-	local id = vim.fn.jobstart(cmd, {
+	debug("== starting job ==")
+	local job_id = vim.fn.jobstart(cmd, {
 		cwd = prev_dir,
 		on_stdout = on_either,
 		on_stderr = on_either,
@@ -71,22 +84,24 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 			callback(count, code, id)
 		end,
 	})
+	debug("job_id = " .. job_id)
 
-	if id <= 0 then
+	if job_id <= 0 then
 		vim.notify("Failed to start job with command " .. cmd, vim.log.levels.ERROR)
 		return
 	end
 
-	vim.g.compile_job_id = id
+	vim.g.compile_job_id = job_id
 
 	if sync then
-		vim.fn.jobwait({ id })
+		debug("== sync mode - waiting for job to finish ==")
+		vim.fn.jobwait({ job_id })
 	end
 
 	vim.api.nvim_create_autocmd({ "BufDelete" }, {
 		buffer = bufnr,
 		callback = function()
-			vim.fn.jobstop(id)
+			vim.fn.jobstop(job_id)
 		end,
 	})
 end, 4)
@@ -104,8 +119,11 @@ end
 
 ---Go to the error on the current line
 function M.goto_error()
+	debug("== goto_error() ==")
+
 	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 	local error = errors.error_list[linenum]
+	debug("error = " .. vim.inspect(error))
 
 	if not error then
 		vim.notify("No error here")
@@ -119,9 +137,13 @@ end
 ---
 ---@type fun(command: string, smods: SMods, sync: boolean | nil)
 local runcommand = a.void(function(command, smods, sync)
+	debug("== runcommand() ==")
 	if vim.g.compile_job_id then
+		debug("== interrupting compilation ==")
+		debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
 
 		local bufnr = vim.fn.bufnr(config.buffer_name --[[@as integer]]) --[[@as integer]]
+		debug("bufnr = " .. bufnr)
 
 		local interrupt_message
 		if not config.no_baleia_support then
@@ -144,7 +166,10 @@ local runcommand = a.void(function(command, smods, sync)
 		utils.delay(1000)
 	end
 
+	debug("== opening compilation buffer ==")
+
 	local bufnr = utils.split_unless_open(config.buffer_name, smods)
+	debug("bufnr = " .. bufnr)
 
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
@@ -192,6 +217,7 @@ local runcommand = a.void(function(command, smods, sync)
 	utils.wait()
 	errors.highlight(bufnr)
 
+	debug("== running command: `" .. string.gsub(command, "\\`", "\\`") .. "` ==")
 	local count, code, job_id = runjob(command, bufnr, sync)
 	if job_id ~= vim.g.compile_job_id then
 		return
@@ -234,6 +260,7 @@ end)
 ---
 ---@param param CommandParam
 M.compile = a.void(function(param)
+	debug("== compile() ==")
 	param = param or {}
 
 	local command = param.args ~= "" and param.args
@@ -256,6 +283,7 @@ end)
 ---Rerun the last command.
 ---@param param CommandParam
 M.recompile = a.void(function(param)
+	debug("==recompile()==")
 	if vim.g.compile_command then
 		runcommand(vim.g.compile_command, param.smods or {}, param.bang)
 	else
@@ -265,12 +293,15 @@ end)
 
 ---Jump to the next error in the error list.
 M.next_error = a.void(function()
+	debug("== next_error() ==")
+
 	local lowest_above = nil
 	for line, _ in pairs(errors.error_list) do
 		if line > current_error and (not lowest_above or lowest_above > line) then
 			lowest_above = line
 		end
 	end
+	debug("line = " .. lowest_above)
 
 	if not lowest_above then
 		vim.notify("Moved past last error")
@@ -278,17 +309,21 @@ M.next_error = a.void(function()
 	end
 
 	current_error = lowest_above
+	debug("current_error = " .. vim.inspect(current_error))
 	utils.jump_to_error(errors.error_list[lowest_above])
 end)
 
 ---Jump to the previous error in the error list.
 M.prev_error = a.void(function()
+	debug("== prev_error() ==")
+
 	local highest_below = nil
 	for line, _ in pairs(errors.error_list) do
 		if line < current_error and (not highest_below or highest_below > line) then
 			highest_below = line
 		end
 	end
+	debug("line = " .. highest_below)
 
 	if not highest_below then
 		vim.notify("Moved past first error")
@@ -296,6 +331,7 @@ M.prev_error = a.void(function()
 	end
 
 	current_error = highest_below
+	debug("current_error = " .. vim.inspect(current_error))
 	utils.jump_to_error(errors.error_list[highest_below])
 end)
 
