@@ -83,9 +83,7 @@ require("compile-mode").setup({
 
 <summary>
 <!-- panvimdoc-ignore-end -->
-
 The default for `error_regexp_table` is:
-
 <!-- panvimdoc-ignore-start -->
 </summary>
 <!-- panvimdoc-ignore-end -->
@@ -391,7 +389,6 @@ error_regexp_table
 See [Errors](#errors).
 -->
 
-
 <!-- panvimdoc-ignore-start -->
 
 #### `no_baleia_support`
@@ -657,9 +654,7 @@ compile_mode.recompile()					*compile-mode.recompile()*
 ```
 -->
 
-Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
-The compilation buffer is opened in a new split if it isn't already opened.
-The command is rerun from the directory in which it was originally run.
+Reruns the last compiled command. See [`:Recompile`](#recompile).
 
 #### Parameters
 
@@ -668,6 +663,18 @@ The command is rerun from the directory in which it was originally run.
     - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
     - {param.smods.silent}: does not print any information
     - {param.smods.split}: modifications for the placement of the split
+
+### next_error()
+
+Jumps to the next error within the compilation buffer. See [`:NextError`](#nexterror).
+
+### prev_error()
+
+Jumps to a prior error within the compilation buffer. See [`:PrevError`](#preverror).
+
+### goto_error()
+
+Jumps to the error under the cursor. See [`:CompileGotoError`](#compilegotoerror).
 
 ## Commands
 
@@ -719,8 +726,53 @@ You can run the command using `:h :silent` to get rid of the "Compilation finish
 
 <!-- panvimdoc-ignore-start -->
 
+### `:NextError`
+
+Jump to the next error in the compilation buffer. This does not take the cursor into effect - it simply starts at the first error in the buffer and continues, one by one, from there. Once the last error in the buffer is reached the command has no effect and reports on this fact.
+
+<!-- panvimdoc-ignore-end -->
+<!-- panvimdoc-include-comment
+:NextError
+
+: Jump to the next error in the compilation buffer. This does not take the cursor into effect - it simply starts at the first error in the buffer and continues, one by one, from there. Once the last error in the buffer is reached the command has no effect and reports on this fact.
+-->
+
+<!-- panvimdoc-ignore-start -->
+
+### `:PrevError`
+
+Jump to a prior error in the compilation buffer. This does not take the cursor into effect - it simply starts at the current error in the buffer and continues backwards, one by one, from there. As long as the current error is before the first error (the default until [`:NextError`](#nexterror) has not yet been used) this command has no effect and reports on this fact.
+
+<!-- panvimdoc-ignore-end -->
+<!-- panvimdoc-include-comment
+:PrevError
+
+: Jump to a prior error in the compilation buffer. This does not take the cursor into effect - it simply starts at the current error in the buffer and continues backwards, one by one, from there. As long as the current error is before the first error (the default until [`:NextError`](#nexterror) has not yet been used) this command has no effect and reports on this fact.
+-->
+
+<!-- panvimdoc-ignore-start -->
+
+### `:CompileGotoError`
+
+Only available within the compilation buffer itself.
+
+Jump to the error present in the line under the cursor. If no such error exists, the command reports on this fact.
+
+<!-- panvimdoc-ignore-end -->
+<!-- panvimdoc-include-comment
+:CompileGotoError
+
+: Only available within the compilation buffer itself.
+
+Jump to the error present in the line under the cursor. If no such error exists, the command reports on this fact.
+-->
+
+<!-- panvimdoc-ignore-start -->
+
 ## Contributing
 
 Contributions are welcome in the form of GitHub issues and pull requests.
+
+For contributing details see [[CONTRIBUTING.md]].
 
 <!-- panvimdoc-ignore-end -->
