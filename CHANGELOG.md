@@ -30,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- The compilation buffer would sometimes simply ignore some of a command's output; this was due to an incorrect condition in the output code, which has been fixed
 - Running a compilation command while another one is in process kills the original process using `jobstop`, and reports this interruption in the compilation buffer
 
 ## [1.0.6] - 2023-11-01

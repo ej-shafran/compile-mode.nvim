@@ -54,7 +54,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 	local count = 0
 
 	local on_either = a.void(function(_, data)
-		if not data or (#data < 1 or data[1] == "") then
+		if not data or #data < 1 or (#data == 1 and data[1] == "") then
 			return
 		end
 
