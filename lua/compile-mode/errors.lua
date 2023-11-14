@@ -1,5 +1,5 @@
 ---@alias StringRange { start: integer, end_: integer }
----@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }? }
+---@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }?, group: string }
 ---@alias RegexpMatcher { regex: string, filename: integer, row: integer|IntByInt|nil, col: integer|IntByInt|nil, type: nil|level|IntByInt }
 ---@alias ErrorRegexpTable table<string, RegexpMatcher>
 
@@ -21,8 +21,9 @@ M.ignore_file_list = {
 	"/bin/[a-z]*sh$",
 }
 
----TODO: document
----(REGEXP FILE [LINE COLUMN TYPE HYPERLINK HIGHLIGHT...])
+---This mirrors the `error_regexp_alist` variable from Emacs.
+---See `error_regexp_table` in the README to understand this more in depth.
+---
 ---@type ErrorRegexpTable
 M.error_regexp_table = {
 	absoft = {
@@ -377,6 +378,7 @@ local function parse_matcher(matcher, line)
 		col = numeric_range_and_value(line, col_range),
 		end_row = numeric_range_and_value(line, end_row_range),
 		end_col = numeric_range_and_value(line, end_col_range),
+		group = nil,
 	}
 end
 
@@ -384,8 +386,7 @@ end
 ---@param line string the line to parse
 ---@return Error|nil
 function M.parse(line)
-	-- TODO: add debug information for which group was parsed
-	for _, matcher in pairs(M.error_regexp_table) do
+	for group, matcher in pairs(M.error_regexp_table) do
 		local result = parse_matcher(matcher, line)
 
 		if result then
@@ -394,6 +395,8 @@ function M.parse(line)
 					return nil
 				end
 			end
+
+			result.group = group
 
 			return result
 		end
