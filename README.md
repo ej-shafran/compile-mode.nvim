@@ -773,6 +773,6 @@ Jump to the error present in the line under the cursor. If no such error exists,
 
 Contributions are welcome in the form of GitHub issues and pull requests.
 
-For contributing details see [[CONTRIBUTING.md]].
+For contributing details see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 <!-- panvimdoc-ignore-end -->
