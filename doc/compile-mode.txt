@@ -1,17 +1,123 @@
-*compile-mode.txt*        For NVIM v0.8.0        Last change: 2023 November 18
+*compile-mode.txt*        For NVIM v0.8.0        Last change: 2023 November 19
 
 ==============================================================================
 Table of Contents                             *compile-mode-table-of-contents*
 
-1.                                                             |compile-mode-|
-  -                                                           |compile-mode--|
-  -                                                           |compile-mode--|
-  -                                                           |compile-mode--|
-2.                                                             |compile-mode-|
+1. Introduction                                    |compile-mode-introduction|
+2. Installation                                    |compile-mode-installation|
+3. Compilation buffer                        |compile-mode-compilation-buffer|
+4. Errors                                                |compile-mode-errors|
+5. API                                                      |compile-mode-api|
+  - next_error()                               |compile-mode-api-next_error()|
+  - prev_error()                               |compile-mode-api-prev_error()|
+  - goto_error()                               |compile-mode-api-goto_error()|
+6. Commands                                            |compile-mode-commands|
+
+==============================================================================
+1. Introduction                                    *compile-mode-introduction*
+
+`compile-mode.nvim` is a Neovim plugin which emulates the features of Emacs’
+`Compilation Mode`. It allows you to run commands which are output into a
+special buffer, and then rerun that command over and over again as much as you
+need. See Emacs Compilation Mode
+<https://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation-Mode.html>
+for more details.
+
+
+==============================================================================
+2. Installation                                    *compile-mode-installation*
+
+Use your favorite plugin manager. `compile-mode.nvim` depends on plenary.nvim
+<https://github.com/nvim-lua/plenary.nvim> and on baleia.nvim
+<https://github.com/m00qek/baleia.nvim> (unless the
+|compile-mode-`no_baleia_support`| option is set).
+
+Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
+`compile-mode.nvim`:
+
+>lua
+    return {
+      "ej-shafran/compile-mode.nvim",
+      branch = "latest",
+      -- or a specific version:
+      -- tag = "v2.0.0"
+      dependencies = {
+        "nvim-lua/plenary.nvim",
+        { "m00qek/baleia.nvim", tag = "v1.3.0" },
+      },
+      opts = {
+        -- you can disable colors by uncommenting this line
+        -- no_baleia_support = true,
+        default_command = "npm run build"
+      }
+    }
+<
+
+
+==============================================================================
+3. Compilation buffer                        *compile-mode-compilation-buffer*
+
+The compilation buffer is the buffer into which the output of compilation
+commands is placed. By default, its name is `"*compilation*"` (though this can
+be configured using the |compile-mode-`buffer_name`| option). Its filetype is
+`compilation` - this can be used to setup |autocmd|s (and thus custom keymaps
+and the like).
+
+After a command has been run, the buffer’s output will contain:
+
+- the "default directory" - i.e., the current working directory from which the command was run
+- the time at which compilation started
+- the compilation command which was executed
+- the output (`stdout` and `stderr`) of the command
+- the exit status of the command (a command can exit successfully, abnormally, or by interruption) and when it occurred
+
+If a compilation command is running and another one is triggered, the first
+command is terminated (using |jobstop|) and this interruption is reported in
+the compilation buffer. Then, after a tiny delay, the compilation buffer is
+cleared and the new command starts running.
+
+
+==============================================================================
+4. Errors                                                *compile-mode-errors*
+
+The compilation buffer is checked for errors in real-time, which can then be
+navigated between using |compile-mode-`compilegotoerror`|,
+|compile-mode-`nexterror`| and |compile-mode-`preverror`|.
+
                            *compile-mode.error_regexp_table*
 
+Errors are defined using the `error_regexp_table` option. Each field in the
+table consists of a key (the name of the error’s source, used for debug
+information) and a table value. This table has the following keys:
+
+- {regex} (string) a Vim regex which captures the error and the relevant capture groups; if this regex matches a line an error is determined to be on that line
+- {filename} (integer) the capture group number for the error’s filename (capture groups start at 1)
+- {row} (integer|[integer, integer]) either the capture group for the row on which the error occurred, or capture groups for the start and end of the row range in which the error occurred (optional)
+- {col} (integer|[integer, integer]) either the capture group for the column on which the error occurred, or the capture groups for the start and end of the column range in which the error occurred (optional)
+- {type} (level|[integer,integer?]) either an error type (`INFO`, `WARNING`, or `ERROR`, taken from `require("compile-mode").level`) or a tuple of capture groups (optional, default `ERROR`)
+    - If capture groups are provided and the first capture group is matched, the error is considered of type `WARNING`. If the second capture group matched, the error is considered to be of type `INFO`.
+
+**Note:** a type alias - `RegexpMatcher` - is available for the values of
+`error_regexp_table`
+
+For example, to add TypeScript errors:
+
+>lua
+    require("compile-mode").setup({
+        error_regexp_table = {
+          typescript = {
+        -- TypeScript errors take the form
+        -- "path/to/error-file.ts(13,23): error TS22: etc."
+            regex = "^\\(.\\+\\)(\\([1-9][0-9]*\\),\\([1-9][0-9]*\\)): error TS[1-9][0-9]*:",
+            filename = 1,
+            row = 2,
+            col = 3,
+          }
+        }
+    })
+<
+
 The default for `error_regexp_table` is:
- ~
 
 >lua
     error_regexp_table = {
@@ -272,13 +378,13 @@ The default for `error_regexp_table` is:
 
 
 ==============================================================================
-1.                                                             *compile-mode-*
+5. API                                                      *compile-mode-api*
 
 compile_mode.setup({opts})                    *compile-mode.setup()*
 
+Sets up the plugin for use.
 
-
-
+Usage:
 
 >lua
     require("compile-mode").setup({
@@ -288,7 +394,7 @@ compile_mode.setup({opts})                    *compile-mode.setup()*
     })
 <
 
-
+Valid keys and values for {opts}:
 
 error_regexp_table
 
@@ -421,40 +527,54 @@ compilation_hidden_output              A Vim regex or list of Vim regexes run on
 
 compile_mode.compile({param})                   *compile-mode.compile()*
 
+Run a command and place its output in the compilation buffer, reporting on its
+result. The command is run from the current working directory. The compilation
+buffer is opened in a new split if it isn’t already opened. If {param.args}
+is not passed in, the user is prompted for a command using |vim.ui.input()|.
 
 
+PARAMETERS ~
 
- ~
-
-
+- {param} (table) a table, identical to the tables passed into Neovim commands (optional)
+    - {param.args}: the string of the command itself, or `nil` if the user should be prompted to enter a command
+    - {param.smods}: a table - see the mods field of |nvim_parse_cmd()| for more
+        - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
+        - {param.smods.silent}: does not print any information
+        - {param.smods.split}: modifications for the placement of the split
 
 compile_mode.recompile()                    *compile-mode.recompile()*
 
+Reruns the last compiled command. See |compile-mode-`:recompile`|.
 
 
+PARAMETERS ~
 
- ~
-
-
-
-
-                                                              *compile-mode--*
-
-
+- {param} (table) a table, identical to the tables passed into Neovim commands (optional)
+    - {param.smods}: a table - see the mods field of |nvim_parse_cmd()| for more
+        - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
+        - {param.smods.silent}: does not print any information
+        - {param.smods.split}: modifications for the placement of the split
 
 
-                                                              *compile-mode--*
+NEXT_ERROR()                                   *compile-mode-api-next_error()*
+
+Jumps to the next error within the compilation buffer. See
+|compile-mode-`:nexterror`|.
 
 
+PREV_ERROR()                                   *compile-mode-api-prev_error()*
+
+Jumps to a prior error within the compilation buffer. See
+|compile-mode-`:preverror`|.
 
 
-                                                              *compile-mode--*
+GOTO_ERROR()                                   *compile-mode-api-goto_error()*
 
-
+Jumps to the error under the cursor. See |compile-mode-`:compilegotoerror`|.
 
 
 ==============================================================================
-2.                                                             *compile-mode-*
+6. Commands                                            *compile-mode-commands*
 
 
                                                      *compile-mode-:Compile*
@@ -466,6 +586,7 @@ compile_mode.recompile()                    *compile-mode.recompile()*
                                        If an argument is present, it is used as the command. Otherwise, the user is prompted using |vim.ui.input()|.
                                        You can run the command using |:vert| to split the window vertically. |:aboveleft|, |:belowright|, |:topleft| and |:botright| also modify the split.
                                        You can run the command using |:silent| to get rid of the "Compilation finished" messages.
+                                       You can run the command with a |count| to set the size of the opened window, like |:split|.
 
 
 
@@ -478,6 +599,7 @@ compile_mode.recompile()                    *compile-mode.recompile()*
                                        The command is rerun from the directory in which it was originally run.
                                        You can run the command using |:vert| to split the window vertically. |:aboveleft|, |:belowright|, |:topleft| and |:botright| also modify the split.
                                        You can run the command using |:silent| to get rid of the "Compilation finished" messages.
+                                       You can run the command with a |count| to set the size of the opened window, like |:split|.
 
 
 
