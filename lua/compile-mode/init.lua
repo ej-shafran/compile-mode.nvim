@@ -1,6 +1,6 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
----@alias CommandParam { args: string?, smods: SMods?, bang: boolean? }
+---@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
 ---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])? }
 
 local a = require("plenary.async")
@@ -151,8 +151,8 @@ end
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
----@type fun(command: string, smods: SMods, sync: boolean | nil)
-local runcommand = a.void(function(command, smods, sync)
+---@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
+local runcommand = a.void(function(command, smods, count, sync)
 	debug("== runcommand() ==")
 	if vim.g.compile_job_id then
 		debug("== interrupting compilation ==")
@@ -184,7 +184,7 @@ local runcommand = a.void(function(command, smods, sync)
 
 	debug("== opening compilation buffer ==")
 
-	local bufnr = utils.split_unless_open(config.buffer_name, smods)
+	local bufnr = utils.split_unless_open(config.buffer_name, smods, count)
 	debug("bufnr = " .. bufnr)
 
 	utils.buf_set_opt(bufnr, "modifiable", true)
@@ -234,13 +234,13 @@ local runcommand = a.void(function(command, smods, sync)
 	errors.highlight(bufnr)
 
 	debug("== running command: `" .. string.gsub(command, "\\`", "\\`") .. "` ==")
-	local count, code, job_id = runjob(command, bufnr, sync)
+	local line_count, code, job_id = runjob(command, bufnr, sync)
 	if job_id ~= vim.g.compile_job_id then
 		return
 	end
 	vim.g.compile_job_id = nil
 
-	if count == 0 then
+	if line_count == 0 then
 		vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "" })
 	end
 
@@ -293,7 +293,7 @@ M.compile = a.void(function(param)
 	vim.g.compile_command = command
 	prev_dir = vim.fn.getcwd()
 
-	runcommand(command, param.smods or {}, param.bang)
+	runcommand(command, param.smods or {}, param.count, param.bang)
 end)
 
 ---Rerun the last command.
@@ -301,7 +301,7 @@ end)
 M.recompile = a.void(function(param)
 	debug("==recompile()==")
 	if vim.g.compile_command then
-		runcommand(vim.g.compile_command, param.smods or {}, param.bang)
+		runcommand(vim.g.compile_command, param.smods or {}, param.count, param.bang)
 	else
 		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
 	end

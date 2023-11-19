@@ -63,8 +63,9 @@ M.buf_set_opt = vim.api.nvim_buf_set_option
 ---
 ---@param fname string
 ---@param smods SMods
+---@param count integer
 ---@return integer bufnr the identifier of the buffer for `fname`
-function M.split_unless_open(fname, smods)
+function M.split_unless_open(fname, smods, count)
 	local bufnum = vim.fn.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
 	local winnum = vim.fn.bufwinnr(bufnum)
 
@@ -74,6 +75,10 @@ function M.split_unless_open(fname, smods)
 			cmd = "vsplit " .. cmd
 		else
 			cmd = "split " .. cmd
+		end
+
+		if count ~= 0 then
+			cmd = count .. cmd
 		end
 
 		if smods.split and smods.split ~= "" then

@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - The colors for errors default to using Neovim's current color theme
   - The `NextError` and `PrevError` commands, which can be used (along with matching API functions) to jump between parsed errors
 - A `debug` option for `setup()` that prints additional information, useful for development
+- Running `:Compile` and `:Recompile` with a `!` (bang) runs the command synchronously
+- Running `:Compile` and `:Recompile` with a count (i.e. `:[N]Compile`) creates the compilation buffer using `:[N]split` (see [this issue](https://github.com/ej-shafran/compile-mode.nvim/issues/2))
 
 ### Changed
 
