@@ -52,12 +52,23 @@ The compilation buffer is checked for errors in real-time, which can then be nav
 
 Errors are defined using the `error_regexp_table` option. Each field in the table consists of a key (the name of the error's source, used for debug information) and a table value. This table has the following keys:
 
+<!-- panvimdoc-ignore-start -->
+- `{regex}` (string) a Vim regex which captures the error and the relevant capture groups; if this regex matches a line an error is determined to be on that line
+- `{filename}` (integer) the capture group number for the error's filename (capture groups start at 1)
+- `{row}` (integer|[integer, integer]) either the capture group for the row on which the error occurred, or capture groups for the start and end of the row range in which the error occurred (optional)
+- `{col}` (integer|[integer, integer]) either the capture group for the column on which the error occurred, or the capture groups for the start and end of the column range in which the error occurred (optional)
+- `{type}` (level|[integer,integer?]) either an error type (`INFO`, `WARNING`, or `ERROR`, taken from `require("compile-mode").level`) or a tuple of capture groups (optional, default `ERROR`)
+  - If capture groups are provided and the first capture group is matched, the error is considered of type `WARNING`. If the second capture group matched, the error is considered to be of type `INFO`.
+<!-- panvimdoc-ignore-end -->
+
+<!-- panvimdoc-include-comment
 - {regex} (string) a Vim regex which captures the error and the relevant capture groups; if this regex matches a line an error is determined to be on that line
 - {filename} (integer) the capture group number for the error's filename (capture groups start at 1)
 - {row} (integer|[integer, integer]) either the capture group for the row on which the error occurred, or capture groups for the start and end of the row range in which the error occurred (optional)
 - {col} (integer|[integer, integer]) either the capture group for the column on which the error occurred, or the capture groups for the start and end of the column range in which the error occurred (optional)
 - {type} (level|[integer,integer?]) either an error type (`INFO`, `WARNING`, or `ERROR`, taken from `require("compile-mode").level`) or a tuple of capture groups (optional, default `ERROR`)
   - If capture groups are provided and the first capture group is matched, the error is considered of type `WARNING`. If the second capture group matched, the error is considered to be of type `INFO`.
+--->
 
 **Note:** a type alias - `RegexpMatcher` - is available for the values of `error_regexp_table`
 
@@ -487,8 +498,10 @@ You can use an empty table to remove all styles from a group.
 
 <details>
 <summary>
-The defaults for `error_highlights` are:
+`error_highlights` default
 </summary>
+
+The defaults for `error_highlights` are:
 
 ```lua
 default_highlights = {
