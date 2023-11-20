@@ -1,22 +1,57 @@
-local a = require("plenary.async")
-local tests = a.tests
-local describe = tests.describe
-local it = tests.it
+local utils = require("tests.utils")
 
----@type fun(name: string, create: boolean?): integer
-local get_bufnr = vim.fn.bufnr
+---@diagnostic disable-next-line: undefined-global
+local before_each = before_each
+---@diagnostic disable-next-line: undefined-global
+local describe = describe
+---@diagnostic disable-next-line: undefined-global
+local it = it
+---@type any
+local assert = assert
+
+local function get_compilation_lines(bufnr)
+	return vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+end
 
 describe(":Compile", function()
-	tests.before_each(function()
-		require("plugin.command")
-		require("compile-mode").setup({})
-	end)
+	before_each(utils.setup_tests)
 
 	it("should run a command and create a buffer with the result", function()
-		vim.cmd.Compile("echo hello world")
+		vim.cmd("silent Compile echo hello world")
 
-		local bufnr = get_bufnr("Compilation")
-		local lines = vim.api.nvim_buf_get_lines(bufnr, 3, -2, false)
-		print(vim.inspect(lines))
+		local bufnr = utils.get_bufnr("*compilation*")
+
+		utils.wait()
+
+		local lines = get_compilation_lines(bufnr)
+		local expected = { "echo hello world", "hello world" }
+		assert.are.same(expected, lines)
+	end)
+end)
+
+describe(":Recompile", function()
+	before_each(utils.setup_tests)
+
+	it("should rerun the latest command", function()
+		vim.cmd("silent Compile echo hello world")
+
+		local bufnr = utils.get_bufnr("*compilation*")
+
+		utils.wait()
+
+		local expected = vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+
+		utils.buf_set_opt(bufnr, "modifiable", true)
+		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
+
+		local lines = get_compilation_lines(bufnr)
+		assert.are_not.same(expected, lines)
+
+		vim.cmd("silent Recompile")
+
+		utils.wait()
+
+		lines = get_compilation_lines(bufnr)
+		assert.are.same(expected, lines)
 	end)
 end)
