@@ -1,4 +1,4 @@
-*compile-mode.txt*        For NVIM v0.8.0        Last change: 2023 November 19
+*compile-mode.txt*        For NVIM v0.8.0        Last change: 2023 November 20
 
 ==============================================================================
 Table of Contents                             *compile-mode-table-of-contents*
@@ -97,25 +97,6 @@ information) and a table value. This table has the following keys:
 - {type} (level|[integer,integer?]) either an error type (`INFO`, `WARNING`, or `ERROR`, taken from `require("compile-mode").level`) or a tuple of capture groups (optional, default `ERROR`)
     - If capture groups are provided and the first capture group is matched, the error is considered of type `WARNING`. If the second capture group matched, the error is considered to be of type `INFO`.
 
-**Note:** a type alias - `RegexpMatcher` - is available for the values of
-`error_regexp_table`
-
-For example, to add TypeScript errors:
-
->lua
-    require("compile-mode").setup({
-        error_regexp_table = {
-          typescript = {
-        -- TypeScript errors take the form
-        -- "path/to/error-file.ts(13,23): error TS22: etc."
-            regex = "^\\(.\\+\\)(\\([1-9][0-9]*\\),\\([1-9][0-9]*\\)): error TS[1-9][0-9]*:",
-            filename = 1,
-            row = 2,
-            col = 3,
-          }
-        }
-    })
-<
 
 The default for `error_regexp_table` is:
 
