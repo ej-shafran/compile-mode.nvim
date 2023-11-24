@@ -11,5 +11,6 @@ vim.api.nvim_create_autocmd({ "FileType" }, {
 	pattern = "compilation",
 	callback = function()
 		vim.api.nvim_buf_create_user_command(0, "CompileGotoError", require("compile-mode").goto_error, {})
+		vim.api.nvim_buf_create_user_command(0, "CompileInterrupt", require("compile-mode").interrupt, {})
 	end,
 })

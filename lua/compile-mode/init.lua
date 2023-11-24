@@ -149,6 +149,44 @@ function M.goto_error()
 	utils.jump_to_error(error)
 end
 
+---Interrupt the currently running compilation command.
+---
+---@type fun()
+M.interrupt = a.void(function()
+	debug("== interrupt() ==")
+
+	if not vim.g.compile_job_id then
+		debug("== nothing to interrupt ==")
+		return
+	end
+
+	debug("== interrupting compilation ==")
+	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
+
+	local bufnr = vim.fn.bufnr(config.buffer_name --[[@as integer]]) --[[@as integer]]
+	debug("bufnr = " .. bufnr)
+
+	local interrupt_message
+	if not config.no_baleia_support then
+		interrupt_message = "Compilation \x1b[31minterrupted\x1b[0m"
+	else
+		interrupt_message = "Compilation interrupted"
+	end
+
+	utils.buf_set_opt(bufnr, "modifiable", true)
+	vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {
+		"",
+		interrupt_message .. " at " .. time(),
+	})
+	utils.wait()
+	utils.buf_set_opt(bufnr, "modifiable", false)
+
+	vim.fn.jobstop(vim.g.compile_job_id)
+	vim.g.compile_job_id = nil
+
+	utils.delay(1000)
+end)
+
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
 ---@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
@@ -157,31 +195,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 
 	debug("== runcommand() ==")
 	if vim.g.compile_job_id then
-		debug("== interrupting compilation ==")
-		debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
-
-		local bufnr = vim.fn.bufnr(config.buffer_name --[[@as integer]]) --[[@as integer]]
-		debug("bufnr = " .. bufnr)
-
-		local interrupt_message
-		if not config.no_baleia_support then
-			interrupt_message = "Compilation \x1b[31minterrupted\x1b[0m"
-		else
-			interrupt_message = "Compilation interrupted"
-		end
-
-		utils.buf_set_opt(bufnr, "modifiable", true)
-		vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {
-			"",
-			interrupt_message .. " at " .. time(),
-		})
-		utils.wait()
-		utils.buf_set_opt(bufnr, "modifiable", false)
-
-		vim.fn.jobstop(vim.g.compile_job_id)
-		vim.g.compile_job_id = nil
-
-		utils.delay(1000)
+		M.interrupt()
 	end
 
 	debug("== opening compilation buffer ==")
@@ -194,6 +208,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
 	vim.keymap.set("n", "<CR>", "<CMD>CompileGotoError<CR>", { silent = true, buffer = bufnr })
+	vim.keymap.set("n", "<C-c>", "<CMD>CompileInterrupt<CR>", { silent = true, buffer = bufnr })
 
 	vim.api.nvim_create_autocmd("ExitPre", {
 		group = vim.api.nvim_create_augroup("compile-mode", { clear = true }),
