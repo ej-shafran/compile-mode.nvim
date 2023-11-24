@@ -40,6 +40,10 @@ After a command has been run, the buffer's output will contain:
 
 If a compilation command is running and another one is triggered, the first command is terminated (using `:h jobstop`) and this interruption is reported in the compilation buffer. Then, after a tiny delay, the compilation buffer is cleared and the new command starts running.
 
+The compilation buffer has a few local commands and keymaps. The local commands are [`:CompileGotoError`](#compilegotoerror) and [`:CompileInterrupt`](#compileinterrupt), mapped to `<CR>` and `<C-c>` respectively. Additionally, `q` is mapped to `<CMD>q<CR>` to allow for easy closing of the compilation buffer.
+
+The compilation buffer is deleted automatically when Neovim would be closed, so unsaved changes don't get in the way.
+
 ## Errors
 
 The compilation buffer is checked for errors in real-time, which can then be navigated between using [`CompileGotoError`](#compilegotoerror), [`NextError`](#nexterror) and [`PrevError`](#preverror).
@@ -53,13 +57,14 @@ The compilation buffer is checked for errors in real-time, which can then be nav
 Errors are defined using the `error_regexp_table` option. Each field in the table consists of a key (the name of the error's source, used for debug information) and a table value. This table has the following keys:
 
 <!-- panvimdoc-ignore-start -->
+
 - `{regex}` (string) a Vim regex which captures the error and the relevant capture groups; if this regex matches a line an error is determined to be on that line
 - `{filename}` (integer) the capture group number for the error's filename (capture groups start at 1)
 - `{row}` (integer|[integer, integer]) either the capture group for the row on which the error occurred, or capture groups for the start and end of the row range in which the error occurred (optional)
 - `{col}` (integer|[integer, integer]) either the capture group for the column on which the error occurred, or the capture groups for the start and end of the column range in which the error occurred (optional)
 - `{type}` (level|[integer,integer?]) either an error type (`INFO`, `WARNING`, or `ERROR`, taken from `require("compile-mode").level`) or a tuple of capture groups (optional, default `ERROR`)
   - If capture groups are provided and the first capture group is matched, the error is considered of type `WARNING`. If the second capture group matched, the error is considered to be of type `INFO`.
-<!-- panvimdoc-ignore-end -->
+  <!-- panvimdoc-ignore-end -->
 
 <!-- panvimdoc-include-comment
 - {regex} (string) a Vim regex which captures the error and the relevant capture groups; if this regex matches a line an error is determined to be on that line
@@ -774,6 +779,8 @@ Only available within the compilation buffer itself.
 
 Jump to the error present in the line under the cursor. If no such error exists, the command reports on this fact.
 
+Mapped to `<CR>` within the compilation buffer.
+
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
 :CompileGotoError
@@ -781,6 +788,26 @@ Jump to the error present in the line under the cursor. If no such error exists,
 : Only available within the compilation buffer itself.
 
 Jump to the error present in the line under the cursor. If no such error exists, the command reports on this fact.
+-->
+
+<!-- panvimdoc-ignore-start -->
+### `:CompileInterrupt`
+
+Only available within the compilation buffer itself.
+
+Interrupt the currently running compilation command, reporting on this in the compilation buffer.
+
+Mapped to `<C-c>` within the compilation buffer.
+
+<!-- panvimdoc-ignore-end -->
+<!-- panvimdoc-include-comment
+:CompileInterrupt
+
+: Only available within the compilation buffer itself.
+
+Interrupt the currently running compilation command, reporting on this in the compilation buffer.
+
+Mapped to `<C-c>` within the compilation buffer.
 -->
 
 <!-- panvimdoc-ignore-start -->
