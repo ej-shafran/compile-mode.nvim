@@ -693,6 +693,10 @@ Jumps to a prior error within the compilation buffer. See [`:PrevError`](#prever
 
 Jumps to the error under the cursor. See [`:CompileGotoError`](#compilegotoerror).
 
+### interrupt()
+
+Interrupts the currently running compilation. See [`:CompileInterrupt`](#compileinterrupt).
+
 ## Commands
 
 <!-- panvimdoc-ignore-start -->
