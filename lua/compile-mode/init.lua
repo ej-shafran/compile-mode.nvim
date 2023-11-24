@@ -183,8 +183,6 @@ M.interrupt = a.void(function()
 
 	vim.fn.jobstop(vim.g.compile_job_id)
 	vim.g.compile_job_id = nil
-
-	utils.delay(1000)
 end)
 
 ---Run `command` and place the results in the "Compilation" buffer.
@@ -196,6 +194,8 @@ local runcommand = a.void(function(command, smods, count, sync)
 	debug("== runcommand() ==")
 	if vim.g.compile_job_id then
 		M.interrupt()
+
+		utils.delay(1000)
 	end
 
 	debug("== opening compilation buffer ==")
