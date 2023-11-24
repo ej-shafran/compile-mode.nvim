@@ -11,6 +11,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - next_error()                               |compile-mode-api-next_error()|
   - prev_error()                               |compile-mode-api-prev_error()|
   - goto_error()                               |compile-mode-api-goto_error()|
+  - interrupt()                                 |compile-mode-api-interrupt()|
 6. Commands                                            |compile-mode-commands|
 
 ==============================================================================
@@ -560,6 +561,12 @@ Jumps to a prior error within the compilation buffer. See
 GOTO_ERROR()                                   *compile-mode-api-goto_error()*
 
 Jumps to the error under the cursor. See |compile-mode-`:compilegotoerror`|.
+
+
+INTERRUPT()                                     *compile-mode-api-interrupt()*
+
+Interrupts the currently running compilation. See
+|compile-mode-`:compileinterrupt`|.
 
 
 ==============================================================================
