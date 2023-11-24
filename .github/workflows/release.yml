@@ -57,7 +57,7 @@ jobs:
           ref: latest
 
       - name: Pull from tag
-        run: "git merge ${GITHUB_REF#refs/tags/v} --no-commit"
+        run: "git merge v${GITHUB_REF#refs/tags/v} --no-commit"
 
       - uses: stefanzweifel/git-auto-commit-action@v4
         with:
