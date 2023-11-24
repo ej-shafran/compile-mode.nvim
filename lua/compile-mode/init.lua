@@ -317,15 +317,15 @@ M.next_error = a.void(function()
 			lowest_above = line
 		end
 	end
-	debug("line = " .. lowest_above)
 
 	if not lowest_above then
 		vim.notify("Moved past last error")
 		return
 	end
+	debug("line = " .. lowest_above)
 
 	current_error = lowest_above
-	debug("current_error = " .. vim.inspect(current_error))
+	debug("current_error = " .. current_error)
 	utils.jump_to_error(errors.error_list[lowest_above])
 end)
 
@@ -339,15 +339,15 @@ M.prev_error = a.void(function()
 			highest_below = line
 		end
 	end
-	debug("line = " .. highest_below)
 
 	if not highest_below then
 		vim.notify("Moved past first error")
 		return
 	end
+	debug("line = " .. highest_below)
 
 	current_error = highest_below
-	debug("current_error = " .. vim.inspect(current_error))
+	debug("current_error = " .. current_error)
 	utils.jump_to_error(errors.error_list[highest_below])
 end)
 
