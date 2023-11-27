@@ -320,7 +320,8 @@ M.recompile = a.void(function(param)
 	if vim.g.compile_command then
 		runcommand(vim.g.compile_command, param.smods or {}, param.count, param.bang)
 	else
-		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
+		-- vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
+		M.compile(param)
 	end
 end)
 
