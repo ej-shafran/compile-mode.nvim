@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The `recompile_no_fail` option, which causes `:Recompile` not to fail without a previous command but instead to call `:Compile`.
+
 ## [2.1.1] - 2023-11-24
 
 ### Fixed

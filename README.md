@@ -635,6 +635,19 @@ compilation_hidden_output
 
 : A Vim regex or list of Vim regexes run on every line in the compilation buffer which will be substituted with empty strings.
 -->
+
+<!-- panvimdoc-ignore-start -->
+#### `recompile_no_fail`
+
+When `true`, running [`:Recompile`](#recompile) without a prior command will not fail, but instead simply trigger a call to [`:Compile`](#compile).
+<!-- panvimdoc-ignore-end -->
+
+<!-- panvimdoc-include-comment
+recompile_no_fail
+
+: When `true`, running [`:Recompile`](#recompile) without a prior command will not fail, but instead simply trigger a call to [`:Compile`](#compile).
+-->
+
 <!-- panvimdoc-ignore-start -->
 
 ### compile({param})
