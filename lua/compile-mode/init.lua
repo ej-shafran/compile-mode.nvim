@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
 ---@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
----@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])? }
+---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -319,9 +319,10 @@ M.recompile = a.void(function(param)
 	debug("==recompile()==")
 	if vim.g.compile_command then
 		runcommand(vim.g.compile_command, param.smods or {}, param.count, param.bang)
-	else
-		-- vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
+	elseif config.recompile_no_fail then
 		M.compile(param)
+	else
+		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
 	end
 end)
 
