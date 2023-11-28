@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2023-11-28
+
 ### Added
 
 - The `recompile_no_fail` option, which causes `:Recompile` not to fail without a previous command but instead to call `:Compile`.
@@ -118,6 +120,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[2.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.0.2...v2.1.0
 [2.0.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.0.1...v2.0.2
