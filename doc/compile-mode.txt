@@ -1,4 +1,4 @@
-*compile-mode.txt*        For NVIM v0.8.0        Last change: 2023 November 24
+*compile-mode.txt*        For NVIM v0.8.0        Last change: 2023 November 28
 
 ==============================================================================
 Table of Contents                             *compile-mode-table-of-contents*
@@ -512,6 +512,14 @@ this, but instead extends the list.
 
 
 compilation_hidden_output              A Vim regex or list of Vim regexes run on every line in the compilation buffer which will be substituted with empty strings.
+
+
+
+
+                                            *compile-mode-recompile_no_fail*
+
+
+recompile_no_fail                      When `true`, running |compile-mode-`:recompile`| without a prior command will not fail, but instead simply trigger a call to |compile-mode-`:compile`|.
 
 
 
