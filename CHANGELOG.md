@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Auto-scrolling behavior for the compilation buffer.
+
 ## [2.2.0] - 2023-11-28
 
 ### Added
