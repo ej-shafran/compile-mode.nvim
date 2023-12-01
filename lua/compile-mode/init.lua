@@ -30,6 +30,18 @@ local debug = a.void(function(...)
 	end
 end)
 
+---@param bufnr integer
+---@param start integer
+---@param end_ integer
+---@param data string[]
+local function set_lines(bufnr, start, end_, data)
+	vim.api.nvim_buf_set_lines(bufnr, start, end_, false, data)
+
+	if utils.bufnr("%") == bufnr then
+		vim.cmd("normal G")
+	end
+end
+
 ---Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
 ---
 ---@param opts Config
@@ -86,7 +98,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 			end
 		end
 
-		vim.api.nvim_buf_set_lines(bufnr, -2, -1, false, data)
+		set_lines(bufnr, -2, -1, data)
 		utils.wait()
 		errors.highlight(bufnr)
 	end)
@@ -163,7 +175,7 @@ M.interrupt = a.void(function()
 	debug("== interrupting compilation ==")
 	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
 
-	local bufnr = vim.fn.bufnr(config.buffer_name --[[@as integer]]) --[[@as integer]]
+	local bufnr = utils.bufnr(config.buffer_name)
 	debug("bufnr = " .. bufnr)
 
 	local interrupt_message
@@ -174,7 +186,7 @@ M.interrupt = a.void(function()
 	end
 
 	utils.buf_set_opt(bufnr, "modifiable", true)
-	vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {
+	set_lines(bufnr, -1, -1, {
 		"",
 		interrupt_message .. " at " .. time(),
 	})
@@ -228,7 +240,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	end
 
 	-- reset compilation buffer
-	vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
+	set_lines(bufnr, 0, -1, {})
 	utils.wait()
 
 	local rendered_command = command
@@ -240,7 +252,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 		rendered_command = vim.fn.substitute(command, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
 	end
 
-	vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, {
+	set_lines(bufnr, 0, 0, {
 		'-*- mode: compilation; default-directory: "' .. default_dir() .. '" -*-',
 		"Compilation started at " .. time(),
 		"",
@@ -258,7 +270,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	vim.g.compile_job_id = nil
 
 	if line_count == 0 then
-		vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, { "" })
+		set_lines(bufnr, -1, -1, { "" })
 	end
 
 	local simple_message
@@ -274,7 +286,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	end
 
 	local compliation_message = config.no_baleia_support and simple_message or finish_message
-	vim.api.nvim_buf_set_lines(bufnr, -1, -1, false, {
+	set_lines(bufnr, -1, -1, {
 		compliation_message .. " at " .. time(),
 		"",
 	})
