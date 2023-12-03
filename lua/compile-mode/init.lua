@@ -36,10 +36,9 @@ end)
 ---@param data string[]
 local function set_lines(bufnr, start, end_, data)
 	vim.api.nvim_buf_set_lines(bufnr, start, end_, false, data)
-
-	if utils.bufnr("%") == bufnr then
+	vim.api.nvim_buf_call(bufnr, function()
 		vim.cmd("normal G")
-	end
+	end)
 end
 
 ---Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
