@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.1] - 2023-12-03
+
+### Fixed
+
+- Auto-scrolling behavior not working when not focused on the buffer
+
 ## [2.3.0] - 2023-12-01
 
 ### Added
@@ -126,7 +132,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
-[2.3.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.2.0...v2.3.0
+[2.3.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.3.0...v2.3.1
 [2.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.1.0...v2.1.1
 [2.1.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.0.2...v2.1.0
