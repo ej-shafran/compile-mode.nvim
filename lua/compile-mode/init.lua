@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier? }
 ---@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
----@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean? }
+---@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -157,7 +157,7 @@ function M.goto_error()
 		return
 	end
 
-	utils.jump_to_error(error)
+	utils.jump_to_error(error, config.same_window_errors)
 end
 
 ---Interrupt the currently running compilation command.
@@ -357,7 +357,7 @@ M.next_error = a.void(function()
 
 	current_error = lowest_above
 	debug("current_error = " .. current_error)
-	utils.jump_to_error(errors.error_list[lowest_above])
+	utils.jump_to_error(errors.error_list[lowest_above], config.same_window_errors)
 end)
 
 ---Jump to the previous error in the error list.
@@ -379,7 +379,7 @@ M.prev_error = a.void(function()
 
 	current_error = highest_below
 	debug("current_error = " .. current_error)
-	utils.jump_to_error(errors.error_list[highest_below])
+	utils.jump_to_error(errors.error_list[highest_below], config.same_window_errors)
 end)
 
 return M
