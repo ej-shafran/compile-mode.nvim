@@ -201,6 +201,7 @@ end)
 ---@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
 local runcommand = a.void(function(command, smods, count, sync)
 	current_error = 0
+	errors.error_list = {}
 
 	debug("== runcommand() ==")
 	if vim.g.compile_job_id then
