@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.4.0] - 2023-12-14
+
 ### Changed
 
 - The default window behavior for jumping to errors (see [this issue](https://github.com/ej-shafran/compile-mode.nvim/issues/8))
@@ -140,6 +142,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[2.4.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.3.1...v2.4.0
 [2.3.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.3.0...v2.3.1
 [2.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.1.1...v2.2.0
 [2.1.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.1.0...v2.1.1
