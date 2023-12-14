@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The default window behavior for jumping to errors (see [this issue](https://github.com/ej-shafran/compile-mode.nvim/issues/8))
+
+### Added
+
+- The `same_window_errors` option, which overrides the new default window behavior and opens errors in the current window
+
 ## [2.3.1] - 2023-12-03
 
 ### Fixed
@@ -17,13 +25,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Auto-scrolling behavior for the compilation buffer.
+- Auto-scrolling behavior for the compilation buffer
 
 ## [2.2.0] - 2023-11-28
 
 ### Added
 
-- The `recompile_no_fail` option, which causes `:Recompile` not to fail without a previous command but instead to call `:Compile`.
+- The `recompile_no_fail` option, which causes `:Recompile` not to fail without a previous command but instead to call `:Compile`
 
 ## [2.1.1] - 2023-11-24
 

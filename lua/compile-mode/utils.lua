@@ -93,7 +93,8 @@ end
 
 ---@param filename string
 ---@param error Error
-local function goto_file(filename, error)
+---@param same_window boolean|nil
+local function goto_file(filename, error, same_window)
 	local row = error.row and error.row.value or 1
 	local end_row = error.end_row and error.end_row.value
 
@@ -106,6 +107,9 @@ local function goto_file(filename, error)
 		end_col = 0
 	end
 
+	if not same_window then
+		vim.cmd.wincmd("p")
+	end
 	vim.cmd.e(filename)
 	local last_row = vim.api.nvim_buf_line_count(0)
 	if row > last_row then
@@ -137,12 +141,12 @@ local function goto_file(filename, error)
 end
 
 ---@param error Error
----@type fun(error: Error)
-M.jump_to_error = a.void(function(error)
+---@type fun(error: Error, same_window: boolean|nil)
+M.jump_to_error = a.void(function(error, same_window)
 	local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
 
 	if file_exists then
-		goto_file(error.filename.value, error)
+		goto_file(error.filename.value, error, same_window)
 		return
 	end
 
@@ -163,7 +167,7 @@ M.jump_to_error = a.void(function(error)
 			return
 		end
 
-		goto_file(dir, error)
+		goto_file(dir, error, same_window)
 		return
 	end
 
@@ -173,7 +177,7 @@ M.jump_to_error = a.void(function(error)
 		return
 	end
 
-	goto_file(nested_filename, error)
+	goto_file(nested_filename, error, same_window)
 end)
 
 ---@type fun(bufname: string): integer
