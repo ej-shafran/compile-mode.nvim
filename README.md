@@ -650,6 +650,20 @@ recompile_no_fail
 
 <!-- panvimdoc-ignore-start -->
 
+#### `same_window_errors`
+
+By default, going to errors from the compilation buffer uses `:h :wincmd` with `p` to jump to the error in an existing window, if there is one. You can override this behavior and override the current window instead by setting this to `true`.
+
+<!-- panvimdoc-ignore-end -->
+
+<!--panvimdoc-include-comment
+same_window_errors
+
+: By default, going to errors from the compilation buffer uses `:h :wincmd` with `p` to jump to the error in an existing window, if there is one. You can override this behavior and override the current window instead by setting this to `true`.
+-->
+
+<!-- panvimdoc-ignore-start -->
+
 ### compile({param})
 
 <!-- panvimdoc-ignore-end -->
