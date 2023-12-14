@@ -42,7 +42,7 @@ If a compilation command is running and another one is triggered, the first comm
 
 The compilation buffer has a few local commands and keymaps. The local commands are [`:CompileGotoError`](#compilegotoerror) and [`:CompileInterrupt`](#compileinterrupt), mapped to `<CR>` and `<C-c>` respectively. Additionally, `q` is mapped to `<CMD>q<CR>` to allow for easy closing of the compilation buffer.
 
-The compilation buffer is deleted automatically when Neovim would be closed, so unsaved changes don't get in the way.
+The compilation buffer is deleted automatically when Neovim would be closed, so unsaved changes don't get in the way. It also has the `:h 'buftype'` option set to `acwrite`.
 
 ## Errors
 
