@@ -215,6 +215,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	local bufnr = utils.split_unless_open(config.buffer_name, smods, count)
 	debug("bufnr = " .. bufnr)
 
+	utils.buf_set_opt(bufnr, "buftype", "acwrite")
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
 
