@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The `buftype` of the compilation buffer to `acwrite`, to disable accidental writing of the buffer (see [this issue](https://github.com/ej-shafran/compile-mode.nvim/issues/10))
+
 ## [2.4.0] - 2023-12-14
 
 ### Changed
