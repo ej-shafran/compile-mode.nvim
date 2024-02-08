@@ -67,6 +67,12 @@ M.buf_set_opt = vim.api.nvim_buf_set_option
 ---@return integer bufnr the identifier of the buffer for `fname`
 function M.split_unless_open(fname, smods, count)
 	local bufnum = M.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+
+	if smods.hide then
+		vim.cmd.badd(fname)
+		return M.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+	end
+
 	local winnum = vim.fn.bufwinnr(bufnum)
 
 	if winnum == -1 then
