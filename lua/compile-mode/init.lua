@@ -215,22 +215,13 @@ local runcommand = a.void(function(command, smods, count, sync)
 	local bufnr = utils.split_unless_open(config.buffer_name, smods, count)
 	debug("bufnr = " .. bufnr)
 
-	utils.buf_set_opt(bufnr, "buftype", "acwrite")
+	utils.buf_set_opt(bufnr, "buftype", "nofile")
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
 
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
 	vim.keymap.set("n", "<CR>", "<CMD>CompileGotoError<CR>", { silent = true, buffer = bufnr })
 	vim.keymap.set("n", "<C-c>", "<CMD>CompileInterrupt<CR>", { silent = true, buffer = bufnr })
-
-	vim.api.nvim_create_autocmd("ExitPre", {
-		group = vim.api.nvim_create_augroup("compile-mode", { clear = true }),
-		callback = function()
-			if vim.api.nvim_buf_is_valid(bufnr) then
-				vim.api.nvim_buf_delete(bufnr, { force = true })
-			end
-		end,
-	})
 
 	if not config.no_baleia_support then
 		local baleia = require("baleia").setup(config.baleia_opts or {})
