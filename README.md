@@ -756,7 +756,7 @@ You can run the command with a `:h count` to set the size of the opened window, 
 
 ### `:Recompile`
 
-Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
+Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()` (unless [`recompile_no_fail`](#recompile_no_fail) is set).
 The compilation buffer is opened in a new split if it isn't already opened.
 The command is rerun from the directory in which it was originally run.
 

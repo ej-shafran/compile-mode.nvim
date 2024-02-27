@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - The ability to use `:hide` on the compilation commands to hide the compilation buffer
 
+## [2.5.0] - 2023-12-23
+
 ### Changed
 
 - The `buftype` of the compilation buffer to `acwrite`, to disable accidental writing of the buffer (see [this issue](https://github.com/ej-shafran/compile-mode.nvim/issues/10))
@@ -154,6 +156,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[2.5.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.3.1...v2.4.0
 [2.3.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.3.0...v2.3.1
 [2.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.1.1...v2.2.0
