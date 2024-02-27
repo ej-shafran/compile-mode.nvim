@@ -367,7 +367,7 @@ M.prev_error = a.void(function()
 
 	local highest_below = nil
 	for line, _ in pairs(errors.error_list) do
-		if line < current_error and (not highest_below or highest_below > line) then
+		if line < current_error and (not highest_below or highest_below < line) then
 			highest_below = line
 		end
 	end

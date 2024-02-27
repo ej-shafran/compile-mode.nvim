@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The behavior of the `PrevError` command and relevant API functions; it no longer jumps to the earliest error instead of one before the current one
+
 ### Added
 
 - The ability to use `:hide` on the compilation commands to hide the compilation buffer
