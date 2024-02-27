@@ -102,7 +102,9 @@ information) and a table value. This table has the following keys:
   groups (optional, default `ERROR`)
   - If capture groups are provided and the first capture group is matched, the
     error is considered of type `WARNING`. If the second capture group matched,
-    the error is considered to be of type `INFO`. <!-- panvimdoc-ignore-end -->
+    the error is considered to be of type `INFO`.
+
+<!-- panvimdoc-ignore-end -->
 
 <!-- panvimdoc-include-comment
 - {regex} (string) a Vim regex which captures the error and the relevant capture
@@ -500,8 +502,9 @@ result. See [`:Compile`](#compile).
   - `{param.args}`: the string of the command itself, or `nil` if the user
     should be prompted to enter a command
   - `{param.smods}`: a table - see the mods field of `:h nvim_parse_cmd()` for
-    more
-  <!-- panvimdoc-ignore-end -->
+  more
+
+<!-- panvimdoc-ignore-end -->
 
 <!-- panvimdoc-include-comment
 - {param} (table) a table, identical to the tables passed into Neovim commands
@@ -532,8 +535,9 @@ Reruns the last compiled command. See [`:Recompile`](#recompile).
 - `{param}` (table) a table, identical to the tables passed into Neovim commands
   (optional)
   - `{param.smods}`: a table - see the mods field of `:h nvim_parse_cmd()` for
-    more
-  <!-- panvimdoc-ignore-end -->
+  more
+
+<!-- panvimdoc-ignore-end -->
 
 <!-- panvimdoc-include-comment
 - {param} (table) a table, identical to the tables passed into Neovim commands
