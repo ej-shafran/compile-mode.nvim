@@ -673,10 +673,7 @@ compile_mode.compile({param})					*compile-mode.compile()*
 ```
 -->
 
-Run a command and place its output in the compilation buffer, reporting on its result.
-The command is run from the current working directory.
-The compilation buffer is opened in a new split if it isn't already opened.
-If {param.args} is not passed in, the user is prompted for a command using `:h vim.ui.input()`.
+Run a command and place its output in the compilation buffer, reporting on its result. See [`:Compile`](#compile).
 
 #### Parameters
 
