@@ -732,10 +732,6 @@ The command is run from the current working directory.
 The compilation buffer is opened in a new split if it isn't already opened.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
 
-You can run the command using `:h :vert` to split the window vertically. `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright` also modify the split.
-You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
-You can run the command with a `:h count` to set the size of the opened window, like `:h :split`.
-
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
 :Compile
@@ -743,11 +739,16 @@ You can run the command with a `:h count` to set the size of the opened window, 
 The command is run from the current working directory.
 The compilation buffer is opened in a new split if it isn't already opened.
 If an argument is present, it is used as the command. Otherwise, the user is prompted using `:h vim.ui.input()`.
-You can run the command using `:h :vert` to split the window vertically. `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright` also modify the split.
-You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
-You can run the command with a `:h count` to set the size of the opened window, like `:h :split`.
-
 -->
+
+The following commands work when prefixed to `:Compile`:
+
+- `:h :vert`
+- `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright`
+- `:h :silent`
+- `:h :hide`
+
+Additionally, you can run the command with a `:h count` to set the size of the opened window, like with `:h :split`.
 
 <!-- panvimdoc-ignore-start -->
 
@@ -757,10 +758,6 @@ Reruns the last compiled command. If there isn't one, the error is reported usin
 The compilation buffer is opened in a new split if it isn't already opened.
 The command is rerun from the directory in which it was originally run.
 
-You can run the command using `:h :vert` to split the window vertically. `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright` also modify the split.
-You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
-You can run the command with a `:h count` to set the size of the opened window, like `:h :split`.
-
 <!-- panvimdoc-ignore-end -->
 <!-- panvimdoc-include-comment
 :Recompile
@@ -768,10 +765,16 @@ You can run the command with a `:h count` to set the size of the opened window, 
 : Reruns the last compiled command. If there isn't one, the error is reported using `:h vim.notify()`.
 The compilation buffer is opened in a new split if it isn't already opened.
 The command is rerun from the directory in which it was originally run.
-You can run the command using `:h :vert` to split the window vertically. `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright` also modify the split.
-You can run the command using `:h :silent` to get rid of the "Compilation finished" messages.
-You can run the command with a `:h count` to set the size of the opened window, like `:h :split`.
 -->
+
+The following commands work when prefixed to `:Compile`:
+
+- `:h :vert`
+- `:h :aboveleft`, `:h :belowright`, `:h :topleft` and `:h :botright`
+- `:h :silent`
+- `:h :hide`
+
+Additionally, you can run the command with a `:h count` to set the size of the opened window, like with `:h :split`.
 
 <!-- panvimdoc-ignore-start -->
 
@@ -819,6 +822,7 @@ Jump to the error present in the line under the cursor. If no such error exists,
 -->
 
 <!-- panvimdoc-ignore-start -->
+
 ### `:CompileInterrupt`
 
 Only available within the compilation buffer itself.
