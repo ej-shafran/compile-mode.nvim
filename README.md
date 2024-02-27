@@ -637,9 +637,11 @@ compilation_hidden_output
 -->
 
 <!-- panvimdoc-ignore-start -->
+
 #### `recompile_no_fail`
 
 When `true`, running [`:Recompile`](#recompile) without a prior command will not fail, but instead simply trigger a call to [`:Compile`](#compile).
+
 <!-- panvimdoc-ignore-end -->
 
 <!-- panvimdoc-include-comment
@@ -677,12 +679,18 @@ Run a command and place its output in the compilation buffer, reporting on its r
 
 #### Parameters
 
+<!-- panvimdoc-ignore-start -->
+
+- `{param}` (table) a table, identical to the tables passed into Neovim commands (optional)
+  - `{param.args}`: the string of the command itself, or `nil` if the user should be prompted to enter a command
+  - `{param.smods}`: a table - see the mods field of `:h nvim_parse_cmd()` for more
+  <!-- panvimdoc-ignore-end -->
+
+<!-- panvimdoc-include-comment
 - {param} (table) a table, identical to the tables passed into Neovim commands (optional)
   - {param.args}: the string of the command itself, or `nil` if the user should be prompted to enter a command
   - {param.smods}: a table - see the mods field of `:h nvim_parse_cmd()` for more
-    - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
-    - {param.smods.silent}: does not print any information
-    - {param.smods.split}: modifications for the placement of the split
+-->
 
 <!-- panvimdoc-ignore-start -->
 
@@ -699,11 +707,16 @@ Reruns the last compiled command. See [`:Recompile`](#recompile).
 
 #### Parameters
 
+<!-- panvimdoc-ignore-start -->
+
+- `{param}` (table) a table, identical to the tables passed into Neovim commands (optional)
+  - `{param.smods}`: a table - see the mods field of `:h nvim_parse_cmd()` for more
+  <!-- panvimdoc-ignore-end -->
+
+<!-- panvimdoc-include-comment
 - {param} (table) a table, identical to the tables passed into Neovim commands (optional)
   - {param.smods}: a table - see the mods field of `:h nvim_parse_cmd()` for more
-    - {param.smods.vertical}: makes the window split vertically if the compilation buffer is not yet open
-    - {param.smods.silent}: does not print any information
-    - {param.smods.split}: modifications for the placement of the split
+-->
 
 ### next_error()
 
