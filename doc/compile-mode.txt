@@ -8,6 +8,8 @@ Table of Contents                             *compile-mode-table-of-contents*
 3. Compilation buffer                        |compile-mode-compilation-buffer|
 4. Errors                                                |compile-mode-errors|
 5. API                                                      |compile-mode-api|
+  - compile({param})                       |compile-mode-api-compile({param})|
+  - recompile({param})                   |compile-mode-api-recompile({param})|
   - next_error()                               |compile-mode-api-next_error()|
   - prev_error()                               |compile-mode-api-prev_error()|
   - goto_error()                               |compile-mode-api-goto_error()|
@@ -312,7 +314,8 @@ recompile_no_fail                      When `true`, running |compile-mode-`:reco
 
 
 
-compile_mode.compile({param})                   *compile-mode.compile()*
+
+COMPILE({PARAM})                           *compile-mode-api-compile({param})*
 
 Run a command and place its output in the compilation buffer, reporting on its
 result. See |compile-mode-`:compile`|.
@@ -327,7 +330,8 @@ PARAMETERS ~
     - {param.smods}: a table - see the mods field of |nvim_parse_cmd()| for
         more
 
-compile_mode.recompile()                *compile-mode.recompile()*
+
+RECOMPILE({PARAM})                       *compile-mode-api-recompile({param})*
 
 Reruns the last compiled command. See |compile-mode-`:recompile`|.
 

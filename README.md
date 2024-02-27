@@ -479,16 +479,7 @@ override this behavior and override the current window instead by setting this
 to `true`.
 -->
 
-<!-- panvimdoc-ignore-start -->
-
 ### compile({param})
-
-<!-- panvimdoc-ignore-end -->
-<!-- panvimdoc-include-comment
-```vimdoc
-compile_mode.compile({param})					*compile-mode.compile()*
-```
--->
 
 Run a command and place its output in the compilation buffer, reporting on its
 result. See [`:Compile`](#compile).
@@ -515,16 +506,7 @@ result. See [`:Compile`](#compile).
     more
 -->
 
-<!-- panvimdoc-ignore-start -->
-
 ### recompile({param})
-
-<!-- panvimdoc-ignore-end -->
-<!-- panvimdoc-include-comment
-```vimdoc
-compile_mode.recompile()				*compile-mode.recompile()*
-```
--->
 
 Reruns the last compiled command. See [`:Recompile`](#recompile).
 
