@@ -6,6 +6,10 @@ M.get_bufnr = vim.fn.bufnr
 ---@diagnostic disable-next-line: undefined-field
 M.buf_set_opt = vim.api.nvim_buf_set_option
 
+function M.get_compilation_bufnr()
+	return M.get_bufnr("*compilation*")
+end
+
 ---@param opts Config|nil
 function M.setup_tests(opts)
 	require("plugin.command")

@@ -19,7 +19,7 @@ describe(":Compile", function()
 	it("should run a command and create a buffer with the result", function()
 		vim.cmd("silent Compile echo hello world")
 
-		local bufnr = utils.get_bufnr("*compilation*")
+		local bufnr = utils.get_compilation_bufnr()
 
 		utils.wait()
 
@@ -35,11 +35,11 @@ describe(":Recompile", function()
 	it("should rerun the latest command", function()
 		vim.cmd("silent Compile echo hello world")
 
-		local bufnr = utils.get_bufnr("*compilation*")
+		local bufnr = utils.get_compilation_bufnr()
 
 		utils.wait()
 
-		local expected = vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+		local expected = get_compilation_lines(bufnr)
 
 		utils.buf_set_opt(bufnr, "modifiable", true)
 		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})

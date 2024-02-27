@@ -19,7 +19,7 @@ describe("the `compilation_hidden_output` option", function()
 	it("should configure parts of the output not to show", function()
 		vim.cmd('silent Compile echo -e "hello world\\nhow are yout"')
 
-		local bufnr = utils.get_bufnr("*compilation*")
+		local bufnr = utils.get_compilation_bufnr()
 
 		utils.wait()
 
