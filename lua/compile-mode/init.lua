@@ -14,7 +14,7 @@ local current_error = 0
 ---@type string|nil
 local prev_dir = nil
 ---@type Config
-local config = {
+M.config = {
 	buffer_name = "*compilation*",
 	default_command = "make -k",
 	error_highlights = colors.default_highlights,
@@ -24,7 +24,7 @@ local config = {
 M.level = errors.level
 
 local debug = a.void(function(...)
-	if config.debug == true then
+	if M.config.debug == true then
 		utils.wait()
 		print(...)
 	end
@@ -46,16 +46,16 @@ end
 ---@param opts Config
 function M.setup(opts)
 	debug("== setup() ==")
-	config = vim.tbl_deep_extend("force", config, opts)
+	M.config = vim.tbl_deep_extend("force", M.config, opts)
 
-	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, config.error_regexp_table or {})
-	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, config.error_ignore_file_list or {})
+	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})
+	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})
 
-	if config.error_highlights then
-		colors.setup_highlights(config.error_highlights)
+	if M.config.error_highlights then
+		colors.setup_highlights(M.config.error_highlights)
 	end
 
-	debug("config = " .. vim.inspect(config))
+	debug("config = " .. vim.inspect(M.config))
 end
 
 ---@type fun(cmd: string, bufnr: integer, sync: boolean | nil): integer, integer, integer
@@ -75,12 +75,12 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 		for i, line in ipairs(data) do
 			local error = errors.parse(line)
 
-			if config.compilation_hidden_output then
+			if M.config.compilation_hidden_output then
 				local hide
-				if type(config.compilation_hidden_output) == "string" then
-					hide = { config.compilation_hidden_output }
+				if type(M.config.compilation_hidden_output) == "string" then
+					hide = { M.config.compilation_hidden_output }
 				else
-					hide = config.compilation_hidden_output --[[@as string[] ]]
+					hide = M.config.compilation_hidden_output --[[@as string[] ]]
 				end
 
 				for _, re in ipairs(hide) do
@@ -91,7 +91,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 			if error then
 				errors.error_list[linecount + i - 1] = error
-			elseif not config.no_baleia_support then
+			elseif not M.config.no_baleia_support then
 				line = vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
 				data[i] = line
 			end
@@ -135,7 +135,7 @@ end, 4)
 
 ---Get the current time, formatted.
 local function time()
-	return vim.fn.strftime(config.time_format)
+	return vim.fn.strftime(M.config.time_format)
 end
 
 ---Get the default directory, formatted.
@@ -157,7 +157,7 @@ function M.goto_error()
 		return
 	end
 
-	utils.jump_to_error(error, config.same_window_errors)
+	utils.jump_to_error(error, M.config.same_window_errors)
 end
 
 ---Interrupt the currently running compilation command.
@@ -174,11 +174,11 @@ M.interrupt = a.void(function()
 	debug("== interrupting compilation ==")
 	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
 
-	local bufnr = utils.bufnr(config.buffer_name)
+	local bufnr = utils.bufnr(M.config.buffer_name)
 	debug("bufnr = " .. bufnr)
 
 	local interrupt_message
-	if not config.no_baleia_support then
+	if not M.config.no_baleia_support then
 		interrupt_message = "Compilation \x1b[31minterrupted\x1b[0m"
 	else
 		interrupt_message = "Compilation interrupted"
@@ -212,7 +212,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 
 	debug("== opening compilation buffer ==")
 
-	local bufnr = utils.split_unless_open(config.buffer_name, smods, count)
+	local bufnr = utils.split_unless_open(M.config.buffer_name, smods, count)
 	debug("bufnr = " .. bufnr)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
@@ -223,8 +223,8 @@ local runcommand = a.void(function(command, smods, count, sync)
 	vim.keymap.set("n", "<CR>", "<CMD>CompileGotoError<CR>", { silent = true, buffer = bufnr })
 	vim.keymap.set("n", "<C-c>", "<CMD>CompileInterrupt<CR>", { silent = true, buffer = bufnr })
 
-	if not config.no_baleia_support then
-		local baleia = require("baleia").setup(config.baleia_opts or {})
+	if not M.config.no_baleia_support then
+		local baleia = require("baleia").setup(M.config.baleia_opts or {})
 		baleia.automatically(bufnr)
 		vim.api.nvim_create_user_command("BaleiaLogs", function()
 			baleia.logger.show()
@@ -240,7 +240,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	local error = errors.parse(command)
 	if error then
 		errors.error_list[4] = error
-	elseif not config.no_baleia_support then
+	elseif not M.config.no_baleia_support then
 		rendered_command = vim.fn.substitute(command, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
 	end
 
@@ -277,7 +277,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 			.. "\x1b[0m"
 	end
 
-	local compliation_message = config.no_baleia_support and simple_message or finish_message
+	local compliation_message = M.config.no_baleia_support and simple_message or finish_message
 	set_lines(bufnr, -1, -1, {
 		compliation_message .. " at " .. time(),
 		"",
@@ -303,7 +303,7 @@ M.compile = a.void(function(param)
 	local command = param.args ~= "" and param.args
 		or utils.input({
 			prompt = "Compile command: ",
-			default = vim.g.compile_command or config.default_command,
+			default = vim.g.compile_command or M.config.default_command,
 			completion = "shellcmd",
 		})
 
@@ -323,7 +323,7 @@ M.recompile = a.void(function(param)
 	debug("==recompile()==")
 	if vim.g.compile_command then
 		runcommand(vim.g.compile_command, param.smods or {}, param.count, param.bang)
-	elseif config.recompile_no_fail then
+	elseif M.config.recompile_no_fail then
 		M.compile(param)
 	else
 		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
@@ -349,7 +349,7 @@ M.next_error = a.void(function()
 
 	current_error = lowest_above
 	debug("current_error = " .. current_error)
-	utils.jump_to_error(errors.error_list[lowest_above], config.same_window_errors)
+	utils.jump_to_error(errors.error_list[lowest_above], M.config.same_window_errors)
 end)
 
 ---Jump to the previous error in the error list.
@@ -371,7 +371,7 @@ M.prev_error = a.void(function()
 
 	current_error = highest_below
 	debug("current_error = " .. current_error)
-	utils.jump_to_error(errors.error_list[highest_below], config.same_window_errors)
+	utils.jump_to_error(errors.error_list[highest_below], M.config.same_window_errors)
 end)
 
 return M
