@@ -15,7 +15,7 @@ local current_error = 0
 local prev_dir = nil
 ---@type Config
 M.config = {
-	buffer_name = "*compilation*",
+	buffer_name = "compilation",
 	default_command = "make -k",
 	error_highlights = colors.default_highlights,
 	time_format = "%a %b %e %H:%M:%S",
