@@ -20,7 +20,7 @@ function M.wait()
 	local co = coroutine.running()
 	vim.defer_fn(function()
 		coroutine.resume(co)
-	end, 30)
+	end, 100)
 	coroutine.yield(co)
 end
 
