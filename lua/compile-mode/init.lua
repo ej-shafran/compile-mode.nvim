@@ -78,7 +78,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 			if M.config.compilation_hidden_output then
 				local hide
 				if type(M.config.compilation_hidden_output) == "string" then
-					hide = { M.config.compilation_hidden_output }
+					hide = { M.config.compilation_hidden_output --[[@as string]] }
 				else
 					hide = M.config.compilation_hidden_output --[[@as string[] ]]
 				end
