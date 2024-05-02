@@ -219,8 +219,8 @@ local runcommand = a.void(function(command, smods, count, sync)
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
 
-	vim.api.nvim_buf_create_user_command(bufnr, "CompileGotoError", require("compile-mode").goto_error, {})
-	vim.api.nvim_buf_create_user_command(bufnr, "CompileInterrupt", require("compile-mode").interrupt, {})
+	vim.api.nvim_buf_create_user_command(bufnr, "CompileGotoError", M.goto_error, {})
+	vim.api.nvim_buf_create_user_command(bufnr, "CompileInterrupt", M.interrupt, {})
 
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
 	vim.keymap.set("n", "<CR>", "<CMD>CompileGotoError<CR>", { silent = true, buffer = bufnr })
