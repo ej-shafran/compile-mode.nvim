@@ -1,3 +1,4 @@
+---@diagnostic disable
 --- include-files.lua – filter to include Markdown files
 ---
 --- Copyright: © 2019–2021 Albert Krewinkel
