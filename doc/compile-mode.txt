@@ -1,4 +1,4 @@
-*compile-mode.txt*        For NVIM v0.8.0        Last change: 2024 February 27
+*compile-mode.txt*           For NVIM v0.8.0          Last change: 2024 May 19
 
 ==============================================================================
 Table of Contents                             *compile-mode-table-of-contents*
