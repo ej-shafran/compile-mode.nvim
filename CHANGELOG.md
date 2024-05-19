@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Changed the `buftype` of the compilation buffer to `"nofile"`.
+
+### Fixed
+
+- Moved the compilation buffer commands out of an `autocmd` to resolve some weird issues with it
+- Make `count` argument of `compile()` and `recompile()` optional
+
 ## [2.6.1] - 2024-02-27
 
 ### Fixed
