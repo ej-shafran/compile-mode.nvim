@@ -54,9 +54,12 @@ M.delay = a.wrap(function(timeout, callback)
 	vim.defer_fn(callback, timeout)
 end, 2)
 
----@type fun(bufnr: integer, opt: string, value: any)
----@diagnostic disable-next-line: undefined-field
-M.buf_set_opt = vim.api.nvim_buf_set_option
+---@param bufnr integer
+---@param opt string
+---@param value any
+function M.buf_set_opt(bufnr, opt, value)
+	vim.api.nvim_set_option_value(opt, value, { buf = bufnr })
+end
 
 ---If `fname` has a window open, do nothing.
 ---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
