@@ -83,7 +83,7 @@ function M.split_unless_open(fname, smods, count)
 			cmd = "split " .. cmd
 		end
 
-		if count ~= 0 then
+		if count ~= 0 and count ~= nil then
 			cmd = count .. cmd
 		end
 
