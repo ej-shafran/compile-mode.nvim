@@ -69,11 +69,10 @@ end
 ---@param count integer
 ---@return integer bufnr the identifier of the buffer for `fname`
 function M.split_unless_open(fname, smods, count)
-	local bufnum = M.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+	local bufnum = vim.fn.bufadd(fname)
 
 	if smods.hide then
-		vim.cmd.badd(fname)
-		return M.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+		return bufnum
 	end
 
 	local winnum = vim.fn.bufwinnr(bufnum)
@@ -97,7 +96,7 @@ function M.split_unless_open(fname, smods, count)
 		vim.cmd(cmd)
 	end
 
-	return M.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+	return bufnum
 end
 
 ---@param filename string
