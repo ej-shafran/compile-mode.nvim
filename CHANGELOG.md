@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] - 2024-05-20
+
 ### Changed
 
 - Changed the `buftype` of the compilation buffer to `"nofile"`.
@@ -173,6 +175,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[2.7.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.6.1...v2.7.0
+[2.6.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.6.0...v2.6.1
 [2.6.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.5.0...v2.6.0
 [2.5.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.3.1...v2.4.0
