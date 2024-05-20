@@ -1,3 +1,4 @@
+---@diagnostic disable
 PANDOC_VERSION:must_be_at_least("3.0")
 
 local pipe = pandoc.pipe

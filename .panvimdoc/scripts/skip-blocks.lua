@@ -1,3 +1,4 @@
+---@diagnostic disable
 function dump(s)
   io.stderr:write(require("scripts.inspect").inspect(s) .. "\n")
   -- io.stderr:write(pandoc.utils.stringify(s) .. "\n")

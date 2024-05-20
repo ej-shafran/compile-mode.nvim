@@ -1,3 +1,4 @@
+---@diagnostic disable
 local demojify = require("lib.Demojify")
 
 -- keep track if a emoji was removed previously

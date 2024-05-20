@@ -1,3 +1,4 @@
+---@diagnostic disable
 --[[
     logging.lua: pandoc-aware logging functions (can also be used standalone)
     Copyright:   (c) 2022 William Lupton
