@@ -69,25 +69,18 @@ end
 ---@param count integer
 ---@return integer bufnr the identifier of the buffer for `fname`
 function M.split_unless_open(fname, smods, count)
-	local bufnum = M.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+	local bufnum = vim.fn.bufadd(fname)
 
 	if smods.hide then
-		vim.cmd.badd(fname)
-		return M.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+		return bufnum
 	end
 
 	local winnum = vim.fn.bufwinnr(bufnum)
 
 	if winnum == -1 then
-		local cmd = fname
+		local cmd = "sbuffer " .. bufnum
 		if smods.vertical then
-			cmd = "vsplit " .. cmd
-		else
-			cmd = "split " .. cmd
-		end
-
-		if count ~= 0 and count ~= nil then
-			cmd = count .. cmd
+			cmd = "vert " .. cmd
 		end
 
 		if smods.split and smods.split ~= "" then
@@ -95,9 +88,13 @@ function M.split_unless_open(fname, smods, count)
 		end
 
 		vim.cmd(cmd)
+
+		if count ~= 0 and count ~= nil then
+			vim.cmd("resize" .. count)
+		end
 	end
 
-	return M.bufnr(vim.fn.expand(fname) --[[@as any]]) --[[@as integer]]
+	return bufnum
 end
 
 ---@param filename string

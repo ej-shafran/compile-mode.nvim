@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The behavior of certain unique characters in the name of the compilation buffer. Specifically, this fixes an issue with the default buffer name - see [here](https://github.com/ej-shafran/compile-mode.nvim/issues/16).
+
 ## [2.7.0] - 2024-05-20
 
 ### Changed
