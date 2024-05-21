@@ -44,7 +44,8 @@
 * DONE Add compilation-hidden-output
   CLOSED: [2023-11-13 Mon 22:15]
 
-* TODO Add CurrentError command
+* DONE Add CurrentError command
+  CLOSED: [2024-05-21 Tue 23:50]
 
 * TODO Add QuickfixErrors command
 
