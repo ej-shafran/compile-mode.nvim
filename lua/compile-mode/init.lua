@@ -10,9 +10,13 @@ local colors = require("compile-mode.colors")
 
 local M = {}
 
-local current_error = 0
+---Line in the compilation buffer that the current error is on;
+---acts as an index of `errors.error_list`
+local error_cursor = 0
+
 ---@type string|nil
 local prev_dir = nil
+
 ---@type Config
 M.config = {
 	buffer_name = "*compilation*",
@@ -79,7 +83,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 				local hide
 				if type(M.config.compilation_hidden_output) == "string" then
 					hide = {
-						M.config.compilation_hidden_output --[[@as string]],
+						M.config.compilation_hidden_output,--[[@as string]]
 					}
 				else
 					hide = M.config.compilation_hidden_output --[[@as string[] ]]
@@ -176,7 +180,7 @@ M.interrupt = a.void(function()
 	debug("== interrupting compilation ==")
 	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
 
-	local bufnr = utils.bufnr(M.config.buffer_name)
+	local bufnr = vim.fn.bufnr(M.config.buffer_name)
 	debug("bufnr = " .. bufnr)
 
 	local interrupt_message
@@ -202,7 +206,7 @@ end)
 ---
 ---@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
 local runcommand = a.void(function(command, smods, count, sync)
-	current_error = 0
+	error_cursor = 0
 	errors.error_list = {}
 
 	debug("== runcommand() ==")
@@ -335,13 +339,28 @@ M.recompile = a.void(function(param)
 	end
 end)
 
+---Jump to the current error in the error list
+M.current_error = a.void(function()
+	debug("== current_error() ==")
+
+	debug("line = " .. error_cursor)
+
+	local error = errors.error_list[error_cursor]
+	if error == nil then
+		vim.notify("No error currently loaded", vim.log.levels.ERROR)
+		return
+	end
+
+	utils.jump_to_error(error, M.config.same_window_errors)
+end)
+
 ---Jump to the next error in the error list.
 M.next_error = a.void(function()
 	debug("== next_error() ==")
 
 	local lowest_above = nil
 	for line, _ in pairs(errors.error_list) do
-		if line > current_error and (not lowest_above or lowest_above > line) then
+		if line > error_cursor and (not lowest_above or lowest_above > line) then
 			lowest_above = line
 		end
 	end
@@ -352,8 +371,7 @@ M.next_error = a.void(function()
 	end
 	debug("line = " .. lowest_above)
 
-	current_error = lowest_above
-	debug("current_error = " .. current_error)
+	error_cursor = lowest_above
 	utils.jump_to_error(errors.error_list[lowest_above], M.config.same_window_errors)
 end)
 
@@ -363,7 +381,7 @@ M.prev_error = a.void(function()
 
 	local highest_below = nil
 	for line, _ in pairs(errors.error_list) do
-		if line < current_error and (not highest_below or highest_below < line) then
+		if line < error_cursor and (not highest_below or highest_below < line) then
 			highest_below = line
 		end
 	end
@@ -374,8 +392,7 @@ M.prev_error = a.void(function()
 	end
 	debug("line = " .. highest_below)
 
-	current_error = highest_below
-	debug("current_error = " .. current_error)
+	error_cursor = highest_below
 	utils.jump_to_error(errors.error_list[highest_below], M.config.same_window_errors)
 end)
 
