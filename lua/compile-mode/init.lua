@@ -396,4 +396,22 @@ M.prev_error = a.void(function()
 	utils.jump_to_error(errors.error_list[highest_below], M.config.same_window_errors)
 end)
 
+---Load all compilation errors into the quickfix list, replacing the existing list.
+M.send_to_qflist = a.void(function()
+	debug("== send_to_qflist() ==")
+
+	vim.api.nvim_exec_autocmds("QuickFixCmdPre", {})
+	vim.fn.setqflist(errors.toqflist(errors.error_list), "r")
+	vim.api.nvim_exec_autocmds("QuickFixCmdPost", {})
+end)
+
+---Load all compilation errors into the quickfix list, appending onto the existing list.
+M.add_to_qflist = a.void(function()
+	debug("== add_to_qflist() ==")
+
+	vim.api.nvim_exec_autocmds("QuickFixCmdPre", {})
+	vim.fn.setqflist(errors.toqflist(errors.error_list), "a")
+	vim.api.nvim_exec_autocmds("QuickFixCmdPost", {})
+end)
+
 return M
