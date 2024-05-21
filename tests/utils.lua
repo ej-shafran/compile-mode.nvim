@@ -1,7 +1,5 @@
 local M = {}
 
----@type fun(name: string, create: boolean?): integer
-M.get_bufnr = vim.fn.bufnr
 ---@param bufnr integer
 ---@param opt string
 ---@param value any
@@ -10,7 +8,7 @@ function M.buf_set_opt(bufnr, opt, value)
 end
 
 function M.get_compilation_bufnr()
-	return M.get_bufnr("*compilation*")
+	return vim.fn.bufnr("*compilation*")
 end
 
 ---@param opts Config|nil

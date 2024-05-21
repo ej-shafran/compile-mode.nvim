@@ -186,7 +186,4 @@ M.jump_to_error = a.void(function(error, same_window)
 	goto_file(nested_filename, error, same_window)
 end)
 
----@type fun(bufname: string): integer
-M.bufnr = vim.fn.bufnr
-
 return M
