@@ -43,3 +43,10 @@
   CLOSED: [2023-11-13 Mon 21:56]
 * DONE Add compilation-hidden-output
   CLOSED: [2023-11-13 Mon 22:15]
+
+* TODO Add CurrentError command
+
+* TODO Add QuickfixErrors command
+
+* TODO Add diagnostic windows
+  As configuration option, probably
