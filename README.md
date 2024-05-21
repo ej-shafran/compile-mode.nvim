@@ -528,6 +528,10 @@ Reruns the last compiled command. See [`:Recompile`](#recompile).
     more
 -->
 
+### current_error()
+
+Jumps to the current error within the compilation buffer. See [`:CurrentError`](#currenterror).
+
 ### next_error()
 
 Jumps to the next error within the compilation buffer. See [`:NextError`](#nexterror).
@@ -602,6 +606,30 @@ The following commands work when prefixed to `:Compile`:
 
 Additionally, you can run the command with a `:h count` to set the size of the
 opened window, like with `:h :split`.
+
+<!-- panvimdoc-ignore-start -->
+
+### `:CurrentError`
+
+Jump to the current error in the compilation buffer. This works using the same
+cursor that [`:NextError`](#nexterror) and [`:PrevError`](#preverror) operate
+on, and acts as a way to jump back to the error you were working after a bit of
+iteration and jumping through files. As long as the current error is before the
+first error (the default until [`:NextError`](#nexterror) has not yet been used)
+this command has no effect and reports on this fact.
+
+<!-- panvimdoc-ignore-end -->
+
+<!-- panvimdoc-include-comment
+:CurrentError
+
+: Jump to the current error in the compilation buffer. This works using the same
+cursor that [`:NextError`](#nexterror) and [`:PrevError`](#preverror) operate
+on, and acts as a way to jump back to the error you were working after a bit of
+iteration and jumping through files. As long as the current error is before the
+first error (the default until [`:NextError`](#nexterror) has not yet been used)
+this command has no effect and reports on this fact.
+-->
 
 <!-- panvimdoc-ignore-start -->
 
