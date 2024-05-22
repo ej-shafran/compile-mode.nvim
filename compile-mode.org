@@ -7,8 +7,6 @@
   CLOSED: [2023-10-29 Sun 01:36]
 * DONE Support split modifier
   CLOSED: [2023-10-29 Sun 01:42]
-* TODO Add option not to split at all if more than certain amount of windows
-  Maybe `window_threshold`, or something of the sort
 * DONE Configure compilation buffer name
   CLOSED: [2023-10-29 Sun 01:48]
 * DONE Configure highlight colors
@@ -43,3 +41,15 @@
   CLOSED: [2023-11-13 Mon 21:56]
 * DONE Add compilation-hidden-output
   CLOSED: [2023-11-13 Mon 22:15]
+
+* DONE Add CurrentError command
+  CLOSED: [2024-05-21 Tue 23:50]
+
+* DONE Add QuickfixErrors command
+  CLOSED: [2024-05-22 Wed 17:11]
+
+* TODO Add diagnostic windows
+  As configuration option, probably
+
+* TODO Add option not to split at all if more than certain amount of windows
+  Maybe `window_threshold`, or something of the sort

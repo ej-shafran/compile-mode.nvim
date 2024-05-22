@@ -1,5 +1,5 @@
 ---@alias StringRange { start: integer, end_: integer }
----@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }?, group: string }
+---@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }?, group: string, full_text: string }
 ---@alias RegexpMatcher { regex: string, filename: integer, row: integer|IntByInt|nil, col: integer|IntByInt|nil, type: nil|level|IntByInt }
 ---@alias ErrorRegexpTable table<string, RegexpMatcher>
 
@@ -373,6 +373,7 @@ local function parse_matcher(matcher, line)
 		highlighted = false,
 		level = error_level,
 		full = result[1],
+		full_text = line,
 		filename = range_and_value(line, filename_range),
 		row = numeric_range_and_value(line, row_range),
 		col = numeric_range_and_value(line, col_range),
@@ -380,6 +381,21 @@ local function parse_matcher(matcher, line)
 		end_col = numeric_range_and_value(line, end_col_range),
 		group = nil,
 	}
+end
+
+---@param error_list table<integer, Error> table of compilation errors, usually `errors.error_list`
+---@return unknown[] qflist values which can be inserted into the quickfix list using `setqflist()`
+function M.toqflist(error_list)
+	return vim.tbl_values(vim.tbl_map(function(error)
+		return {
+			filename = error.filename.value,
+			lnum = error.row and error.row.value,
+			end_lnum = error.end_row and error.end_row.value,
+			col = error.col and error.col.value,
+			end_col = error.end_col and error.end_col.value,
+			text = error.full_text,
+		}
+	end, error_list))
 end
 
 ---Parses error syntax from a given line.

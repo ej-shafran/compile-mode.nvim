@@ -22,6 +22,7 @@ describe("error parsing", function()
 
 		---@type Error
 		local expected = {
+			full_text = error_string,
 			full = {
 				start = 1,
 				end_ = error_length,
@@ -65,17 +66,19 @@ describe("error parsing", function()
 		local col = 23
 		local filename = "path/to/error-file.ts"
 		local error_string = filename .. "(" .. row .. "," .. col .. "): error TS22:"
+		local error_length = error_string:len()
+		error_string = error_string .. " error details..."
 
-		vim.cmd("silent Compile echo '" .. error_string .. " error details...'")
+		vim.cmd("silent Compile echo '" .. error_string .. "'")
 		utils.wait()
 
 		local filename_length = filename:len()
-		local error_length = error_string:len()
 		local row_length = tostring(row):len()
 		local col_length = tostring(col):len()
 
 		---@type Error
 		local expected = {
+			full_text = error_string,
 			full = {
 				start = 1,
 				end_ = error_length,

@@ -19,7 +19,7 @@ describe("interrupting a compilation", function()
 		vim.cmd("silent Compile echo hello world")
 		utils.wait()
 
-		local bufnr = utils.get_bufnr("*compilation*")
+		local bufnr = vim.fn.bufnr("*compilation*")
 
 		local lines = vim.api.nvim_buf_get_lines(bufnr, -2, -1, false)
 		local expected = { "Compilation interrupted at " .. vim.fn.strftime("%a %b %e %H:%M:%S") }
