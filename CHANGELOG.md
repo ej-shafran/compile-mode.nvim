@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - The `CurrentError` command, which acts as a way to jump back to the error you were working after a bit of iteration.
+- The `QuickfixErrors` command, which sends compilation errors to the quickfix list and opens the quickfix window.
+- Several new API functions which are used to implement those commands.
+
+### Changed
+
+- The documentation process; the docs themselves are no longer created from the README, which creates better, more readable docs and a cleaner, simpler README.
 
 ## [2.7.1] - 2024-05-21
 
