@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The `CurrentError` command, which acts as a way to jump back to the error you were working after a bit of iteration.
+
 ## [2.7.1] - 2024-05-21
 
 ### Fixed

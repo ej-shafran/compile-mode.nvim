@@ -42,11 +42,13 @@
 * DONE Add compilation-hidden-output
   CLOSED: [2023-11-13 Mon 22:15]
 
-* TODO Add option not to split at all if more than certain amount of windows
-  Maybe `window_threshold`, or something of the sort
-* TODO Add CurrentError command
+* DONE Add CurrentError command
+  CLOSED: [2024-05-21 Tue 23:50]
 
 * TODO Add QuickfixErrors command
 
-* TODO Add diagnostic windows for the errors
-  As a config option, probably
+* TODO Add diagnostic windows
+  As configuration option, probably
+
+* TODO Add option not to split at all if more than certain amount of windows
+  Maybe `window_threshold`, or something of the sort
