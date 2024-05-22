@@ -45,7 +45,8 @@
 * DONE Add CurrentError command
   CLOSED: [2024-05-21 Tue 23:50]
 
-* TODO Add QuickfixErrors command
+* DONE Add QuickfixErrors command
+  CLOSED: [2024-05-22 Wed 17:11]
 
 * TODO Add diagnostic windows
   As configuration option, probably
