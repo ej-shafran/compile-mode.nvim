@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.8.0] - 2024-05-22
+
 ### Added
 
 - The `CurrentError` command, which acts as a way to jump back to the error you were working after a bit of iteration.
@@ -191,6 +193,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[2.8.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.6.1...v2.7.0
 [2.6.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.6.0...v2.6.1
