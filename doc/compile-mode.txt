@@ -25,6 +25,8 @@ Table of Contents                             *compile-mode-table-of-contents*
   - current_error()                             |compile-mode.current_error()|
   - next_error()                                   |compile-mode.next_error()|
   - prev_error()                                   |compile-mode.prev_error()|
+  - send_to_qflist()                           |compile-mode.send_to_qflist()|
+  - add_to_qflist()                             |compile-mode.add_to_qflist()|
   - goto_error()                                   |compile-mode.goto_error()|
   - interrupt()                                     |compile-mode.interrupt()|
 6. Commands                                            |compile-mode-commands|
@@ -33,6 +35,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :CurrentError                                              |:CurrentError|
   - :NextError                                                    |:NextError|
   - :PrevError                                                    |:PrevError|
+  - :QuickfixErrors                                          |:QuickfixErrors|
   - :CompileGotoError                                      |:CompileGotoError|
   - :CompileInterrupt                                      |:CompileInterrupt|
 
@@ -311,6 +314,16 @@ next_error() ~
 prev_error() ~
     Jumps to a prior error within the compilation buffer. See |:PrevError|.
 
+					       *compile-mode.send_to_qflist()*
+send_to_qflist() ~
+    Loads all compilation errors into the quickfix list, replacing the
+    existing list.
+
+						*compile-mode.add_to_qflist()*
+add_to_qflist() ~
+    Loads all compilation errors into the quickfix list, appending onto the
+    existing list.
+
 						   *compile-mode.goto_error()*
 goto_error() ~
     Jumps to the error under the cursor. See |:CompileGotoError|.
@@ -381,6 +394,12 @@ interrupt() ~
     and continues backwards, one by one, from there. As long as the current
     error is before the first error (the default until |:NextError| has not
     yet been used) this command has no effect and reports on this fact.
+
+							     *:QuickfixErrors*
+:QuickfixErrors ~
+    Load all compilation errors into the quickfix list, replacing it (uses
+    |compile-mode.send_to_qflist()|), and then opens the quickfix window using
+    `:botright copen` (see |:botright| and |:copen|).
 
 							   *:CompileGotoError*
 :CompileGotoError ~
