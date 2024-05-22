@@ -12,7 +12,7 @@ for more details.
 Use your favorite plugin manager. `compile-mode.nvim` depends on
 [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) and on
 [baleia.nvim](https://github.com/m00qek/baleia.nvim) (unless the
-[`no_baleia_support`](#no_baleia_support) option is set).
+[no_baleia_support](#no_baleia_support) option is set).
 
 Here's an example of a [Lazy](https://github.com/folke/lazy.nvim) config for
 `compile-mode.nvim`:
@@ -39,7 +39,7 @@ return {
 
 The compilation buffer is the buffer into which the output of compilation
 commands is placed. By default, its name is `"*compilation*"` (though this can
-be configured using the [`buffer_name`](#buffer_name) option). Its filetype is
+be configured using the [buffer_name](#buffer_name) option). Its filetype is
 `compilation` - this can be used to setup `:h autocmd`s (and thus custom keymaps
 and the like).
 
@@ -583,7 +583,7 @@ opened window, like with `:h :split`.
 ### `:Recompile`
 
 Reruns the last compiled command. If there isn't one, the error is reported
-using `:h vim.notify()` (unless [`recompile_no_fail`](#recompile_no_fail) is
+using `:h vim.notify()` (unless [recompile_no_fail](#recompile_no_fail) is
 set). The compilation buffer is opened in a new split if it isn't already
 opened. The command is rerun from the directory in which it was originally run.
 
