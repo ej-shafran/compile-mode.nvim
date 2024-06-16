@@ -152,6 +152,10 @@ local runcommand = a.void(function(command, smods, count, sync)
 
 	vim.api.nvim_buf_create_user_command(bufnr, "CompileGotoError", M.goto_error, {})
 	vim.api.nvim_buf_create_user_command(bufnr, "CompileInterrupt", M.interrupt, {})
+	vim.api.nvim_buf_create_user_command(bufnr, "CompileNextError", M.move_to_next_error, {})
+	vim.api.nvim_buf_create_user_command(bufnr, "CompileNextFile", M.move_to_next_file, {})
+	vim.api.nvim_buf_create_user_command(bufnr, "CompilePrevError", M.move_to_prev_error, {})
+	vim.api.nvim_buf_create_user_command(bufnr, "CompilePrevFile", M.move_to_prev_file, {})
 
 	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
 	vim.keymap.set("n", "<CR>", "<CMD>CompileGotoError<CR>", { silent = true, buffer = bufnr })
@@ -226,6 +230,35 @@ local runcommand = a.void(function(command, smods, count, sync)
 	utils.buf_set_opt(bufnr, "modifiable", false)
 	utils.buf_set_opt(bufnr, "modified", false)
 end)
+
+---Get the next/previous matching line within the compilation buffer that has an error on it.
+---
+---@param is_previous boolean whether to search backwards from the error cursor
+---@param different_file boolean whether to only match errors that occur in different files from the current error
+---@return integer|nil
+local function get_error_line(is_previous, different_file)
+	local current_error = errors.error_list[error_cursor]
+
+	local error_line = nil
+	for line, error in pairs(errors.error_list) do
+		local fits_file_constraint = true
+		if different_file then
+			fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
+		end
+
+		local fits_line_constraint = true
+		if is_previous then
+			fits_line_constraint = line < error_cursor and (not error_line or error_line < line)
+		else
+			fits_line_constraint = line > error_cursor and (not error_line or error_line > line)
+		end
+
+		if fits_file_constraint and fits_line_constraint then
+			error_line = line
+		end
+	end
+	return error_line
+end
 
 --- PUBLIC (NON-COMMAND) API
 
@@ -319,21 +352,15 @@ end)
 M.next_error = a.void(function()
 	debug("== next_error() ==")
 
-	local lowest_above = nil
-	for line, _ in pairs(errors.error_list) do
-		if line > error_cursor and (not lowest_above or lowest_above > line) then
-			lowest_above = line
-		end
-	end
-
-	if not lowest_above then
+	local error_line = get_error_line(false, false)
+	if not error_line then
 		vim.notify("Moved past last error")
 		return
 	end
-	debug("line = " .. lowest_above)
+	debug("line = " .. error_line)
 
-	error_cursor = lowest_above
-	utils.jump_to_error(errors.error_list[lowest_above], M.config.same_window_errors)
+	error_cursor = error_line
+	utils.jump_to_error(errors.error_list[error_line], M.config.same_window_errors)
 end)
 
 ---Jump to the previous error in the error list.
@@ -342,21 +369,15 @@ end)
 M.prev_error = a.void(function()
 	debug("== prev_error() ==")
 
-	local highest_below = nil
-	for line, _ in pairs(errors.error_list) do
-		if line < error_cursor and (not highest_below or highest_below < line) then
-			highest_below = line
-		end
-	end
-
-	if not highest_below then
-		vim.notify("Moved past first error")
+	local error_line = get_error_line(true, false)
+	if not error_line then
+		vim.notify("Moved back before first error")
 		return
 	end
-	debug("line = " .. highest_below)
+	debug("line = " .. error_line)
 
-	error_cursor = highest_below
-	utils.jump_to_error(errors.error_list[highest_below], M.config.same_window_errors)
+	error_cursor = error_line
+	utils.jump_to_error(errors.error_list[error_line], M.config.same_window_errors)
 end)
 
 ---Load all compilation errors into the quickfix list, replacing the existing list.
@@ -436,6 +457,74 @@ M.interrupt = a.void(function()
 
 	vim.fn.jobstop(vim.g.compile_job_id)
 	vim.g.compile_job_id = nil
+end)
+
+---Move to the location of the next error within the compilation buffer.
+---Does not jump to the error's actual locus.
+---
+---@type fun()
+M.move_to_next_error = a.void(function()
+	debug("== move_to_next_error() ==")
+
+	local error_line = get_error_line(false, false)
+	if not error_line then
+		vim.notify("Moved past last error")
+		return
+	end
+
+	error_cursor = error_line
+	vim.api.nvim_win_set_cursor(0, { error_line, 0 })
+end)
+
+---Move to the location of the next error within the compilation buffer that has a different file to the current one.
+---Does not jump to the error's actual locus.
+---
+---@type fun()
+M.move_to_next_file = a.void(function()
+	debug("== move_to_next_file() ==")
+
+	local error_line = get_error_line(false, true)
+	if not error_line then
+		vim.notify("Moved past last error")
+		return
+	end
+
+	error_cursor = error_line
+	vim.api.nvim_win_set_cursor(0, { error_line, 0 })
+end)
+
+---Move to the location of the previous error within the compilation buffer.
+---Does not jump to the error's actual locus.
+---
+---@type fun()
+M.move_to_prev_error = a.void(function()
+	debug("== move_to_prev_error() ==")
+
+	local error_line = get_error_line(true, false)
+	if not error_line then
+		vim.notify("Moved back before first error")
+		return
+	end
+
+	error_cursor = error_line
+	vim.api.nvim_win_set_cursor(0, { error_line, 0 })
+end)
+
+---Move to the location of the previous error within the compilation buffer that has a different file to the current one.
+---Does not jump to the error's actual locus.
+---
+---@type fun()
+M.move_to_prev_file = a.void(function()
+	debug("== move_to_prev_file() ==")
+
+	local error_line = get_error_line(true, true)
+	if not error_line then
+		vim.notify("Moved back before first error")
+		return
+	end
+
+	error_cursor = error_line
+	vim.api.nvim_win_set_cursor(0, { error_line, 0 })
 end)
 
 return M

@@ -54,7 +54,8 @@
 * TODO Add option not to split at all if more than certain amount of windows
   Maybe `window_threshold`, or something of the sort
 
-* TODO Add CompilationNext{Error,File} and CompilationPrev{Error,File}
+* DONE Add CompilationNext{Error,File} and CompilationPrev{Error,File}
+  CLOSED: [2024-06-16 Sun 05:16]
 
 * TODO Add auto-jump to first error option
 
@@ -106,3 +107,6 @@ This gets tacked on the end of the generated expressions.")
 * TODO Update docs to use language similar to Emacs docs
 
 * TODO Remove Baleia support
+
+* TODO Refactor =get_error_line=-based functions
+
