@@ -355,10 +355,10 @@ local function parse_matcher(matcher, line)
 	local col_range, end_col_range = parse_matcher_group(result, matcher.col)
 
 	local error_level
-	if not matcher.type then
+	if matcher.type == nil then
 		error_level = M.level.ERROR
 	elseif type(matcher.type) == "number" then
-		error_level = matcher[5]
+		error_level = matcher.type
 	elseif type(matcher.type) == "table" then
 		if result[matcher.type[1] + 1] then
 			error_level = M.level.WARNING
