@@ -13,6 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `CompileNextFile` and `CompilePrevFile` commands, which act similarly to the two mentioned above but skip any errors within the current error's file.
 - Several new API functions which are used to implement those commands.
 
+### Changed
+
+- Instead of printing the Emacs-style "-*- ... -*-" at the top of the compilation buffer (which does nothing in Vim), a Vim modeline is printed that modifies the `filetype` and `path` options in the same way that the original Emacs mode does.
+
+### Removed
+
+- **(Breaking)** The dependency on `baleia.nvim`, along with the `no_baleia_support` and `baleia_options` options. This means that ANSI escape codes will no longer be automatically highlighted inside of the compilation buffer.
+- **(Breaking)** The `error_highlights` option. Instead, customize the highlights defined by this plugin using Vim's regular `:highlight` command (see the docs).
+
+### Fixed
+
+- Bug with parsing of error levels that caused some of the defaults of `error_regexp_table` not to function properly.
+
 ## [2.8.0] - 2024-05-22
 
 ### Added
