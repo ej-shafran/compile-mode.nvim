@@ -186,4 +186,30 @@ M.jump_to_error = a.void(function(error, same_window)
 	goto_file(nested_filename, error, same_window)
 end)
 
+function M.match_command_ouput(line, linenum)
+	local highlights = {}
+
+	local result = M.matchlistpos(line, "^\\([[:alnum:]_/.+-]\\+\\)\\%(\\[\\([0-9]\\+\\)\\]\\)\\?[ \t]*:")
+	if result then
+		local entire = result[1]
+		if entire then
+			table.insert(highlights, { "CompileModeCommandOutput", linenum, entire })
+		end
+
+		local num = result[3]
+		if num then
+			table.insert(highlights, { "CompileModeMessageRow", linenum, num })
+		end
+	end
+
+	return highlights
+end
+
+function M.highlight_command_outputs(bufnr, command_output_highlights)
+		for _, highlight in ipairs(command_output_highlights) do
+			M.add_highlight(bufnr, unpack(highlight))
+		end
+
+end
+
 return M

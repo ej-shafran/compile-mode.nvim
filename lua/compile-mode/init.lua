@@ -1,12 +1,11 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier?, hide: boolean? }
 ---@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
----@alias Config { no_baleia_support: boolean?, default_command: string?, time_format: string?, baleia_opts: table?, buffer_name: string?, error_highlights: false|table<string, HighlightStyle|false>?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean? }
+---@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
 local utils = require("compile-mode.utils")
-local colors = require("compile-mode.colors")
 
 local M = {}
 
@@ -53,6 +52,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 		count = count + #data
 
 		local linecount = vim.api.nvim_buf_line_count(bufnr)
+		local command_output_highlights = {}
 		for i, line in ipairs(data) do
 			local error = errors.parse(line)
 
@@ -74,14 +74,17 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 			if error then
 				errors.error_list[linecount + i - 1] = error
-			elseif not M.config.no_baleia_support then
-				line = vim.fn.substitute(line, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
-				data[i] = line
+			else
+				local highlights = utils.match_command_ouput(line, linecount + i - 1)
+				for _, highlight in ipairs(highlights) do
+					table.insert(command_output_highlights, highlight)
+				end
 			end
 		end
 
 		set_lines(bufnr, -2, -1, data)
 		utils.wait()
+		utils.highlight_command_outputs(bufnr, command_output_highlights)
 		errors.highlight(bufnr)
 	end)
 
@@ -146,6 +149,14 @@ local runcommand = a.void(function(command, smods, count, sync)
 	local bufnr = utils.split_unless_open(M.config.buffer_name, smods, count)
 	debug("bufnr = " .. bufnr)
 
+	vim.fn.matchadd("CompileModeInfo", "^Compilation \\zsfinished\\ze.*")
+	vim.fn.matchadd(
+		"CompileModeError",
+		"^Compilation \\zs\\(exited abnormally\\|interrupt\\|killed\\|terminated\\|segmentation fault\\)\\ze"
+	)
+	vim.fn.matchadd("CompileModeError", "^Compilation .* with code \\zs[0-9]\\+\\ze")
+	vim.fn.matchadd("CompileModeOutputFile", " --\\?o\\(utfile\\|utput\\)\\?[= ]\\zs\\(\\S\\+\\)\\ze")
+
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
@@ -161,32 +172,20 @@ local runcommand = a.void(function(command, smods, count, sync)
 	vim.keymap.set("n", "<CR>", "<CMD>CompileGotoError<CR>", { silent = true, buffer = bufnr })
 	vim.keymap.set("n", "<C-c>", "<CMD>CompileInterrupt<CR>", { silent = true, buffer = bufnr })
 
-	if not M.config.no_baleia_support then
-		local baleia = require("baleia").setup(M.config.baleia_opts or {})
-		baleia.automatically(bufnr)
-		vim.api.nvim_create_user_command("BaleiaLogs", function()
-			baleia.logger.show()
-		end, {})
-	end
-
 	-- reset compilation buffer
 	set_lines(bufnr, 0, -1, {})
 	utils.wait()
 
-	local rendered_command = command
-
 	local error = errors.parse(command)
 	if error then
 		errors.error_list[4] = error
-	elseif not M.config.no_baleia_support then
-		rendered_command = vim.fn.substitute(command, "^\\([^: \\t]\\+\\):", "\x1b[34m\\1\x1b[0m:", "")
 	end
 
 	set_lines(bufnr, 0, 0, {
-		'-*- mode: compilation; default-directory: "' .. default_dir() .. '" -*-',
+		"vim: filetype=compilation:path+=" .. default_dir(),
 		"Compilation started at " .. time(),
 		"",
-		rendered_command,
+		command,
 	})
 
 	utils.wait()
@@ -203,26 +202,20 @@ local runcommand = a.void(function(command, smods, count, sync)
 		set_lines(bufnr, -1, -1, { "" })
 	end
 
-	local simple_message
-	local finish_message
+	local compilation_message
 	if code == 0 then
-		simple_message = "Compilation finished"
-		finish_message = "Compilation \x1b[32mfinished\x1b[0m"
+		compilation_message = "Compilation finished"
 	else
-		simple_message = "Compilation exited abnormally with code " .. tostring(code)
-		finish_message = "Compilation \x1b[31mexited abnormally\x1b[0m with code \x1b[31m"
-			.. tostring(code)
-			.. "\x1b[0m"
+		compilation_message = "Compilation exited abnormally with code " .. tostring(code)
 	end
 
-	local compliation_message = M.config.no_baleia_support and simple_message or finish_message
 	set_lines(bufnr, -1, -1, {
-		compliation_message .. " at " .. time(),
+		compilation_message .. " at " .. time(),
 		"",
 	})
 
 	if not smods.silent then
-		vim.notify(simple_message)
+		vim.notify(compilation_message)
 	end
 
 	utils.wait()
@@ -286,7 +279,6 @@ end
 M.config = {
 	buffer_name = "*compilation*",
 	default_command = "make -k",
-	error_highlights = colors.default_highlights,
 	time_format = "%a %b %e %H:%M:%S",
 }
 
@@ -302,9 +294,14 @@ function M.setup(opts)
 	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})
 	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})
 
-	if M.config.error_highlights then
-		colors.setup_highlights(M.config.error_highlights)
-	end
+	vim.cmd("highlight default CompileModeMessage guifg=NONE gui=underline")
+	vim.cmd("highlight link CompileModeCommandOutput Function")
+	vim.cmd("highlight link CompileModeOutputFile Keyword")
+	vim.cmd("highlight default CompileModeMessageRow guifg=Magenta")
+	vim.cmd("highlight default CompileModeMessageCol guifg=Cyan")
+	vim.cmd("highlight default CompileModeError cterm=bold gui=bold guifg=Red")
+	vim.cmd("highlight default CompileModeWarning cterm=bold gui=bold guifg=DarkYellow")
+	vim.cmd("highlight default CompileModeInfo cterm=bold gui=bold guifg=Green")
 
 	debug("config = " .. vim.inspect(M.config))
 end
@@ -436,12 +433,7 @@ M.interrupt = a.void(function()
 	local bufnr = vim.fn.bufnr(M.config.buffer_name)
 	debug("bufnr = " .. bufnr)
 
-	local interrupt_message
-	if not M.config.no_baleia_support then
-		interrupt_message = "Compilation \x1b[31minterrupted\x1b[0m"
-	else
-		interrupt_message = "Compilation interrupted"
-	end
+	local interrupt_message = "Compilation interrupted"
 
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	set_lines(bufnr, -1, -1, {

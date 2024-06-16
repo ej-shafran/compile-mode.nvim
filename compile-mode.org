@@ -77,7 +77,8 @@
 
 * TODO Allow skipping/jumping forward several errors
 
-* TODO Implement all of the additional highlights
+* DONE Implement all of the additional highlights
+  CLOSED: [2024-06-16 Sun 09:34]
 
   #+begin_src elisp
   (defvar compilation-mode-font-lock-keywords
@@ -106,7 +107,8 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Update docs to use language similar to Emacs docs
 
-* TODO Remove Baleia support
+* DONE Remove Baleia support
+  CLOSED: [2024-06-16 Sun 09:34]
 
 * DONE Refactor =get_error_line=-based functions
   CLOSED: [2024-06-16 Sun 05:33]

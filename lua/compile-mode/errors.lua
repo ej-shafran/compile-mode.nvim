@@ -433,7 +433,7 @@ local function highlight_error(bufnr, error, linenum)
 	error.highlighted = true
 
 	local full_range = error.full
-	utils.add_highlight(bufnr, "CompileModeError", linenum, full_range)
+	utils.add_highlight(bufnr, "CompileModeMessage", linenum, full_range)
 
 	local hlgroup = "CompileMode"
 	if error.level == M.level.WARNING then
@@ -443,27 +443,26 @@ local function highlight_error(bufnr, error, linenum)
 	else
 		hlgroup = hlgroup .. "Error"
 	end
-	hlgroup = hlgroup .. "Filename"
 
 	local filename_range = error.filename.range
 	utils.add_highlight(bufnr, hlgroup, linenum, filename_range)
 
 	local row_range = error.row and error.row.range
 	if row_range then
-		utils.add_highlight(bufnr, "CompileModeErrorRow", linenum, row_range)
+		utils.add_highlight(bufnr, "CompileModeMessageRow", linenum, row_range)
 	end
 	local end_row_range = error.end_row and error.end_row.range
 	if end_row_range then
-		utils.add_highlight(bufnr, "CompileModeErrorRow", linenum, end_row_range)
+		utils.add_highlight(bufnr, "CompileModeMessageRow", linenum, end_row_range)
 	end
 
 	local col_range = error.col and error.col.range
 	if col_range then
-		utils.add_highlight(bufnr, "CompileModeErrorCol", linenum, col_range)
+		utils.add_highlight(bufnr, "CompileModeMessageCol", linenum, col_range)
 	end
 	local end_col_range = error.end_col and error.end_col.range
 	if end_col_range then
-		utils.add_highlight(bufnr, "CompileModeErrorCol", linenum, end_col_range)
+		utils.add_highlight(bufnr, "CompileModeMessageCol", linenum, end_col_range)
 	end
 end
 
