@@ -57,7 +57,8 @@
 * DONE Add CompilationNext{Error,File} and CompilationPrev{Error,File}
   CLOSED: [2024-06-16 Sun 05:16]
 
-* TODO Add auto-jump to first error option
+* DONE Add auto-jump to first error option
+  CLOSED: [2024-06-16 Sun 10:03]
 
 * TODO Add ask about save before compiling
 
