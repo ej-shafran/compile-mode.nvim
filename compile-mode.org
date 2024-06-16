@@ -53,3 +53,56 @@
 
 * TODO Add option not to split at all if more than certain amount of windows
   Maybe `window_threshold`, or something of the sort
+
+* TODO Add CompilationNext{Error,File} and CompilationPrev{Error,File}
+
+* TODO Add auto-jump to first error option
+
+* TODO Add ask about save before compiling
+
+* TODO Add compilation environment
+
+* TODO Parse entering/leaving directory messages
+
+** TODO Use for highlighting
+
+** TODO Use for determining relative paths
+
+* TODO Add ask-to-interrupt
+
+* TODO Add checks for segfault or termination
+
+* TODO Move logic to compilation ftplugin
+
+* TODO Allow skipping/jumping forward several errors
+
+* TODO Implement all of the additional highlights
+
+  #+begin_src elisp
+  (defvar compilation-mode-font-lock-keywords
+   '(;; configure output lines.
+     ("^[Cc]hecking \\(?:[Ff]or \\|[Ii]f \\|[Ww]hether \\(?:to \\)?\\)?\\(.+\\)\\.\\.\\. *\\(?:(cached) *\\)?\\(\\(yes\\(?: .+\\)?\\)\\|no\\|\\(.*\\)\\)$"
+      (1 font-lock-variable-name-face)
+      (2 (compilation-face '(4 . 3))))
+     ;; Command output lines.  Recognize `make[n]:' lines too.
+     ("^\\([[:alnum:]_/.+-]+\\)\\(\\[\\([0-9]+\\)\\]\\)?[ \t]*:"
+      (1 font-lock-function-name-face) (3 compilation-line-face nil t))
+     (" --?o\\(?:utfile\\|utput\\)?[= ]\\(\\S +\\)" . 1)
+     ("^Compilation \\(finished\\).*"
+      (0 '(face nil compilation-message nil help-echo nil mouse-face nil) t)
+      (1 compilation-info-face))
+     ("^Compilation \\(exited abnormally\\|interrupt\\|killed\\|terminated\\|segmentation fault\\)\\(?:.*with code \\([0-9]+\\)\\)?.*"
+      (0 '(face nil compilation-message nil help-echo nil mouse-face nil) t)
+      (1 compilation-error-face)
+      (2 compilation-error-face nil t)))
+   "Additional things to highlight in Compilation mode.
+This gets tacked on the end of the generated expressions.")
+  #+end_src
+
+* TODO Highlight line when jumping to error
+
+  Probably as configuration option.
+
+* TODO Update docs to use language similar to Emacs docs
+
+* TODO Remove Baleia support
