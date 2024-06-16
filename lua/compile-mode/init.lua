@@ -67,7 +67,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 				end
 
 				for _, re in ipairs(hide) do
-					line = vim.fn.substitute(line, re, "", "") --[[@as string]]
+					line = vim.fn.substitute(line, re --[[@as string]], "", "") --[[@as string]]
 					data[i] = line
 				end
 			end
