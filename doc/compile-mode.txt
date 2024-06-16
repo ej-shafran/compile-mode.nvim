@@ -28,6 +28,10 @@ Table of Contents                             *compile-mode-table-of-contents*
   - send_to_qflist()                           |compile-mode.send_to_qflist()|
   - add_to_qflist()                             |compile-mode.add_to_qflist()|
   - goto_error()                                   |compile-mode.goto_error()|
+  - move_to_next_error()                                |move_to_next_error()|
+  - move_to_next_file()                                  |move_to_next_file()|
+  - move_to_prev_error()                                |move_to_prev_error()|
+  - move_to_prev_file()                                  |move_to_prev_file()|
   - interrupt()                                     |compile-mode.interrupt()|
 6. Commands                                            |compile-mode-commands|
   - :Compile                                                        |:Compile|
@@ -37,6 +41,10 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :PrevError                                                    |:PrevError|
   - :QuickfixErrors                                          |:QuickfixErrors|
   - :CompileGotoError                                      |:CompileGotoError|
+  - :CompileNextError                                      |:CompileNextError|
+  - :CompileNextFile                                        |:CompileNextFile|
+  - :CompilePrevError                                      |:CompilePrevError|
+  - :CompilePrevFile                                        |:CompilePrevFile|
   - :CompileInterrupt                                      |:CompileInterrupt|
 
 ==============================================================================
@@ -328,6 +336,26 @@ add_to_qflist() ~
 goto_error() ~
     Jumps to the error under the cursor. See |:CompileGotoError|.
 
+					   *compile-mode.move_to_next_error()*
+move_to_next_error() ~
+    Move to the line of the next error within the compilation buffer. See
+    |:CompileNextError|.
+
+					   *compile-mode.move_to_next_file()*
+move_to_next_file() ~
+    Move to the line of the next error within the compilation buffer that has
+    a different file to the current error. See |:CompileNextFile|.
+
+					   *compile-mode.move_to_prev_error()*
+move_to_prev_error() ~
+    Move to the line of the previous error within the compilation buffer. See
+    |:CompilePrevError|.
+
+					    *compile-mode.move_to_prev_file()*
+move_to_prev_file() ~
+    Move to the line of the previous error within the compilation buffer that
+    has a different file to the current error. See |:CompilePrevFile|.
+
 						    *compile-mode.interrupt()*
 interrupt() ~
     Interrupts the currently running compilation. See |:CompileInterrupt|.
@@ -407,6 +435,36 @@ interrupt() ~
 
     Jump to the error present in the line under the cursor. If no such error
     exists, the command reports on this fact.
+
+							   *:CompileNextError*
+:CompileNextError ~
+    Only available within the compilation buffer itself.
+
+    Move to the line of the next error within the compilation buffer. Does not
+    jump to the error's actual file.
+
+							   *:CompileNextFile*
+:CompileNextFile ~
+    Only available within the compilation buffer itself.
+
+    Move to the line of the next error within the compilation buffer that has
+    a different file to the current error. Does not jump to the error's actual
+    file.
+
+							   *:CompilePrevError*
+:CompilePrevError ~
+    Only available within the compilation buffer itself.
+
+    Move to the line of the previous error within the compilation buffer. Does
+    not jump to the error's actual file.
+
+							    *:CompilePrevFile*
+:CompilePrevFile ~
+    Only available within the compilation buffer itself.
+
+    Move to the line of the previous error within the compilation buffer that
+    has a different file to the current error. Does not jump to the error's
+    actual file.
 
 							   *:CompileInterrupt*
 :CompileInterrupt ~
