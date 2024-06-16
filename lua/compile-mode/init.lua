@@ -398,6 +398,7 @@ M.goto_error = a.void(function()
 		return
 	end
 
+	error_cursor = linenum
 	utils.jump_to_error(error, M.config.same_window_errors)
 end)
 
