@@ -4,7 +4,7 @@
 
 ## Installation
 
-Use your favorite plugin manager. `compile-mode.nvim` depends on [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) and on [baleia.nvim](https://github.com/m00qek/baleia.nvim) (unless the [no_baleia_support](#no_baleia_support) option is set).
+Use your favorite plugin manager. `compile-mode.nvim` depends on [plenary.nvim](https://github.com/nvim-lua/plenary.nvim).
 
 Here's an example of a [Lazy](https://github.com/folke/lazy.nvim) config for `compile-mode.nvim`:
 
@@ -13,16 +13,9 @@ return {
   "ej-shafran/compile-mode.nvim",
   branch = "latest",
   -- or a specific version:
-  -- tag = "v2.0.0"
-  dependencies = {
-    "nvim-lua/plenary.nvim",
-    { "m00qek/baleia.nvim", tag = "v1.3.0" },
-  },
-  opts = {
-    -- you can disable colors by uncommenting this line
-    -- no_baleia_support = true,
-    default_command = "npm run build"
-  }
+  -- tag = "v3.0.0"
+  dependencies = { "nvim-lua/plenary.nvim" },
+  opts = {}
 }
 ```
 

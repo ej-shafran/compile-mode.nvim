@@ -10,12 +10,9 @@ Table of Contents                             *compile-mode-table-of-contents*
 5. API                                                      |compile-mode-api|
   - setup()                                             |compile-mode.setup()|
     - error_regexp_table                     |compile-mode.error_regexp_table|
-    - no_baleia_support                       |compile-mode.no_baleia_support|
     - default_command                           |compile-mode.default_command|
     - time_format                                   |compile-mode.time_format|
-    - baleia_options                             |compile-mode.baleia_options|
     - buffer_name                                   |compile-mode.buffer_name|
-    - error_highlights                         |compile-mode.error_highlights|
     - debug                                               |compile-mode.debug|
     - error_ignore_file_list             |compile-mode.error_ignore_file_list|
     - compilation_hidden_output       |compile-mode.compilation_hidden_output|
@@ -61,9 +58,7 @@ for more details.
 2. Installation                                    *compile-mode-installation*
 
 Use your favorite plugin manager. `compile-mode.nvim` depends on plenary.nvim
-<https://github.com/nvim-lua/plenary.nvim> and on baleia.nvim
-<https://github.com/m00qek/baleia.nvim> (unless the
-|compile-mode.no_baleia_support| option is set).
+<https://github.com/nvim-lua/plenary.nvim>.
 
 Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
 `compile-mode.nvim`:
@@ -73,16 +68,9 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
       "ej-shafran/compile-mode.nvim",
       branch = "latest",
       -- or a specific version:
-      -- tag = "v2.0.0"
-      dependencies = {
-        "nvim-lua/plenary.nvim",
-        { "m00qek/baleia.nvim", tag = "v1.3.0" },
-      },
-      opts = {
-        -- you can disable colors by uncommenting this line
-        -- no_baleia_support = true,
-        default_command = "npm run build"
-      }
+      -- tag = "v3.0.0"
+      dependencies = { "nvim-lua/plenary.nvim" },
+      opts = {}
     }
 <
 
@@ -182,9 +170,8 @@ setup({opts})                                           *compile-mode.setup()*
 
     >lua
 	require("compile-mode").setup({
-	 -- you can disable colors by uncommenting this line
-	 -- no_baleia_support = true,
-	 default_command = "npm run build",
+	  default_command = "npm run build",
+	  -- ...other options here
 	})
 <
 
@@ -192,11 +179,6 @@ Valid keys and values for {opts}:
 
 error_regexp_table                            *compile-mode.error_regexp_table
     See |compile-mode-errors|.
-
-no_baleia_support                             *compile-mode.no_baleia_support*
-    By default, `compile-mode.nvim` uses `baleia.nvim` to color in ANSI color
-    escape sequences in the compilation buffer. You can disable this behavior
-    by setting this config option to `true`.
 
 default_command                                 *compile-mode.default_command*
     The string to show in the |compile-mode.compile()| prompt as a default.
@@ -206,68 +188,8 @@ time_format                                         *compile-mode.time_format*
     The way to format the time displayed at the top of the compilation buffer.
     Passed into |strftime()|. Defaults to: `"%a %b %e %H:%M:%S"`.
 
-baleia_options                                   *compile-mode.baleia_options*
-    Table of options to pass into `baleia.setup()`. Defaults to an empty
-    table.
-
 buffer_name                                         *compile-mode.buffer_name*
     The name for the compilation buffer. Defaults to `"*compilation*"`.
-
-error_highlights                               *compile-mode.error_highlights*
-    A table of highlights to use for errors in the compilation buffer.
-
-    The possible keys are:
-
-    - {error} applied to the entire captured error (optional)
-    - {error_row} applied to the number that specifies the row (or range of
-      rows) of the error (optional)
-    - {error_col} applied to the number that specifies the column (or range of
-      columns) of the error (optional)
-    - {error_filename} applied to the filename in which the error ocurred,
-      when the error is of type `ERROR` (optional)
-    - {warning_filename} applied to the filename in which the error ocurred,
-      when the error is of type `WARNING` (optional)
-    - {info_filename} applied to the filename in which the error ocurred, when
-      the error is of type `INFO` (optional)
-
-    Each of the values is a table, with the following keys:
-
-    - {background} (string) sets the |guibg| of the highlight group (optional)
-    - {foreground} (string) sets the |guifg| of the highlight group (optional)
-    - {gui} (string) sets the |highlight-gui| of the highlight group, and can
-      be a comma-seperated list of attributes (optional)
-
-    You can use an empty table to remove all styles from a group.
-
-    The defaults for `error_highlights` are:
-
-    >lua
-        default_highlights = {
-            error = {
-                gui = "underline",
-            },
-            error_row = {
-                gui = "underline",
-                foreground = theme[2],
-            },
-            error_col = {
-                gui = "underline",
-                foreground = theme[8],
-            },
-            error_filename = {
-                gui = "bold,underline",
-                foreground = theme[9],
-            },
-            warning_filename = {
-                gui = "underline",
-                foreground = theme[3],
-            },
-            info_filename = {
-                gui = "underline",
-                foreground = theme[14],
-            },
-        }
-<
 
 debug                                                     *compile-mode.debug*
     Print additional debug information. This is printed using |print|, so you

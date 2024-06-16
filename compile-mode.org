@@ -113,3 +113,5 @@ This gets tacked on the end of the generated expressions.")
 * DONE Refactor =get_error_line=-based functions
   CLOSED: [2024-06-16 Sun 05:33]
 
+* TODO Add documentation for highlights
+
