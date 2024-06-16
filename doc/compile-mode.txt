@@ -208,6 +208,10 @@ recompile_no_fail                             *compile-mode.recompile_no_fail*
     When `true`, running |:Recompile| without a prior command will not fail,
     but instead simply trigger a call to |:Compile|.
 
+auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
+    When `true`, compiling jumps to the first error as soon as it is
+    available.
+
 						      *compile-mode.compile()*
 compile({param}) ~
     Run a command and place its output in the compilation buffer, reporting on
