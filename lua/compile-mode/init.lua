@@ -231,33 +231,53 @@ local runcommand = a.void(function(command, smods, count, sync)
 	utils.buf_set_opt(bufnr, "modified", false)
 end)
 
----Get the next/previous matching line within the compilation buffer that has an error on it.
+---Create a command that takes some action on the next/previous error from the current error cursor.
 ---
----@param is_previous boolean whether to search backwards from the error cursor
+---@param action "jump"|"move" the action to do with the matching error:
+--- * "jump" means go to the locus of the error
+--- * "move" means scroll to the line in the compilation buffer
+---@param direction "next"|"prev" what direction from the error cursor to find matches from:
+--- * "next" means work forward from the current error
+--- * "prev" means work backwards from the current error
+---This also determines the printed message if there is no match in the specified direction.
 ---@param different_file boolean whether to only match errors that occur in different files from the current error
----@return integer|nil
-local function get_error_line(is_previous, different_file)
-	local current_error = errors.error_list[error_cursor]
+---@return fun() command an async callback that performs the created action
+local function act_from_current_error(action, direction, different_file)
+	return a.void(function()
+		local current_error = errors.error_list[error_cursor]
 
-	local error_line = nil
-	for line, error in pairs(errors.error_list) do
-		local fits_file_constraint = true
-		if different_file then
-			fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
+		local error_line = nil
+		for line, error in pairs(errors.error_list) do
+			local fits_file_constraint = true
+			if different_file then
+				fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
+			end
+
+			local fits_line_constraint = true
+			if direction == "prev" then
+				fits_line_constraint = line < error_cursor and (not error_line or error_line < line)
+			else
+				fits_line_constraint = line > error_cursor and (not error_line or error_line > line)
+			end
+
+			if fits_file_constraint and fits_line_constraint then
+				error_line = line
+			end
 		end
 
-		local fits_line_constraint = true
-		if is_previous then
-			fits_line_constraint = line < error_cursor and (not error_line or error_line < line)
+		if not error_line then
+			local message = direction == "next" and "past last" or "back before first"
+			vim.notify("Moved " .. message .. " error")
+			return
+		end
+
+		error_cursor = error_line
+		if action == "jump" then
+			utils.jump_to_error(errors.error_list[error_line], M.config.same_window_errors)
 		else
-			fits_line_constraint = line > error_cursor and (not error_line or error_line > line)
+			vim.api.nvim_win_set_cursor(0, { error_line, 0 })
 		end
-
-		if fits_file_constraint and fits_line_constraint then
-			error_line = line
-		end
-	end
-	return error_line
+	end)
 end
 
 --- PUBLIC (NON-COMMAND) API
@@ -349,36 +369,12 @@ end)
 ---Jump to the next error in the error list.
 ---
 ---@type fun()
-M.next_error = a.void(function()
-	debug("== next_error() ==")
-
-	local error_line = get_error_line(false, false)
-	if not error_line then
-		vim.notify("Moved past last error")
-		return
-	end
-	debug("line = " .. error_line)
-
-	error_cursor = error_line
-	utils.jump_to_error(errors.error_list[error_line], M.config.same_window_errors)
-end)
+M.next_error = act_from_current_error("jump", "next", false)
 
 ---Jump to the previous error in the error list.
 ---
 ---@type fun()
-M.prev_error = a.void(function()
-	debug("== prev_error() ==")
-
-	local error_line = get_error_line(true, false)
-	if not error_line then
-		vim.notify("Moved back before first error")
-		return
-	end
-	debug("line = " .. error_line)
-
-	error_cursor = error_line
-	utils.jump_to_error(errors.error_list[error_line], M.config.same_window_errors)
-end)
+M.prev_error = act_from_current_error("jump", "prev", false)
 
 ---Load all compilation errors into the quickfix list, replacing the existing list.
 ---
@@ -463,68 +459,24 @@ end)
 ---Does not jump to the error's actual locus.
 ---
 ---@type fun()
-M.move_to_next_error = a.void(function()
-	debug("== move_to_next_error() ==")
-
-	local error_line = get_error_line(false, false)
-	if not error_line then
-		vim.notify("Moved past last error")
-		return
-	end
-
-	error_cursor = error_line
-	vim.api.nvim_win_set_cursor(0, { error_line, 0 })
-end)
+M.move_to_next_error = act_from_current_error("move", "next", false)
 
 ---Move to the location of the next error within the compilation buffer that has a different file to the current one.
 ---Does not jump to the error's actual locus.
 ---
 ---@type fun()
-M.move_to_next_file = a.void(function()
-	debug("== move_to_next_file() ==")
-
-	local error_line = get_error_line(false, true)
-	if not error_line then
-		vim.notify("Moved past last error")
-		return
-	end
-
-	error_cursor = error_line
-	vim.api.nvim_win_set_cursor(0, { error_line, 0 })
-end)
+M.move_to_next_file = act_from_current_error("move", "next", true)
 
 ---Move to the location of the previous error within the compilation buffer.
 ---Does not jump to the error's actual locus.
 ---
 ---@type fun()
-M.move_to_prev_error = a.void(function()
-	debug("== move_to_prev_error() ==")
-
-	local error_line = get_error_line(true, false)
-	if not error_line then
-		vim.notify("Moved back before first error")
-		return
-	end
-
-	error_cursor = error_line
-	vim.api.nvim_win_set_cursor(0, { error_line, 0 })
-end)
+M.move_to_prev_error = act_from_current_error("move", "prev", false)
 
 ---Move to the location of the previous error within the compilation buffer that has a different file to the current one.
 ---Does not jump to the error's actual locus.
 ---
 ---@type fun()
-M.move_to_prev_file = a.void(function()
-	debug("== move_to_prev_file() ==")
-
-	local error_line = get_error_line(true, true)
-	if not error_line then
-		vim.notify("Moved back before first error")
-		return
-	end
-
-	error_cursor = error_line
-	vim.api.nvim_win_set_cursor(0, { error_line, 0 })
-end)
+M.move_to_prev_file = act_from_current_error("move", "prev", true)
 
 return M

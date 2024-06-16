@@ -108,5 +108,6 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Remove Baleia support
 
-* TODO Refactor =get_error_line=-based functions
+* DONE Refactor =get_error_line=-based functions
+  CLOSED: [2024-06-16 Sun 05:33]
 
