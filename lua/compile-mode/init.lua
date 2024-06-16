@@ -10,6 +10,8 @@ local colors = require("compile-mode.colors")
 
 local M = {}
 
+--- FILE-GLOBAL VARIABLES
+
 ---Line in the compilation buffer that the current error is on;
 ---acts as an index of `errors.error_list`
 local error_cursor = 0
@@ -17,15 +19,7 @@ local error_cursor = 0
 ---@type string|nil
 local prev_dir = nil
 
----@type Config
-M.config = {
-	buffer_name = "*compilation*",
-	default_command = "make -k",
-	error_highlights = colors.default_highlights,
-	time_format = "%a %b %e %H:%M:%S",
-}
-
-M.level = errors.level
+--- UTILITY FUNCTIONS
 
 local debug = a.void(function(...)
 	if M.config.debug == true then
@@ -43,23 +37,6 @@ local function set_lines(bufnr, start, end_, data)
 	vim.api.nvim_buf_call(bufnr, function()
 		vim.cmd("normal G")
 	end)
-end
-
----Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
----
----@param opts Config
-function M.setup(opts)
-	debug("== setup() ==")
-	M.config = vim.tbl_deep_extend("force", M.config, opts)
-
-	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})
-	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})
-
-	if M.config.error_highlights then
-		colors.setup_highlights(M.config.error_highlights)
-	end
-
-	debug("config = " .. vim.inspect(M.config))
 end
 
 ---@type fun(cmd: string, bufnr: integer, sync: boolean | nil): integer, integer, integer
@@ -149,58 +126,6 @@ local function default_dir()
 	local cwd = vim.fn.getcwd() --[[@as string]]
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
-
----Go to the error on the current line
-function M.goto_error()
-	debug("== goto_error() ==")
-
-	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
-	local error = errors.error_list[linenum]
-	debug("error = " .. vim.inspect(error))
-
-	if not error then
-		vim.notify("No error here")
-		return
-	end
-
-	utils.jump_to_error(error, M.config.same_window_errors)
-end
-
----Interrupt the currently running compilation command.
----
----@type fun()
-M.interrupt = a.void(function()
-	debug("== interrupt() ==")
-
-	if not vim.g.compile_job_id then
-		debug("== nothing to interrupt ==")
-		return
-	end
-
-	debug("== interrupting compilation ==")
-	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
-
-	local bufnr = vim.fn.bufnr(M.config.buffer_name)
-	debug("bufnr = " .. bufnr)
-
-	local interrupt_message
-	if not M.config.no_baleia_support then
-		interrupt_message = "Compilation \x1b[31minterrupted\x1b[0m"
-	else
-		interrupt_message = "Compilation interrupted"
-	end
-
-	utils.buf_set_opt(bufnr, "modifiable", true)
-	set_lines(bufnr, -1, -1, {
-		"",
-		interrupt_message .. " at " .. time(),
-	})
-	utils.wait()
-	utils.buf_set_opt(bufnr, "modifiable", false)
-
-	vim.fn.jobstop(vim.g.compile_job_id)
-	vim.g.compile_job_id = nil
-end)
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
@@ -302,9 +227,40 @@ local runcommand = a.void(function(command, smods, count, sync)
 	utils.buf_set_opt(bufnr, "modified", false)
 end)
 
+--- PUBLIC (NON-COMMAND) API
+
+---@type Config
+M.config = {
+	buffer_name = "*compilation*",
+	default_command = "make -k",
+	error_highlights = colors.default_highlights,
+	time_format = "%a %b %e %H:%M:%S",
+}
+
+M.level = errors.level
+
+---Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
+---
+---@param opts Config
+function M.setup(opts)
+	debug("== setup() ==")
+	M.config = vim.tbl_deep_extend("force", M.config, opts)
+
+	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})
+	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})
+
+	if M.config.error_highlights then
+		colors.setup_highlights(M.config.error_highlights)
+	end
+
+	debug("config = " .. vim.inspect(M.config))
+end
+
+--- GENERAL COMMANDS
+
 ---Prompt for (or get by parameter) a command and run it.
 ---
----@param param CommandParam
+---@type fun(param: CommandParam)
 M.compile = a.void(function(param)
 	debug("== compile() ==")
 	param = param or {}
@@ -327,7 +283,8 @@ M.compile = a.void(function(param)
 end)
 
 ---Rerun the last command.
----@param param CommandParam
+---
+---@type fun(param: CommandParam)
 M.recompile = a.void(function(param)
 	debug("==recompile()==")
 	if vim.g.compile_command then
@@ -340,6 +297,8 @@ M.recompile = a.void(function(param)
 end)
 
 ---Jump to the current error in the error list
+---
+---@type fun()
 M.current_error = a.void(function()
 	debug("== current_error() ==")
 
@@ -355,6 +314,8 @@ M.current_error = a.void(function()
 end)
 
 ---Jump to the next error in the error list.
+---
+---@type fun()
 M.next_error = a.void(function()
 	debug("== next_error() ==")
 
@@ -376,6 +337,8 @@ M.next_error = a.void(function()
 end)
 
 ---Jump to the previous error in the error list.
+---
+---@type fun()
 M.prev_error = a.void(function()
 	debug("== prev_error() ==")
 
@@ -397,6 +360,8 @@ M.prev_error = a.void(function()
 end)
 
 ---Load all compilation errors into the quickfix list, replacing the existing list.
+---
+---@type fun()
 M.send_to_qflist = a.void(function()
 	debug("== send_to_qflist() ==")
 
@@ -406,12 +371,70 @@ M.send_to_qflist = a.void(function()
 end)
 
 ---Load all compilation errors into the quickfix list, appending onto the existing list.
+---
+---@type fun()
 M.add_to_qflist = a.void(function()
 	debug("== add_to_qflist() ==")
 
 	vim.api.nvim_exec_autocmds("QuickFixCmdPre", {})
 	vim.fn.setqflist(errors.toqflist(errors.error_list), "a")
 	vim.api.nvim_exec_autocmds("QuickFixCmdPost", {})
+end)
+
+--- COMPILATION BUFFER COMMANDS
+
+---Go to the error on the current line
+---
+---@type fun()
+M.goto_error = a.void(function()
+	debug("== goto_error() ==")
+
+	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
+	local error = errors.error_list[linenum]
+	debug("error = " .. vim.inspect(error))
+
+	if not error then
+		vim.notify("No error here")
+		return
+	end
+
+	utils.jump_to_error(error, M.config.same_window_errors)
+end)
+
+---Interrupt the currently running compilation command.
+---
+---@type fun()
+M.interrupt = a.void(function()
+	debug("== interrupt() ==")
+
+	if not vim.g.compile_job_id then
+		debug("== nothing to interrupt ==")
+		return
+	end
+
+	debug("== interrupting compilation ==")
+	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
+
+	local bufnr = vim.fn.bufnr(M.config.buffer_name)
+	debug("bufnr = " .. bufnr)
+
+	local interrupt_message
+	if not M.config.no_baleia_support then
+		interrupt_message = "Compilation \x1b[31minterrupted\x1b[0m"
+	else
+		interrupt_message = "Compilation interrupted"
+	end
+
+	utils.buf_set_opt(bufnr, "modifiable", true)
+	set_lines(bufnr, -1, -1, {
+		"",
+		interrupt_message .. " at " .. time(),
+	})
+	utils.wait()
+	utils.buf_set_opt(bufnr, "modifiable", false)
+
+	vim.fn.jobstop(vim.g.compile_job_id)
+	vim.g.compile_job_id = nil
 end)
 
 return M
