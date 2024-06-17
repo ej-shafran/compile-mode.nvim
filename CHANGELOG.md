@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `CompileNextFile` and `CompilePrevFile` commands, which act similarly to the two mentioned above but skip any errors within the current error's file.
 - Several new API functions which are used to implement those commands.
 - The `auto_jump_to_first_error` option, which makes compiling jump to the first error as soon as it is available.
+- The `ask_about_save` option, which makes compiling ask about saving each unsaved buffer before running a command.
 
 ### Changed
 
