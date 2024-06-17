@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier?, hide: boolean? }
 ---@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
----@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean? }
+---@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -140,6 +140,31 @@ end
 ---
 ---@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
 local runcommand = a.void(function(command, smods, count, sync)
+	if M.config.ask_about_save then
+		local buffers = vim.api.nvim_list_bufs()
+		local buffers_with_changes = vim.tbl_filter(function(bufnr)
+			return vim.api.nvim_get_option_value("modified", { buf = bufnr })
+		end, buffers)
+
+		for _, bufnr in ipairs(buffers_with_changes) do
+			local bufname = vim.api.nvim_buf_get_name(bufnr)
+			local result = vim.fn.confirm("Save changes to " .. bufname .. "?", "&Yes\n&No\nSkip &All\n&Quit")
+
+			if result == 1 then
+				vim.cmd(tostring(bufnr) .. "bufdo w")
+			end
+
+			if result == 3 then
+				break
+			end
+
+			if result == 4 then
+				vim.notify("Quit")
+				return
+			end
+		end
+	end
+
 	error_cursor = 0
 	errors.error_list = {}
 
