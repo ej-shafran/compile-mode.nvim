@@ -17,6 +17,7 @@ Table of Contents                             *compile-mode-table-of-contents*
     - error_ignore_file_list             |compile-mode.error_ignore_file_list|
     - compilation_hidden_output       |compile-mode.compilation_hidden_output|
     - recompile_no_fail                       |compile-mode.recompile_no_fail|
+    - auto_jump_to_first_error         |compile-mode.auto_jump_to_first_error|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
   - current_error()                             |compile-mode.current_error()|
