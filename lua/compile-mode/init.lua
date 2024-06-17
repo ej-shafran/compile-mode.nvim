@@ -158,7 +158,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	vim.fn.matchadd("CompileModeInfo", "^Compilation \\zsfinished\\ze.*")
 	vim.fn.matchadd(
 		"CompileModeError",
-		"^Compilation \\zs\\(exited abnormally\\|interrupt\\|killed\\|terminated\\|segmentation fault\\)\\ze"
+		"^Compilation \\zs\\(exited abnormally\\|interrupted\\|killed\\|terminated\\|segmentation fault\\)\\ze"
 	)
 	vim.fn.matchadd("CompileModeError", "^Compilation .* with code \\zs[0-9]\\+\\ze")
 	vim.fn.matchadd("CompileModeOutputFile", " --\\?o\\(utfile\\|utput\\)\\?[= ]\\zs\\(\\S\\+\\)\\ze")
