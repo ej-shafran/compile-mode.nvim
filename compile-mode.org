@@ -48,35 +48,17 @@
 * DONE Add QuickfixErrors command
   CLOSED: [2024-05-22 Wed 17:11]
 
-* TODO Add diagnostic windows
-  As configuration option, probably
-
-* TODO Add option not to split at all if more than certain amount of windows
-  Maybe `window_threshold`, or something of the sort
-
 * DONE Add CompilationNext{Error,File} and CompilationPrev{Error,File}
   CLOSED: [2024-06-16 Sun 05:16]
 
 * DONE Add auto-jump to first error option
   CLOSED: [2024-06-16 Sun 10:03]
 
-* TODO Add ask about save before compiling
+* DONE Refactor =get_error_line=-based functions
+  CLOSED: [2024-06-16 Sun 05:33]
 
-* TODO Add compilation environment
-
-* TODO Parse entering/leaving directory messages
-
-** TODO Use for highlighting
-
-** TODO Use for determining relative paths
-
-* TODO Add ask-to-interrupt
-
-* TODO Add checks for segfault or termination
-
-* TODO Move logic to compilation ftplugin
-
-* TODO Allow skipping/jumping forward several errors
+* DONE Remove Baleia support
+  CLOSED: [2024-06-16 Sun 09:34]
 
 * DONE Implement all of the additional highlights
   CLOSED: [2024-06-16 Sun 09:34]
@@ -102,17 +84,28 @@
 This gets tacked on the end of the generated expressions.")
   #+end_src
 
-* TODO Highlight line when jumping to error
+* TODO Add ask about save before compiling
 
-  Probably as configuration option.
+* TODO Add checks for segfault or termination
+
+* TODO Add compilation environment
+
+* TODO Parse entering/leaving directory messages
+
+** TODO Use for highlighting
+
+** TODO Use for determining relative paths
+
+* TODO Add ask-to-interrupt
+
+* TODO Allow skipping/jumping forward several errors
+
+* TODO Move logic to compilation ftplugin
+
+* TODO Add documentation for highlights
 
 * TODO Update docs to use language similar to Emacs docs
 
-* DONE Remove Baleia support
-  CLOSED: [2024-06-16 Sun 09:34]
-
-* DONE Refactor =get_error_line=-based functions
-  CLOSED: [2024-06-16 Sun 05:33]
-
-* TODO Add documentation for highlights
+* TODO Add diagnostic windows
+  As configuration option, probably
 
