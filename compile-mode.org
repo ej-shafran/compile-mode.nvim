@@ -84,7 +84,8 @@
 This gets tacked on the end of the generated expressions.")
   #+end_src
 
-* TODO Add ask about save before compiling
+* DONE Add ask about save before compiling
+  CLOSED: [2024-06-18 Tue 00:38]
 
 * TODO Add checks for segfault or termination
 
