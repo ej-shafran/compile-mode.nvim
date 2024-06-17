@@ -206,10 +206,9 @@ function M.match_command_ouput(line, linenum)
 end
 
 function M.highlight_command_outputs(bufnr, command_output_highlights)
-		for _, highlight in ipairs(command_output_highlights) do
-			M.add_highlight(bufnr, unpack(highlight))
-		end
-
+	for _, highlight in ipairs(command_output_highlights) do
+		M.add_highlight(bufnr, unpack(highlight))
+	end
 end
 
 return M
