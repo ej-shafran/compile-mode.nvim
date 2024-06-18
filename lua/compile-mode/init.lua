@@ -1,7 +1,7 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier?, hide: boolean? }
 ---@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
----@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean? }
+---@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean?, environment: table<string, string>? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -102,6 +102,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 		on_exit = function(id, code)
 			callback(count, code, id)
 		end,
+		env = M.config.environment,
 	})
 	debug("job_id = " .. job_id)
 
