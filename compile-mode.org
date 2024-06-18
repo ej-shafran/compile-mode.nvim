@@ -87,7 +87,8 @@ This gets tacked on the end of the generated expressions.")
 * DONE Add ask about save before compiling
   CLOSED: [2024-06-18 Tue 00:38]
 
-* TODO Add checks for segfault or termination
+* DONE Add checks for segfault or termination
+  CLOSED: [2024-06-19 Wed 02:01]
 
 * TODO Add compilation environment
 
