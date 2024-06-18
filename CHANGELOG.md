@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `auto_jump_to_first_error` option, which makes compiling jump to the first error as soon as it is available.
 - The `ask_about_save` option, which makes compiling ask about saving each unsaved buffer before running a command.
 - The `environment` option, which configures additional environment variables that each compilation command should inherit.
+  - Also, add the `clear_environment` option, which modifies the behavior of `environment` to no longer merge with the existing environment.
 - Proper logs for segmentation faults and command termination
 
 ### Changed
