@@ -101,9 +101,17 @@ the compilation buffer. Then, after a tiny delay, the compilation buffer is
 cleared and the new command starts running.
 
 The compilation buffer has a few local commands and keymaps. The local
-commands are |:CompileGotoError| and |:CompileInterrupt|, mapped to `<CR>` and
-`<C-c>` respectively. Additionally, `q` is mapped to `<CMD>q<CR>` to allow for
-easy closing of the compilation buffer.
+commands (and their keymaps, if mentioned) are:
+
+- |:CompileGotoError| - mapped to `<CR>`
+- |:CompileInterrupt| - mapped to `<C-c>`
+- |:CompileNextError|
+- |:CompileNextFile|
+- |:CompilePrevError|
+- |:CompilePrevFile|
+
+Additionally, `q` is mapped to `<CMD>q<CR>` to allow for easy closing of the
+compilation buffer.
 
 The compilation buffer is deleted automatically when Neovim would be closed, so
 unsaved changes don’t get in the way. It also has the |'buftype'| option set
