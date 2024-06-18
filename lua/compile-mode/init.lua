@@ -136,6 +136,14 @@ local function default_dir()
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
 
+---Common exit codes to check against.
+---See `:h on_exit` to understand why 128 + signal number
+local exit_code = {
+	SUCCESS = 0,
+	SIGSEGV = 139, -- 128 + signal number 11
+	SIGTERM = 143, -- 128 + signal number 15
+}
+
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
 ---@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
@@ -234,8 +242,12 @@ local runcommand = a.void(function(command, smods, count, sync)
 	end
 
 	local compilation_message
-	if code == 0 then
+	if code == exit_code.SUCCESS then
 		compilation_message = "Compilation finished"
+	elseif code == exit_code.SIGSEGV then
+		compilation_message = "Compilation segmentation fault (core dumped)"
+	elseif code == exit_code.SIGTERM then
+		compilation_message = "Compilation terminated"
 	else
 		compilation_message = "Compilation exited abnormally with code " .. tostring(code)
 	end
