@@ -233,6 +233,8 @@ environment                                         *compile-mode.environment*
     A table of string values and string keys, defining additional environment
     variables which each compilation command should inherit.
 
+    Uses the `env` option of |jobstart()|. |jobstart-env| |jobstart-options|
+
     For example:
 
     >lua
@@ -241,7 +243,13 @@ environment                                         *compile-mode.environment*
 	    CI = "true"
 	  }
 	})
-<
+
+
+clear_environment                             *compile-mode.clear_environment*
+    When `true`, `environment` defines each compilation command's environment
+    exactly, instead of merging with the current environment.
+
+    Uses the `clear_env` option of |jobstart()|. |jobstart-options|
 
 						      *compile-mode.compile()*
 compile({param}) ~
