@@ -19,6 +19,7 @@ Table of Contents                             *compile-mode-table-of-contents*
     - recompile_no_fail                       |compile-mode.recompile_no_fail|
     - auto_jump_to_first_error         |compile-mode.auto_jump_to_first_error|
     - ask_about_save                             |compile-mode.ask_about_save|
+    - environment                                   |compile-mode.environment|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
   - current_error()                             |compile-mode.current_error()|
@@ -227,6 +228,20 @@ auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
 ask_about_save                                   *compile-mode.ask_about_save*
     When `true`, compiling asks about each unsaved buffer, checking whether to
     save it or not, before running the compilation command.
+
+environment                                         *compile-mode.environment*
+    A table of string values and string keys, defining additional environment
+    variables which each compilation command should inherit.
+
+    For example:
+
+    >lua
+	require("compile-mode").setup({
+	  environment = {
+	    CI = "true"
+	  }
+	})
+<
 
 						      *compile-mode.compile()*
 compile({param}) ~
