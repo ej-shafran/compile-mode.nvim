@@ -243,7 +243,7 @@ environment                                         *compile-mode.environment*
 	    CI = "true"
 	  }
 	})
-
+<
 
 clear_environment                             *compile-mode.clear_environment*
     When `true`, `environment` defines each compilation command's environment
