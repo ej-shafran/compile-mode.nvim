@@ -92,12 +92,14 @@ After a command has been run, the buffer’s output will contain:
 - the time at which compilation started
 - the compilation command which was executed
 - the output (`stdout` and `stderr`) of the command
-- the exit status of the command (a command can exit successfully, abnormally,
-    or by interruption) and when it occurred
+- the exit status of the command and when it occurred; a command can exit
+  successfully (exit code 0), abnormally (non-zero exit code), by interruption
+  (running another compilation command or calling |:CompileInterrupt|), by
+  segfault (SIGSEGV), or by termination (SIGTERM)
 
 If a compilation command is running and another one is triggered, the first
-command is terminated (using |jobstop|) and this interruption is reported in
-the compilation buffer. Then, after a tiny delay, the compilation buffer is
+command is interrupted (using |jobstop()|) and this is reported in the
+compilation buffer. Then, after a short delay, the compilation buffer is
 cleared and the new command starts running.
 
 The compilation buffer has a few local commands and keymaps. The local
