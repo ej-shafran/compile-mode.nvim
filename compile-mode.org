@@ -90,7 +90,8 @@ This gets tacked on the end of the generated expressions.")
 * DONE Add checks for segfault or termination
   CLOSED: [2024-06-19 Wed 02:01]
 
-* TODO Add compilation environment
+* DONE Add compilation environment
+  CLOSED: [2024-06-19 Wed 02:12]
 
 * TODO Parse entering/leaving directory messages
 
