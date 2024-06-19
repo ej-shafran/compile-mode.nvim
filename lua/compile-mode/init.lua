@@ -197,6 +197,22 @@ local runcommand = a.void(function(command, smods, count, sync)
 	)
 	vim.fn.matchadd("CompileModeError", "^Compilation .* with code \\zs[0-9]\\+\\ze")
 	vim.fn.matchadd("CompileModeOutputFile", " --\\?o\\(utfile\\|utput\\)\\?[= ]\\zs\\(\\S\\+\\)\\ze")
+	vim.fn.matchadd(
+		"CompileModeCheckTarget",
+		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\zs\\(.\\+\\)\\ze\\.\\.\\."
+	)
+	vim.fn.matchadd(
+		"CompileModeCheckResult",
+		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\(.\\+\\)\\.\\.\\. *\\((cached) *\\)\\?\\zs.*\\ze"
+	)
+	vim.fn.matchadd(
+		"CompileModeInfo",
+		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\(.\\+\\)\\.\\.\\. *\\((cached) *\\)\\?\\zsyes\\( .\\+\\)\\?\\ze$"
+	)
+	vim.fn.matchadd(
+		"CompileModeError",
+		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\(.\\+\\)\\.\\.\\. *\\((cached) *\\)\\?\\zsno\\ze$"
+	)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
 	utils.buf_set_opt(bufnr, "modifiable", true)
@@ -340,13 +356,17 @@ function M.setup(opts)
 	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})
 
 	vim.cmd("highlight default CompileModeMessage guifg=NONE gui=underline")
-	vim.cmd("highlight link CompileModeCommandOutput Function")
-	vim.cmd("highlight link CompileModeOutputFile Keyword")
 	vim.cmd("highlight default CompileModeMessageRow guifg=Magenta")
 	vim.cmd("highlight default CompileModeMessageCol guifg=Cyan")
-	vim.cmd("highlight default CompileModeError cterm=bold gui=bold guifg=Red")
-	vim.cmd("highlight default CompileModeWarning cterm=bold gui=bold guifg=DarkYellow")
-	vim.cmd("highlight default CompileModeInfo cterm=bold gui=bold guifg=Green")
+
+	vim.cmd("highlight default CompileModeError guifg=Red")
+	vim.cmd("highlight default CompileModeWarning guifg=DarkYellow")
+	vim.cmd("highlight default CompileModeInfo guifg=Green")
+
+	vim.cmd("highlight default CompileModeCommandOutput guifg=#6699ff")
+	vim.cmd("highlight default CompileModeOutputFile guifg=#9966cc")
+	vim.cmd("highlight default CompileModeCheckResult cterm=bold gui=bold guifg=#ff9966")
+	vim.cmd("highlight default CompileModeCheckTarget guifg=#ff9966")
 
 	debug("config = " .. vim.inspect(M.config))
 end
