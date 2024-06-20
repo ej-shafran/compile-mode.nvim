@@ -43,17 +43,25 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 	debug("== runjob() ==")
 
 	local count = 0
+	local partial_line = ""
 
 	local on_either = a.void(function(_, data)
 		if not data or #data < 1 or (#data == 1 and data[1] == "") then
 			return
 		end
 
-		count = count + #data
-
 		local linecount = vim.api.nvim_buf_line_count(bufnr)
+		count = count + #data
+		partial_line = partial_line .. data[1]
+
+		local new_lines = { partial_line }
+		for i = 2, #data do
+			table.insert(new_lines, data[i])
+		end
+		partial_line = table.remove(data, #data)
+
 		local command_output_highlights = {}
-		for i, line in ipairs(data) do
+		for i, line in ipairs(new_lines) do
 			local error = errors.parse(line)
 			local linenum = linecount + i - 1
 
@@ -69,7 +77,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 				for _, re in ipairs(hide) do
 					line = vim.fn.substitute(line, re --[[@as string]], "", "") --[[@as string]]
-					data[i] = line
+					new_lines[i] = line
 				end
 			end
 
@@ -88,7 +96,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 			end
 		end
 
-		set_lines(bufnr, -2, -1, data)
+		set_lines(bufnr, -2, -1, new_lines)
 		utils.wait()
 		utils.highlight_command_outputs(bufnr, command_output_highlights)
 		errors.highlight(bufnr)
