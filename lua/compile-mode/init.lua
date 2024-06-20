@@ -221,6 +221,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 		"CompileModeError",
 		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\(.\\+\\)\\.\\.\\. *\\((cached) *\\)\\?\\zsno\\ze$"
 	)
+	vim.fn.matchadd("CompileModeDirectoryMessage", "\\(Entering\\|Leaving\\) directory [`']\\zs.\\+\\ze'$")
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
 	utils.buf_set_opt(bufnr, "modifiable", true)
@@ -372,6 +373,7 @@ function M.setup(opts)
 	vim.cmd("highlight default CompileModeInfo guifg=Green")
 
 	vim.cmd("highlight default CompileModeCommandOutput guifg=#6699ff")
+	vim.cmd("highlight default CompileModeDirectoryMessage guifg=#6699ff")
 	vim.cmd("highlight default CompileModeOutputFile guifg=#9966cc")
 	vim.cmd("highlight default CompileModeCheckResult cterm=bold gui=bold guifg=#ff9966")
 	vim.cmd("highlight default CompileModeCheckTarget guifg=#ff9966")

@@ -95,7 +95,8 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Parse entering/leaving directory messages
 
-** TODO Use for highlighting
+** DONE Use for highlighting
+   CLOSED: [2024-06-20 Thu 22:29]
 
 ** TODO Use for determining relative paths
 
