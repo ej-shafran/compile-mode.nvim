@@ -198,45 +198,9 @@ local runcommand = a.void(function(command, smods, count, sync)
 	local bufnr = utils.split_unless_open(M.config.buffer_name, smods, count)
 	debug("bufnr = " .. bufnr)
 
-	vim.fn.matchadd("CompileModeInfo", "^Compilation \\zsfinished\\ze.*")
-	vim.fn.matchadd(
-		"CompileModeError",
-		"^Compilation \\zs\\(exited abnormally\\|interrupted\\|killed\\|terminated\\|segmentation fault\\)\\ze"
-	)
-	vim.fn.matchadd("CompileModeError", "^Compilation .* with code \\zs[0-9]\\+\\ze")
-	vim.fn.matchadd("CompileModeOutputFile", " --\\?o\\(utfile\\|utput\\)\\?[= ]\\zs\\(\\S\\+\\)\\ze")
-	vim.fn.matchadd(
-		"CompileModeCheckTarget",
-		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\zs\\(.\\+\\)\\ze\\.\\.\\."
-	)
-	vim.fn.matchadd(
-		"CompileModeCheckResult",
-		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\(.\\+\\)\\.\\.\\. *\\((cached) *\\)\\?\\zs.*\\ze"
-	)
-	vim.fn.matchadd(
-		"CompileModeInfo",
-		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\(.\\+\\)\\.\\.\\. *\\((cached) *\\)\\?\\zsyes\\( .\\+\\)\\?\\ze$"
-	)
-	vim.fn.matchadd(
-		"CompileModeError",
-		"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\(.\\+\\)\\.\\.\\. *\\((cached) *\\)\\?\\zsno\\ze$"
-	)
-	vim.fn.matchadd("CompileModeDirectoryMessage", "\\(Entering\\|Leaving\\) directory [`']\\zs.\\+\\ze'$")
-
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
-
-	vim.api.nvim_buf_create_user_command(bufnr, "CompileGotoError", M.goto_error, {})
-	vim.api.nvim_buf_create_user_command(bufnr, "CompileInterrupt", M.interrupt, {})
-	vim.api.nvim_buf_create_user_command(bufnr, "CompileNextError", M.move_to_next_error, {})
-	vim.api.nvim_buf_create_user_command(bufnr, "CompileNextFile", M.move_to_next_file, {})
-	vim.api.nvim_buf_create_user_command(bufnr, "CompilePrevError", M.move_to_prev_error, {})
-	vim.api.nvim_buf_create_user_command(bufnr, "CompilePrevFile", M.move_to_prev_file, {})
-
-	vim.keymap.set("n", "q", "<CMD>q<CR>", { silent = true, buffer = bufnr })
-	vim.keymap.set("n", "<CR>", "<CMD>CompileGotoError<CR>", { silent = true, buffer = bufnr })
-	vim.keymap.set("n", "<C-c>", "<CMD>CompileInterrupt<CR>", { silent = true, buffer = bufnr })
 
 	-- reset compilation buffer
 	set_lines(bufnr, 0, -1, {})

@@ -104,7 +104,8 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Allow skipping/jumping forward several errors
 
-* TODO Move logic to compilation ftplugin
+* DONE Move logic to compilation ftplugin
+  CLOSED: [2024-06-21 Fri 19:55]
 
 * TODO Add documentation for highlights
 
