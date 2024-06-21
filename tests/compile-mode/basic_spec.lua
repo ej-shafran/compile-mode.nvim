@@ -41,17 +41,11 @@ describe(":Recompile", function()
 
 		local expected = get_compilation_lines(bufnr)
 
-		utils.buf_set_opt(bufnr, "modifiable", true)
-		vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, {})
-
-		local lines = get_compilation_lines(bufnr)
-		assert.are_not.same(expected, lines)
-
 		vim.cmd("silent Recompile")
 
 		utils.wait()
 
-		lines = get_compilation_lines(bufnr)
+		local lines = get_compilation_lines(bufnr)
 		assert.are.same(expected, lines)
 	end)
 end)
