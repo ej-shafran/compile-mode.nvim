@@ -1,4 +1,4 @@
-local utils = require("tests.utils")
+local utils = require("tests.test_helpers")
 
 ---@diagnostic disable-next-line: undefined-global
 local before_each = before_each
