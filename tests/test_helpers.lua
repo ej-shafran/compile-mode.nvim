@@ -8,7 +8,7 @@ function M.buf_set_opt(bufnr, opt, value)
 end
 
 function M.get_compilation_bufnr()
-	return vim.fn.bufnr("*compilation*")
+	return vim.fn.bufnr(vim.fn.fnameescape("*compilation*"))
 end
 
 ---@param opts Config|nil
