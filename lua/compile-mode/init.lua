@@ -176,7 +176,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 				break
 			end
 
-			if result == 4 then
+			if result == 4 and not smods.silent then
 				vim.notify("Quit")
 				return
 			end
