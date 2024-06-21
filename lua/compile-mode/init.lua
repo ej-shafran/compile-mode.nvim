@@ -324,6 +324,7 @@ M.level = errors.level
 function M.setup(opts)
 	debug("== setup() ==")
 	M.config = vim.tbl_deep_extend("force", M.config, opts)
+	M.config.buffer_name = vim.fn.fnameescape(M.config.buffer_name)
 
 	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})
 	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})
