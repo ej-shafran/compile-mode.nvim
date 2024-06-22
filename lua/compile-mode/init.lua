@@ -1,6 +1,6 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias CommandParam { args: string?, smods: vim.api.keyset.parse_cmd.mods?, bang: boolean?, count: integer }
----@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean?, environment: table<string, string>?, clear_environment: boolean? }
+---@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean?, environment: table<string, string>?, clear_environment: boolean?, ask_to_interrupt: boolean? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -153,6 +153,13 @@ local runcommand = a.void(function(command, smods, count, sync)
 
 	debug("== runcommand() ==")
 	if vim.g.compile_job_id then
+		if M.config.ask_to_interrupt then
+			local response = vim.fn.confirm("Interrupt running process?", "&Yes\n&No")
+			if response ~= 1 then
+				return
+			end
+		end
+
 		M.interrupt()
 
 		utils.delay(1000)

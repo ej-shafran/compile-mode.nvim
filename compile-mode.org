@@ -100,7 +100,8 @@ This gets tacked on the end of the generated expressions.")
 
 ** TODO Use for determining relative paths
 
-* TODO Add ask-to-interrupt
+* DONE Add ask-to-interrupt
+  CLOSED: [2024-06-22 Sat 17:31]
 
 * TODO Allow skipping/jumping forward several errors
 
