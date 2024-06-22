@@ -21,6 +21,7 @@ Table of Contents                             *compile-mode-table-of-contents*
     - ask_about_save                             |compile-mode.ask_about_save|
     - ask_to_interrupt                         |compile-mode.ask_to_interrupt|
     - environment                                   |compile-mode.environment|
+    - clear_environment                       |compile-mode.clear_environment|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
   - current_error()                             |compile-mode.current_error()|
