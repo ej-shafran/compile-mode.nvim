@@ -117,3 +117,7 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Support :tab
 
+* TODO Make `ask_to_interrupt` and `ask_about_save` the default
+
+* TODO Rename `compilation_hidden_output` option
+
