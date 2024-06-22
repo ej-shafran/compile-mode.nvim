@@ -350,6 +350,7 @@ interrupt() ~
     - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
     - |:silent|
     - |:hide|
+    - |:tab|
 
     Additionally, you can run the command with a |count| to set the size of
     the opened window, like with |:split|.
@@ -367,6 +368,7 @@ interrupt() ~
     - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
     - |:silent|
     - |:hide|
+    - |:tab|
 
     Additionally, you can run the command with a |count| to set the size of the
     opened window, like with |:split|.

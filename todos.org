@@ -115,7 +115,8 @@ This gets tacked on the end of the generated expressions.")
 * TODO Add diagnostic windows
   As configuration option, probably
 
-* TODO Support :tab
+* DONE Support :tab
+  CLOSED: [2024-06-22 Sat 17:47]
 
 * TODO Make `ask_to_interrupt` and `ask_about_save` the default
 

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- The ability to use `:tab` on `:Compile` and `:Recompile`.
 - The `CompileNextError` and `CompilePrevError` commands, which quickly scroll to an error without opening its locus (i.e. source file).
 - The `CompileNextFile` and `CompilePrevFile` commands, which act similarly to the two mentioned above but skip any errors within the current error's file.
 - Several new API functions which are used to implement those commands.
