@@ -446,6 +446,8 @@ interrupt() ~
     Jump to the error present in the line under the cursor. If no such error
     exists, the command reports on this fact.
 
+    Mapped to `<CR>` within the compilation buffer.
+
 :CompileNextError                                          *:CompileNextError*
 :[N]CompileNextError
     Only available within the compilation buffer itself.
