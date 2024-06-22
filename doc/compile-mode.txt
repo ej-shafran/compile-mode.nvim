@@ -268,8 +268,7 @@ compile({param}) ~
 	  commands (optional)
 	    - {param.args}: the string of the command itself, or `nil` if the
 	      user should be prompted to enter a command
-	    - {param.smods}: a table - see the mods field of
-	      |nvim_parse_cmd()| for more
+	    - {param.smods}: a table - see |:command-modifiers| for more
 
 						    *compile-mode.recompile()*
 recompile({param}) ~
