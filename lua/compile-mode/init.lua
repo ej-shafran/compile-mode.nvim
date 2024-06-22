@@ -296,7 +296,6 @@ M.level = errors.level
 function M.setup(opts)
 	debug("== setup() ==")
 	M.config = vim.tbl_deep_extend("force", M.config, opts)
-	M.config.buffer_name = vim.fn.fnameescape(M.config.buffer_name)
 	if type(M.config.compilation_hidden_output) == "string" then
 		local hide = M.config.compilation_hidden_output--[[@as string]]
 		M.config.compilation_hidden_output = { hide }
@@ -446,7 +445,7 @@ M.interrupt = a.void(function()
 	debug("== interrupting compilation ==")
 	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
 
-	local bufnr = vim.fn.bufnr(M.config.buffer_name)
+	local bufnr = vim.fn.bufnr(vim.fn.fnameescape(M.config.buffer_name))
 	debug("bufnr = " .. bufnr)
 
 	local interrupt_message = "Compilation interrupted"
