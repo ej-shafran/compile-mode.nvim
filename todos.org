@@ -125,3 +125,5 @@ This gets tacked on the end of the generated expressions.")
 * DONE Rename `compilation_hidden_output` option
   CLOSED: [2024-06-22 Sat 18:16]
 
+* TODO Add lots of new tests
+
