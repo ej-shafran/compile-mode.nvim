@@ -32,7 +32,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
-- Instead of printing the Emacs-style "-*- ... -*-" at the top of the
+- Instead of printing the Emacs-style "-\*- ... -\*-" at the top of the
   compilation buffer (which does nothing in Vim), a Vim modeline is printed
   that modifies the `filetype` and `path` options in the same way that the
   original Emacs mode does.
