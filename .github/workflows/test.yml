@@ -15,11 +15,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: compile-mode.nvim
-      - name: Setup `baleia.nvim`
-        uses: actions/checkout@v2
-        with:
-          repository: m00qek/baleia.nvim
-          path: baleia.nvim
       - name: Setup `plenary.nvim`
         uses: actions/checkout@v2
         with:
