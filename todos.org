@@ -1,4 +1,4 @@
-#+title: compile-mode.nvim
+#+title: compile-mode.nvim TODOs
 #+author: EJ Shafran
 
 * DONE Add goto error message outputs
