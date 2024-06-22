@@ -14,8 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The `CompileNextFile` and `CompilePrevFile` commands, which act similarly to the two mentioned above but skip any errors within the current error's file.
 - Several new API functions which are used to implement those commands.
 - The `auto_jump_to_first_error` option, which makes compiling jump to the first error as soon as it is available.
-- The `ask_about_save` option, which makes compiling ask about saving each unsaved buffer before running a command. This option is now the default, but it can be disabled by setting it to `false`.
-- The `ask_to_interrupt` option, which makes compiling ask to interrupt a previously running command instead of stopping it instantly. This option is now the default, but it can be disabled by setting it to `false`.
+- **(Breaking)** The `ask_about_save` option, which makes compiling ask about saving each unsaved buffer before running a command. This option is now the default, but it can be disabled by setting it to `false`.
+- **(Breaking)** The `ask_to_interrupt` option, which makes compiling ask to interrupt a previously running command instead of stopping it instantly. This option is now the default, but it can be disabled by setting it to `false`.
 - The `environment` option, which configures additional environment variables that each compilation command should inherit.
   - Also, add the `clear_environment` option, which modifies the behavior of `environment` to no longer merge with the existing environment.
 - Proper logs for segmentation faults and command termination
@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Bug with parsing of error levels that caused some of the defaults of `error_regexp_table` not to function properly.
+- Bugs with partial output being printed to the compilation buffer, because of a mishandling of partial lines returned from `jobstart()`.
 
 ## [2.8.0] - 2024-05-22
 
