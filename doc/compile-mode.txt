@@ -545,8 +545,8 @@ CompileModeMessageRow                               *hl-CompileModeMessageRow*
     Example:
 
     >
-    README.md[1,1] error
-              ^
+    README.md:[1,1] error
+               ^
 <
 CompileModeMessageCol                               *hl-CompileModeMessageCol*
     The column number of compilation errors.
@@ -554,8 +554,8 @@ CompileModeMessageCol                               *hl-CompileModeMessageCol*
     Example:
 
     >
-    README.md[1,1] error
-                ^
+    README.md:[1,1] error
+                 ^
 <
 
 CompileModeCommandOutput                         *hl-CompileModeCommandOutput*
