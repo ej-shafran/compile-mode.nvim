@@ -534,7 +534,7 @@ CompileModeMessage                                     *hl-CompileModeMessage*
 
     >
     README.md:[1,1] error
-    ^^^^^^^^^^^^^^^^^^^^^
+    ^^^^^^^^^^^^^^^^
 <
 
 CompileModeMessageRow                               *hl-CompileModeMessageRow*
