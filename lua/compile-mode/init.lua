@@ -1,6 +1,5 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
----@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier?, hide: boolean? }
----@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
+---@alias CommandParam { args: string?, smods: vim.api.keyset.parse_cmd.mods?, bang: boolean?, count: integer }
 ---@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean?, environment: table<string, string>?, clear_environment: boolean? }
 
 local a = require("plenary.async")
@@ -52,31 +51,20 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 		local linecount = vim.api.nvim_buf_line_count(bufnr)
 		count = count + #data
-		partial_line = partial_line .. data[1]
 
-		local new_lines = { partial_line }
-		for i = 2, #data do
-			table.insert(new_lines, data[i])
-		end
-		partial_line = table.remove(data, #data)
+		local new_lines = { partial_line .. data[1] }
+		table.move(data, 2, #data, #new_lines + 1, new_lines)
+		partial_line = new_lines[#new_lines]
 
-		local command_output_highlights = {}
+		local output_highlights = {}
 		for i, line in ipairs(new_lines) do
 			local error = errors.parse(line)
 			local linenum = linecount + i - 1
 
 			if M.config.compilation_hidden_output then
-				local hide
-				if type(M.config.compilation_hidden_output) == "string" then
-					hide = {
-						M.config.compilation_hidden_output,--[[@as string]]
-					}
-				else
-					hide = M.config.compilation_hidden_output --[[@as string[] ]]
-				end
-
+				local hide = M.config.compilation_hidden_output --[[@as string[] ]]
 				for _, re in ipairs(hide) do
-					line = vim.fn.substitute(line, re --[[@as string]], "", "") --[[@as string]]
+					line = vim.fn.substitute(line, re, "", "")
 					new_lines[i] = line
 				end
 			end
@@ -90,15 +78,13 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 				end
 			else
 				local highlights = utils.match_command_ouput(line, linenum)
-				for _, highlight in ipairs(highlights) do
-					table.insert(command_output_highlights, highlight)
-				end
+				table.move(highlights, 1, #highlights, #output_highlights + 1, output_highlights)
 			end
 		end
 
 		set_lines(bufnr, -2, -1, new_lines)
 		utils.wait()
-		utils.highlight_command_outputs(bufnr, command_output_highlights)
+		utils.highlight_command_outputs(bufnr, output_highlights)
 		errors.highlight(bufnr)
 	end)
 
@@ -156,31 +142,10 @@ local exit_code = {
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
----@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
+---@type fun(command: string, smods: vim.api.keyset.parse_cmd.mods, count: integer, sync: boolean | nil)
 local runcommand = a.void(function(command, smods, count, sync)
-	if M.config.ask_about_save then
-		local buffers = vim.api.nvim_list_bufs()
-		local buffers_with_changes = vim.tbl_filter(function(bufnr)
-			return vim.api.nvim_get_option_value("modified", { buf = bufnr })
-		end, buffers)
-
-		for _, bufnr in ipairs(buffers_with_changes) do
-			local bufname = vim.api.nvim_buf_get_name(bufnr)
-			local result = vim.fn.confirm("Save changes to " .. bufname .. "?", "&Yes\n&No\nSkip &All\n&Quit")
-
-			if result == 1 then
-				vim.cmd(tostring(bufnr) .. "bufdo w")
-			end
-
-			if result == 3 then
-				break
-			end
-
-			if result == 4 and not smods.silent then
-				vim.notify("Quit")
-				return
-			end
-		end
+	if M.config.ask_about_save and utils.ask_to_save(smods) then
+		return
 	end
 
 	error_cursor = 0
@@ -325,6 +290,10 @@ function M.setup(opts)
 	debug("== setup() ==")
 	M.config = vim.tbl_deep_extend("force", M.config, opts)
 	M.config.buffer_name = vim.fn.fnameescape(M.config.buffer_name)
+	if type(M.config.compilation_hidden_output) == "string" then
+		local hide = M.config.compilation_hidden_output--[[@as string]]
+		M.config.compilation_hidden_output = { hide }
+	end
 
 	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})
 	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})

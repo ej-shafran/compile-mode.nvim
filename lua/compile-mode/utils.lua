@@ -65,7 +65,7 @@ end
 ---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
 ---
 ---@param fname string
----@param smods SMods
+---@param smods vim.api.keyset.parse_cmd.mods
 ---@param count integer
 ---@return integer bufnr the identifier of the buffer for `fname`
 function M.split_unless_open(fname, smods, count)
@@ -209,6 +209,36 @@ function M.highlight_command_outputs(bufnr, command_output_highlights)
 	for _, highlight in ipairs(command_output_highlights) do
 		M.add_highlight(bufnr, unpack(highlight))
 	end
+end
+
+---Ask user whether to save each modified buffer, and save them as requested.
+---@param smods vim.api.keyset.parse_cmd.mods
+---@return boolean quit whether to quit or not
+function M.ask_to_save(smods)
+	local buffers = vim.api.nvim_list_bufs()
+	local buffers_with_changes = vim.tbl_filter(function(bufnr)
+		return vim.api.nvim_get_option_value("modified", { buf = bufnr })
+	end, buffers)
+
+	for _, bufnr in ipairs(buffers_with_changes) do
+		local bufname = vim.api.nvim_buf_get_name(bufnr)
+		local result = vim.fn.confirm("Save changes to " .. bufname .. "?", "&Yes\n&No\nSkip &All\n&Quit")
+
+		if result == 1 then
+			vim.cmd(tostring(bufnr) .. "bufdo w")
+		end
+
+		if result == 3 then
+			break
+		end
+
+		if result == 4 and not smods.silent then
+			vim.notify("Quit")
+			return true
+		end
+	end
+
+	return false
 end
 
 return M
