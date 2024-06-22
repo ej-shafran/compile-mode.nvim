@@ -1,4 +1,4 @@
-local utils = require("tests.test_helpers")
+local utils = require("spec.test_helpers")
 local errors = require("compile-mode.errors")
 
 local assert = require("luassert")

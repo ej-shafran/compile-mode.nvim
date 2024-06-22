@@ -1,4 +1,4 @@
-local helpers = require("tests.test_helpers")
+local helpers = require("spec.test_helpers")
 local assert = require("luassert")
 
 local function get_output()
