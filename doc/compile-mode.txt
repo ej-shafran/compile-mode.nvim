@@ -190,7 +190,8 @@ itself).
 ==============================================================================
 5. API                                                      *compile-mode-api*
 
-setup({opts})                                           *compile-mode.setup()*
+							*compile-mode.setup()*
+setup({opts}) ~
     Sets up the plugin for use.
 
     Usage:
@@ -276,8 +277,7 @@ compile({param}) ~
     its result. See |:Compile|.
 
     Parameters:
-	- {param} (table) a table, identical to the tables passed into Neovim
-	  commands (optional)
+	- {param} (table) command param (optional)
 	    - {param.args}: the string of the command itself, or `nil` if the
 	      user should be prompted to enter a command
 	    - {param.smods}: a table - see |:command-modifiers| for more
@@ -287,10 +287,8 @@ recompile({param}) ~
     Reruns the last compiled command. See |:Recompile|.
 
     Parameters:
-	- {param} (table) a table, identical to the tables passed into Neovim
-	  commands (optional)
-	    - {param.smods}: a table - see the `mods` field of
-	      |nvim_parse_cmd()| for more
+	- {param} (table) command param (optional)
+	    - {param.smods}: a table - see |:command-modifiers| for more
 
 						*compile-mode.current_error()*
 current_error() ~
@@ -298,12 +296,20 @@ current_error() ~
     |:CurrentError|.
 
 						   *compile-mode.next_error()*
-next_error() ~
+next_error({param}) ~
     Jumps to the next error within the compilation buffer. See |:NextError|.
 
+    Parameters:
+	- {param} (table) command param (optional)
+	    - {param.count}: how many errors forwards to jump; default `1`
+
 						   *compile-mode.prev_error()*
-prev_error() ~
+prev_error({param}) ~
     Jumps to a prior error within the compilation buffer. See |:PrevError|.
+
+    Parameters:
+	- {param} (table) command param (optional)
+	    - {param.count}: how many errors backwards to jump; default `1`
 
 					       *compile-mode.send_to_qflist()*
 send_to_qflist() ~
@@ -320,24 +326,44 @@ goto_error() ~
     Jumps to the error under the cursor. See |:CompileGotoError|.
 
 					   *compile-mode.move_to_next_error()*
-move_to_next_error() ~
+move_to_next_error({param}) ~
     Move to the line of the next error within the compilation buffer. See
     |:CompileNextError|.
 
+    Parameters:
+	- {param} (table) command param (optional)
+	    - {param.count}: how many errors forwards to move; default `1`
+
+
 					   *compile-mode.move_to_next_file()*
-move_to_next_file() ~
+move_to_next_file({param}) ~
     Move to the line of the next error within the compilation buffer that has
     a different file to the current error. See |:CompileNextFile|.
 
+    Parameters:
+	- {param} (table) command parameter (optional)
+	    - {param.count}: how many files forwards to move; default `1`
+
+
 					   *compile-mode.move_to_prev_error()*
-move_to_prev_error() ~
+move_to_prev_error({param}) ~
     Move to the line of the previous error within the compilation buffer. See
     |:CompilePrevError|.
 
+    Parameters:
+	- {param} (table) command parameter (optional)
+	    - {param.count}: how many errors backwards to move; default `1`
+
+
 					    *compile-mode.move_to_prev_file()*
-move_to_prev_file() ~
+move_to_prev_file({param}) ~
     Move to the line of the previous error within the compilation buffer that
     has a different file to the current error. See |:CompilePrevFile|.
+
+    Parameters:
+	- {param} (table) command parameter (optional)
+	    - {param.count}: how many files backwards to move; default `1`
+
 
 						    *compile-mode.interrupt()*
 interrupt() ~
@@ -347,8 +373,7 @@ interrupt() ~
 6. Commands                                            *compile-mode-commands*
 
 
-								    *:Compile*
-:Compile ~
+:Compile                                                            *:Compile*
     Runs a command and places its output in the compilation buffer. The
     command is run from the current working directory. The compilation buffer
     is opened in a new split if it isn’t already opened. If an argument is
@@ -366,8 +391,7 @@ interrupt() ~
     Additionally, you can run the command with a |count| to set the size of
     the opened window, like with |:split|.
 
-								  *:Recompile*
-:Recompile ~
+:Recompile                                                        *:Recompile*
     Reruns the last compiled command. If there isn’t one, the error is
     reported using |vim.notify()|. The compilation buffer is opened in a new
     split if it isn’t already opened. The command is rerun from the directory
@@ -384,8 +408,7 @@ interrupt() ~
     Additionally, you can run the command with a |count| to set the size of the
     opened window, like with |:split|.
 
-							       *:CurrentError*
-:CurrentError ~
+:CurrentError                                                  *:CurrentError*
     Jump to the current error in the compilation buffer. This works using the
     same cursor that |:NextError| and |:PrevError| operate on, and acts as a
     way to jump back to the error you were working after a bit of iteration
@@ -393,66 +416,76 @@ interrupt() ~
     first error (the default until |:NextError| has not yet been used) this
     command has no effect and reports on this fact.
 
-								  *:NextError*
-:NextError ~
+:NextError                                                        *:NextError*
+:[N]NextError
     Jump to the next error in the compilation buffer. This does not take the
     cursor into effect - it simply starts at the first error in the buffer and
     continues, one by one, from there. Once the last error in the buffer is
     reached the command has no effect and reports on this fact.
 
-								  *:PrevError*
-:PrevError ~
+    If passed a count, jumps N errors forwards instead.
+
+:PrevError                                                        *:PrevError*
+:[N]PrevError
     Jump to a prior error in the compilation buffer. This does not take the
     cursor into effect - it simply starts at the current error in the buffer
     and continues backwards, one by one, from there. As long as the current
     error is before the first error (the default until |:NextError| has not
     yet been used) this command has no effect and reports on this fact.
 
-							     *:QuickfixErrors*
-:QuickfixErrors ~
+    If passed a count, jumps N errors backwards instead.
+
+:QuickfixErrors                                              *:QuickfixErrors*
     Load all compilation errors into the quickfix list, replacing it (uses
     |compile-mode.send_to_qflist()|), and then opens the quickfix window using
     `:botright copen` (see |:botright| and |:copen|).
 
-							   *:CompileGotoError*
-:CompileGotoError ~
+:CompileGotoError                                          *:CompileGotoError*
     Only available within the compilation buffer itself.
 
     Jump to the error present in the line under the cursor. If no such error
     exists, the command reports on this fact.
 
-							   *:CompileNextError*
-:CompileNextError ~
+:CompileNextError                                          *:CompileNextError*
+:[N]CompileNextError
     Only available within the compilation buffer itself.
 
     Move to the line of the next error within the compilation buffer. Does not
     jump to the error's actual file.
 
-							   *:CompileNextFile*
-:CompileNextFile ~
+    If passed a count, moves N errors forwards instead.
+
+:CompileNextFile                                            *:CompileNextFile*
+:[N]CompileNextFile
     Only available within the compilation buffer itself.
 
     Move to the line of the next error within the compilation buffer that has
     a different file to the current error. Does not jump to the error's actual
     file.
 
-							   *:CompilePrevError*
-:CompilePrevError ~
+    If passed a count, moves N files forwards instead.
+
+:CompilePrevError                                          *:CompilePrevError*
+:[N]CompilePrevError
     Only available within the compilation buffer itself.
 
     Move to the line of the previous error within the compilation buffer. Does
     not jump to the error's actual file.
 
-							    *:CompilePrevFile*
-:CompilePrevFile ~
+    If passed a count, moves N errors backwards instead.
+
+:CompilePrevFile                                            *:CompilePrevFile*
+:[N]CompilePrevFile
     Only available within the compilation buffer itself.
 
     Move to the line of the previous error within the compilation buffer that
     has a different file to the current error. Does not jump to the error's
     actual file.
 
-							   *:CompileInterrupt*
-:CompileInterrupt ~
+    If passed a count, moves N files backwards instead.
+
+:CompileInterrupt                                          *:CompileInterrupt*
+:[N]CompileInterrupt
     Only available within the compilation buffer itself.
 
     Interrupt the currently running compilation command, reporting on this in
@@ -484,7 +517,7 @@ CompileModeInfo                                           *hl-CompileModeInfo*
 <
 
 CompileModeWarning                                     *hl-CompileModeWarning*
-    The filename of `WARN` level errors.
+    The filename of `WARNING` level errors.
 
     Example:
 
