@@ -1,32 +1,26 @@
-local utils = require("tests.test_helpers")
+local helpers = require("tests.test_helpers")
 
----@diagnostic disable-next-line: undefined-global
-local before_each = before_each
----@diagnostic disable-next-line: undefined-global
-local describe = describe
----@diagnostic disable-next-line: undefined-global
-local it = it
----@type any
-local assert = assert
+local assert = require("luassert")
 
-describe("the `compilation_hidden_output` option", function()
+describe("`hidden_output` option", function()
+	local hide = "hello"
+	local non_hide = "goodbye"
+
 	before_each(function()
-		utils.setup_tests({
-			compilation_hidden_output = "^hello.*",
+		helpers.setup_tests({
+			hidden_output = "^" .. hide .. ".*",
 		})
 	end)
 
 	it("should configure parts of the output not to show", function()
-		vim.cmd('silent Compile echo -e "hello world\\nhow are yout"')
+		vim.cmd('silent Compile echo -e "' .. hide .. "\\n" .. non_hide .. '"')
+		helpers.wait()
 
-		local bufnr = utils.get_compilation_bufnr()
-
-		utils.wait()
-
+		local bufnr = helpers.get_compilation_bufnr()
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
 
 		for _, line in ipairs(lines) do
-			assert.are_not.same(line, "hello world")
+			assert.are_not.same(line, hide)
 		end
 	end)
 end)
