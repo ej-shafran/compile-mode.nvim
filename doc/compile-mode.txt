@@ -48,6 +48,18 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :CompilePrevError                                      |:CompilePrevError|
   - :CompilePrevFile                                        |:CompilePrevFile|
   - :CompileInterrupt                                      |:CompileInterrupt|
+7. Highlights                                        |compile-mode-highlights|
+  - CompileModeError                                     |hl-CompileModeError|
+  - CompileModeInfo                                       |hl-CompileModeInfo|
+  - CompileModeWarning                                 |hl-CompileModeWarning|
+  - CompileModeMessage                                 |hl-CompileModeMessage|
+  - CompileModeMessageRow                           |hl-CompileModeMessageRow|
+  - CompileModeMessageCol                           |hl-CompileModeMessageCol|
+  - CompileModeCommandOutput                     |hl-CompileModeCommandOutput|
+  - CompileModeOutputFile                           |hl-CompileModeOutputFile|
+  - CompileModeCheckResult                         |hl-CompileModeCheckResult|
+  - CompileModeCheckTarget                               |hl-CompileModeError|
+  - CompileModeDirectoryMessage               |hl-CompileModeDirectoryMessage|
 
 ==============================================================================
 1. Introduction                                    *compile-mode-introduction*
@@ -447,5 +459,120 @@ interrupt() ~
     the compilation buffer.
 
     Mapped to `<C-c>` within the compilation buffer.
+
+==============================================================================
+7. Highlights                                        *compile-mode-highlights*
+
+CompileModeError                                         *hl-CompileModeError*
+    The filename of compilation errors.
+
+    Example:
+
+    >
+    README.md[1,1] error
+    ^^^^^^^^^
+<
+
+CompileModeInfo                                           *hl-CompileModeInfo*
+    The filename of `INFO` level errors.
+
+    Example:
+
+    >
+    [INFO] README.md:[1,1] error
+           ^^^^^^^^^
+<
+
+CompileModeWarning                                     *hl-CompileModeWarning*
+    The filename of `WARN` level errors.
+
+    Example:
+
+    >
+    [WARNING] README.md:[1,1] error
+              ^^^^^^^^^
+<
+
+CompileModeMessage                                     *hl-CompileModeMessage*
+    The entirety of the compilation error message (i.e. the entire match of
+    the regex from `error_regexp_table`).
+
+    Example:
+
+    >
+    README.md:[1,1] error
+    ^^^^^^^^^^^^^^^^^^^^^
+<
+
+CompileModeMessageRow                               *hl-CompileModeMessageRow*
+    The row number of compilation errors.
+
+    Example:
+
+    >
+    README.md[1,1] error
+              ^
+<
+CompileModeMessageCol                               *hl-CompileModeMessageCol*
+    The column number of compilation errors.
+
+    Example:
+
+    >
+    README.md[1,1] error
+                ^
+<
+
+CompileModeCommandOutput                         *hl-CompileModeCommandOutput*
+    The prefix of a command output (anything that prefixes an output with a
+    colon).
+
+    Example:
+
+    >
+    make: Nothing to be done for 'all'.
+    ^^^^^
+<
+
+CompileModeOutputFile                               *hl-CompileModeOutputFile*
+    The output file of a certain command, found after the `-o`, `--output`, or
+    `--output-file` flag of a command.
+
+    Example:
+
+    >
+    gcc -o main main.c
+           ^^^^
+<
+
+CompileModeCheckTarget                             *hl-CompileModeCheckTarget*
+    The target of a "checking" message (usually from `./configure`).
+
+    Example:
+
+    >
+    checking for gcc... gcc
+                 ^^^
+<
+
+CompileModeCheckResult                             *hl-CompileModeCheckResult*
+    The result of a "checking" message (usually from `./configure`).
+
+    Example:
+
+    >
+    checking for gcc... gcc
+                        ^^^
+<
+
+CompileModeDirectoryMessage                   *hl-CompileModeDirectoryMessage*
+    The directory name in a "Leaving directory"/"Entering directory" message.
+
+    Example:
+
+    >
+    make[1]: Entering directory '/home/user/build/directory'
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+<
 
  vim:tw=78:ts=8:noet:ft=help:norl:

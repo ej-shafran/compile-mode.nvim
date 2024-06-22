@@ -108,7 +108,8 @@ This gets tacked on the end of the generated expressions.")
 * DONE Move logic to compilation ftplugin
   CLOSED: [2024-06-21 Fri 19:55]
 
-* TODO Add documentation for highlights
+* DONE Add documentation for highlights
+  CLOSED: [2024-06-22 Sat 18:08]
 
 * TODO Update docs to use language similar to Emacs docs
 
