@@ -119,7 +119,8 @@ This gets tacked on the end of the generated expressions.")
 * DONE Support :tab
   CLOSED: [2024-06-22 Sat 17:47]
 
-* TODO Make `ask_to_interrupt` and `ask_about_save` the default
+* DONE Make `ask_to_interrupt` and `ask_about_save` the default
+  CLOSED: [2024-06-22 Sat 18:10]
 
 * TODO Rename `compilation_hidden_output` option
 
