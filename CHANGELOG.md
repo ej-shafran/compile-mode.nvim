@@ -30,6 +30,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   - Also, add the `clear_environment` option, which modifies the behavior of
     `environment` to no longer merge with the existing environment.
 - Proper logs for segmentation faults and command termination
+- Several new keymaps within the compilation buffer
 
 ### Changed
 

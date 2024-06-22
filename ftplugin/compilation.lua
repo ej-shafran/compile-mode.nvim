@@ -7,7 +7,7 @@ local function command(cmd, expr, opts)
 end
 
 local function set(mode, key, expr, opts)
-	vim.keymap.set(mode, key, expr, vim.tbl_extend("force", opts, { buffer = 0 }))
+	vim.keymap.set(mode, key, expr, vim.tbl_extend("force", { silent = true }, opts or {}, { buffer = 0 }))
 end
 
 matchadd("CompileModeInfo", "^Compilation \\zsfinished\\ze.*")
@@ -42,6 +42,12 @@ command("CompileNextFile", compile_mode.move_to_next_file, { count = 1 })
 command("CompilePrevError", compile_mode.move_to_prev_error, { count = 1 })
 command("CompilePrevFile", compile_mode.move_to_prev_file, { count = 1 })
 
-set("n", "q", "<cmd>q<cr>", { silent = true })
-set("n", "<cr>", "<cmd>CompileGotoError<cr>", { silent = true })
-set("n", "<C-c>", "<cmd>CompileInterrupt<cr>", { silent = true })
+set("n", "q", "<cmd>q<cr>")
+set("n", "<cr>", "<cmd>CompileGotoError<cr>")
+set("n", "<C-c>", "<cmd>CompileInterrupt<cr>")
+set("n", "<C-q>", "<cmd>QuickfixErrors<cr>")
+set("n", "<C-r>", "<cmd>Recompile<cr>")
+set("n", "<C-g>n", "<cmd>CompileNextError<cr>")
+set("n", "<C-g>p", "<cmd>CompilePrevError<cr>")
+set("n", "<C-g>]", "<cmd>CompileNextFile<cr>")
+set("n", "<C-g>[", "<cmd>CompilePrevFile<cr>")

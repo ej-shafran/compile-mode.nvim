@@ -122,13 +122,15 @@ commands (and their keymaps, if mentioned) are:
 
 - |:CompileGotoError| - mapped to `<CR>`
 - |:CompileInterrupt| - mapped to `<C-c>`
-- |:CompileNextError|
-- |:CompileNextFile|
-- |:CompilePrevError|
-- |:CompilePrevFile|
+- |:CompileNextError| - mapped to `<C-g>n`
+- |:CompileNextFile| - mapped to `<C-g>]`
+- |:CompilePrevError| - mapped to `<C-g>p`
+- |:CompilePrevFile| - mapped to `<C-g>[`
 
-Additionally, `q` is mapped to `<CMD>q<CR>` to allow for easy closing of the
-compilation buffer.
+Additional keymaps within the compilation buffer are:
+
+- `q` is mapped to `<CMD>q<CR>` for easy closing of the compilation buffer.
+- `<C-r>` is mapped to `<CMD>Recompile<CR>` for quick recompilation.
 
 The compilation buffer is deleted automatically when Neovim would be closed, so
 unsaved changes don’t get in the way. It also has the |'buftype'| option set
@@ -408,6 +410,8 @@ interrupt() ~
     Additionally, you can run the command with a |count| to set the size of the
     opened window, like with |:split|.
 
+    Mapped to `<C-r>` within the compilation buffer.
+
 :CurrentError                                                  *:CurrentError*
     Jump to the current error in the compilation buffer. This works using the
     same cursor that |:NextError| and |:PrevError| operate on, and acts as a
@@ -440,6 +444,8 @@ interrupt() ~
     |compile-mode.send_to_qflist()|), and then opens the quickfix window using
     `:botright copen` (see |:botright| and |:copen|).
 
+    Mapped to `<C-q>` within the compilation buffer.
+
 :CompileGotoError                                          *:CompileGotoError*
     Only available within the compilation buffer itself.
 
@@ -457,6 +463,8 @@ interrupt() ~
 
     If passed a count, moves N errors forwards instead.
 
+    Mapped to `<C-g>n` within the compilation buffer.
+
 :CompileNextFile                                            *:CompileNextFile*
 :[N]CompileNextFile
     Only available within the compilation buffer itself.
@@ -467,6 +475,8 @@ interrupt() ~
 
     If passed a count, moves N files forwards instead.
 
+    Mapped to `<C-g>]` within the compilation buffer.
+
 :CompilePrevError                                          *:CompilePrevError*
 :[N]CompilePrevError
     Only available within the compilation buffer itself.
@@ -475,6 +485,8 @@ interrupt() ~
     not jump to the error's actual file.
 
     If passed a count, moves N errors backwards instead.
+
+    Mapped to `<C-g>p` within the compilation buffer.
 
 :CompilePrevFile                                            *:CompilePrevFile*
 :[N]CompilePrevFile
@@ -485,6 +497,8 @@ interrupt() ~
     actual file.
 
     If passed a count, moves N files backwards instead.
+
+    Mapped to `<C-g>[` within the compilation buffer.
 
 :CompileInterrupt                                          *:CompileInterrupt*
 :[N]CompileInterrupt
