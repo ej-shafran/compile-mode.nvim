@@ -103,7 +103,8 @@ This gets tacked on the end of the generated expressions.")
 * DONE Add ask-to-interrupt
   CLOSED: [2024-06-22 Sat 17:31]
 
-* TODO Allow skipping/jumping forward several errors
+* DONE Allow skipping/jumping forward several errors
+  CLOSED: [2024-06-22 Sat 19:03]
 
 * DONE Move logic to compilation ftplugin
   CLOSED: [2024-06-21 Fri 19:55]

@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - The ability to use `:tab` on `:Compile` and `:Recompile`.
+- The ability to use a count with `NextError` and `PrevError`.
 - The `CompileNextError` and `CompilePrevError` commands, which quickly scroll
   to an error without opening its locus (i.e. source file).
 - The `CompileNextFile` and `CompilePrevFile` commands, which act similarly to

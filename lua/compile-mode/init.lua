@@ -231,6 +231,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 end)
 
 ---Create a command that takes some action on the next/previous error from the current error cursor.
+---The command is repeated equal to the `count` that it receives, which defaults to `1`.
 ---
 ---@param action "jump"|"move" the action to do with the matching error:
 --- * "jump" means go to the locus of the error
@@ -240,13 +241,24 @@ end)
 --- * "prev" means work backwards from the current error
 ---This also determines the printed message if there is no match in the specified direction.
 ---@param different_file boolean whether to only match errors that occur in different files from the current error
----@return fun() command an async callback that performs the created action
+---@return fun(param: CommandParam) command an async callback that performs the created action
 local function act_from_current_error(action, direction, different_file)
-	return a.void(function()
+	return a.void(function(param)
+		param = param or {}
+		local count = param.count or 1
 		local current_error = errors.error_list[error_cursor]
 
+		local lines = {}
+		for line, _ in pairs(errors.error_list) do
+			table.insert(lines, line)
+		end
+		table.sort(lines)
+
 		local error_line = nil
-		for line, error in pairs(errors.error_list) do
+		local errors_found = 0
+		for i = direction == "prev" and #lines or 1, direction == "prev" and 1 or #lines, direction == "prev" and -1 or 1 do
+			local line = lines[i]
+			local error = errors.error_list[line]
 			local fits_file_constraint = true
 			if different_file then
 				fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
@@ -260,7 +272,11 @@ local function act_from_current_error(action, direction, different_file)
 			end
 
 			if fits_file_constraint and fits_line_constraint then
-				error_line = line
+				errors_found = errors_found + 1
+				if errors_found == count then
+					error_line = line
+					break
+				end
 			end
 		end
 
@@ -466,26 +482,18 @@ end)
 
 ---Move to the location of the next error within the compilation buffer.
 ---Does not jump to the error's actual locus.
----
----@type fun()
 M.move_to_next_error = act_from_current_error("move", "next", false)
 
 ---Move to the location of the next error within the compilation buffer that has a different file to the current one.
 ---Does not jump to the error's actual locus.
----
----@type fun()
 M.move_to_next_file = act_from_current_error("move", "next", true)
 
 ---Move to the location of the previous error within the compilation buffer.
 ---Does not jump to the error's actual locus.
----
----@type fun()
 M.move_to_prev_error = act_from_current_error("move", "prev", false)
 
 ---Move to the location of the previous error within the compilation buffer that has a different file to the current one.
 ---Does not jump to the error's actual locus.
----
----@type fun()
 M.move_to_prev_file = act_from_current_error("move", "prev", true)
 
 return M
