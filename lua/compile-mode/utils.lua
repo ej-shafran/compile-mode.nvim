@@ -65,7 +65,7 @@ end
 ---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
 ---
 ---@param fname string
----@param smods vim.api.keyset.parse_cmd.mods
+---@param smods SMods
 ---@param count integer
 ---@return integer bufnr the identifier of the buffer for `fname`
 function M.split_unless_open(fname, smods, count)
@@ -216,7 +216,7 @@ function M.highlight_command_outputs(bufnr, command_output_highlights)
 end
 
 ---Ask user whether to save each modified buffer, and save them as requested.
----@param smods vim.api.keyset.parse_cmd.mods
+---@param smods SMods
 ---@return boolean quit whether to quit or not
 function M.ask_to_save(smods)
 	local buffers = vim.api.nvim_list_bufs()
