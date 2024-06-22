@@ -1,6 +1,6 @@
 ---@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
 ---@alias CommandParam { args: string?, smods: vim.api.keyset.parse_cmd.mods?, bang: boolean?, count: integer }
----@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, compilation_hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean?, environment: table<string, string>?, clear_environment: boolean?, ask_to_interrupt: boolean? }
+---@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean?, environment: table<string, string>?, clear_environment: boolean?, ask_to_interrupt: boolean? }
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
@@ -61,8 +61,8 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 			local error = errors.parse(line)
 			local linenum = linecount + i - 1
 
-			if M.config.compilation_hidden_output then
-				local hide = M.config.compilation_hidden_output --[[@as string[] ]]
+			if M.config.hidden_output then
+				local hide = M.config.hidden_output --[[@as string[] ]]
 				for _, re in ipairs(hide) do
 					line = vim.fn.substitute(line, re, "", "")
 					new_lines[i] = line
@@ -298,9 +298,9 @@ M.level = errors.level
 function M.setup(opts)
 	debug("== setup() ==")
 	M.config = vim.tbl_deep_extend("force", M.config, opts)
-	if type(M.config.compilation_hidden_output) == "string" then
-		local hide = M.config.compilation_hidden_output--[[@as string]]
-		M.config.compilation_hidden_output = { hide }
+	if type(M.config.hidden_output) == "string" then
+		local hide = M.config.hidden_output--[[@as string]]
+		M.config.hidden_output = { hide }
 	end
 
 	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})

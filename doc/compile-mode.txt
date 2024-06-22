@@ -15,7 +15,7 @@ Table of Contents                             *compile-mode-table-of-contents*
     - buffer_name                                   |compile-mode.buffer_name|
     - debug                                               |compile-mode.debug|
     - error_ignore_file_list             |compile-mode.error_ignore_file_list|
-    - compilation_hidden_output       |compile-mode.compilation_hidden_output|
+    - hidden_output                               |compile-mode.hidden_output|
     - recompile_no_fail                       |compile-mode.recompile_no_fail|
     - auto_jump_to_first_error         |compile-mode.auto_jump_to_first_error|
     - ask_about_save                             |compile-mode.ask_about_save|
@@ -227,7 +227,7 @@ error_ignore_file_list                   *compile-mode.error_ignore_file_list*
     file should be ignored. Defaults to: `{ "/bin/[a-z]*sh$" }`. Passing in
     this option does not override this, but instead extends the list.
 
-compilation_hidden_output             *compile-mode.compilation_hidden_output*
+hidden_output                                     *compile-mode.hidden_output*
     A Vim regex or list of Vim regexes run on every line in the compilation
     buffer which will be substituted with empty strings.
 

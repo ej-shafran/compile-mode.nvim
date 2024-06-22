@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Instead of printing the Emacs-style "-*- ... -*-" at the top of the compilation buffer (which does nothing in Vim), a Vim modeline is printed that modifies the `filetype` and `path` options in the same way that the original Emacs mode does.
+- **(Breaking)** The `compilation_hidden_output` option has been renamed to `hidden_output`.
 
 ### Removed
 
