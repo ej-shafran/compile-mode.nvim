@@ -87,7 +87,7 @@ function M.split_unless_open(fname, smods, count)
 			cmd = smods.split .. " " .. cmd
 		end
 
-		if smods.tab ~= -1 then
+		if smods.tab and smods.tab ~= -1 then
 			cmd = tostring(smods.tab) .. "tab " .. cmd
 		end
 
