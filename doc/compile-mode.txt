@@ -87,6 +87,8 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
       -- or a specific version:
       -- tag = "v3.0.0"
       dependencies = { "nvim-lua/plenary.nvim" },
+      -- if not using Lazy, make sure to call:
+      --   require("compile-mode").setup({})
       opts = {}
     }
 <
