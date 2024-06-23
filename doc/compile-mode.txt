@@ -196,12 +196,15 @@ itself).
 setup({opts}) ~
     Sets up the plugin for use.
 
-    Usage:
+    The defaults for `setup` are:
 
     >lua
 	require("compile-mode").setup({
-	  default_command = "npm run build",
-	  -- ...other options here
+		buffer_name = "*compilation*",
+		default_command = "make -k",
+		time_format = "%a %b %e %H:%M:%S",
+		ask_about_save = true,
+		ask_to_interrupt = true,
 	})
 <
 
@@ -244,12 +247,13 @@ auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
 
 ask_about_save                                   *compile-mode.ask_about_save*
     When `true`, compiling asks about each unsaved buffer, checking whether to
-    save it or not, before running the compilation command.
+    save it or not, before running the compilation command. Defaults to
+    `true`.
 
 ask_to_interrupt                               *compile-mode.ask_to_interrupt*
     When `true`, compiling when another compilation command is currently
     running will confirm whether to interrupt instead of interrupting
-    automatically.
+    automatically. Defaults to `true`.
 
 environment                                         *compile-mode.environment*
     A table of string values and string keys, defining additional environment
