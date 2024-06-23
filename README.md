@@ -6,6 +6,10 @@ Mode](https://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation-Mode
 It allows you to run commands which are output into a special buffer, and then
 rerun that command over and over again as much as you need.
 
+## Features
+
+[Compile Mode Features](https://github.com/ej-shafran/compile-mode.nvim/assets/116496520/9ec09b34-ec90-4f49-b73e-13c0b8cbe178)
+
 ## Installation
 
 Use your favorite plugin manager. `compile-mode.nvim` depends on
@@ -26,10 +30,6 @@ return {
   opts = {}
 }
 ```
-
-## Features
-
-<!-- Place video here -->
 
 ## Contributing
 
