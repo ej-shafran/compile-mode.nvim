@@ -2,9 +2,11 @@ name: Test
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   test:
@@ -12,24 +14,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: compile-mode.nvim
-      - name: Setup `baleia.nvim`
-        uses: actions/checkout@v2
-        with:
-          repository: m00qek/baleia.nvim
-          path: baleia.nvim
+
       - name: Setup `plenary.nvim`
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: nvim-lua/plenary.nvim
           path: plenary.nvim
+
       - name: Install Neovim
         run: |
           sudo apt-get update
           sudo add-apt-repository ppa:neovim-ppa/unstable
           sudo apt-get install neovim
+
       - name: Run Tests
         run: |
           cd compile-mode.nvim
