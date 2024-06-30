@@ -104,8 +104,8 @@ and the like).
 
 After a command has been run, the buffer’s output will contain:
 
-- the "default directory" - i.e., the current working directory from which the
-    command was run
+- a modeline specifying the filetype and modifying the path to include the
+  directory from which the command was run
 - the time at which compilation started
 - the compilation command which was executed
 - the output (`stdout` and `stderr`) of the command
@@ -114,7 +114,9 @@ After a command has been run, the buffer’s output will contain:
   (running another compilation command or calling |:CompileInterrupt|), by
   segfault (SIGSEGV), or by termination (SIGTERM)
 
-If a compilation command is running and another one is triggered, the first
+If a compilation command is running and another one is triggered, the user is
+prompted whether to interrupt the already running process (unless
+|compile-mode.ask_to_interrupt| is `false`). If they confirm, the original
 command is interrupted (using |jobstop()|) and this is reported in the
 compilation buffer. Then, after a short delay, the compilation buffer is
 cleared and the new command starts running.
@@ -150,8 +152,8 @@ table consists of a key (the name of the error’s source, used for debug
 information) and a table value. This table has the following keys:
 
 - {regex} (string) a Vim regex which captures the error and the relevant
-  capture groups; if this regex matches a line an error is determined to be on
-  that line
+  capture groups; if this regex matches a line, an error is determined to
+  exist on that line
 - {filename} (integer) the capture group number for the error’s filename
   (capture groups start at 1)
 - {row} (integer|[integer, integer]) either the capture group for the row on
@@ -165,7 +167,7 @@ information) and a table value. This table has the following keys:
   capture groups (optional, default `ERROR`)
     - If capture groups are provided and the first capture group is matched,
       the error is considered of type `WARNING`. If the second capture group
-      matched, the error is considered to be of type `INFO`. -
+      matched, the error is considered to be of type `INFO`.
 
 **Note:** a type alias - `RegexpMatcher` - is available for the values of
 `error_regexp_table`.
@@ -532,7 +534,7 @@ CompileModeError                                         *hl-CompileModeError*
     Example:
 
     >
-    README.md[1,1] error
+    README.md:[1,1] error
     ^^^^^^^^^
 <
 
