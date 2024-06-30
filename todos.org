@@ -130,7 +130,8 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Add Next Error Follow
 
-* TODO Document behavior of :Compile!
+* DONE Document behavior of :Compile!
+  CLOSED: [2024-07-01 Mon 00:19]
 
 * TODO Re-add optional Baleia support
 

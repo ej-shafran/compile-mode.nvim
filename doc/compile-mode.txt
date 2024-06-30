@@ -381,12 +381,16 @@ interrupt() ~
 6. Commands                                            *compile-mode-commands*
 
 
-:Compile                                                            *:Compile*
+:Compile[!]                                                         *:Compile*
     Runs a command and places its output in the compilation buffer. The
     command is run from the current working directory. The compilation buffer
     is opened in a new split if it isn’t already opened. If an argument is
     present, it is used as the command. Otherwise, the user is prompted using
     |vim.ui.input()|.
+
+    With a bang (`:Compile!`), the compilation buffer will only be updated
+    once the command finishes (i.e. the compilation command will be run
+    synchronously).
 
     The following commands work when prefixed to `:Compile`:
 
@@ -399,11 +403,15 @@ interrupt() ~
     Additionally, you can run the command with a |count| to set the size of
     the opened window, like with |:split|.
 
-:Recompile                                                        *:Recompile*
+:Recompile[!]                                                     *:Recompile*
     Reruns the last compiled command. If there isn’t one, the error is
     reported using |vim.notify()|. The compilation buffer is opened in a new
     split if it isn’t already opened. The command is rerun from the directory
     in which it was originally run.
+
+    With a bang (`:Recompile!`), the compilation buffer will only be updated
+    once the command finishes (i.e. the compilation command will be run
+    synchronously).
 
     The following commands work when prefixed to `:Recompile`:
 
