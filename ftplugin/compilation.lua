@@ -1,5 +1,18 @@
 local compile_mode = require("compile-mode")
 
+if compile_mode.config.baleia_setup then
+	local ok, baleia_mod = pcall(require, "baleia")
+	if ok then
+		local opts = {}
+		if type(compile_mode.config.baleia_setup) == "table" then
+			opts = compile_mode.config.baleia_setup --[[@as table]]
+		end
+
+		local baleia = baleia_mod.setup(opts)
+		baleia.automatically(0)
+	end
+end
+
 local matchadd = vim.fn.matchadd
 
 local function command(cmd, expr, opts)

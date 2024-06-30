@@ -29,6 +29,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   that each compilation command should inherit.
   - Also, add the `clear_environment` option, which modifies the behavior of
     `environment` to no longer merge with the existing environment.
+- The `baleia_setup` option, which will enable support for automatic
+  highlighting of ANSI escape codes when set to `true`. It can be set to a
+  table of options to pass to the `baleia.setup` call.
 - Proper logs for segmentation faults and command termination
 - Several new keymaps within the compilation buffer
 
@@ -40,13 +43,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   original Emacs mode does.
 - **(Breaking)** The `compilation_hidden_output` option has been renamed to
   `hidden_output`.
+- **(Breaking)** The dependency on baleia.nvim is now optional, and can be
+  enabled with the `baleia_setup` option. This means that by default, ANSI
+  escape codes in the output of commands will not be highlighted.
 
 ### Removed
 
-- **(Breaking)** The dependency on `baleia.nvim`, along with the
-  `no_baleia_support` and `baleia_options` options. This means that ANSI escape
-  codes will no longer be automatically highlighted inside of the compilation
-  buffer.
+- **(Breaking)** The `no_baleia_support` and `baleia_options` options. As
+  baleia.nvim is no longer depended upon by default, if you want to enable
+  support for it within compile-mode you should use the `baleia_setup` option.
 - **(Breaking)** The `error_highlights` option. Instead, customize the
   highlights defined by this plugin using Vim's regular `:highlight` command
   (see the docs).

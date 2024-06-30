@@ -133,5 +133,6 @@ This gets tacked on the end of the generated expressions.")
 * DONE Document behavior of :Compile!
   CLOSED: [2024-07-01 Mon 00:19]
 
-* TODO Re-add optional Baleia support
+* DONE Re-add optional Baleia support
+  CLOSED: [2024-07-01 Mon 00:57]
 

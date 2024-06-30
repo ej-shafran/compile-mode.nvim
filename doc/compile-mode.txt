@@ -14,6 +14,7 @@ Table of Contents                             *compile-mode-table-of-contents*
     - time_format                                   |compile-mode.time_format|
     - buffer_name                                   |compile-mode.buffer_name|
     - debug                                               |compile-mode.debug|
+    - baleia_setup                                 |compile-mode.baleia_setup|
     - error_ignore_file_list             |compile-mode.error_ignore_file_list|
     - hidden_output                               |compile-mode.hidden_output|
     - recompile_no_fail                       |compile-mode.recompile_no_fail|
@@ -75,7 +76,8 @@ for more details.
 2. Installation                                    *compile-mode-installation*
 
 Use your favorite plugin manager. `compile-mode.nvim` depends on plenary.nvim
-<https://github.com/nvim-lua/plenary.nvim>.
+<https://github.com/nvim-lua/plenary.nvim> (and optionally baleia.nvim
+<https://github.com/m00qek/baleia.nvim>).
 
 Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
 `compile-mode.nvim`:
@@ -86,10 +88,18 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
       branch = "latest",
       -- or a specific version:
       -- tag = "v3.0.0"
-      dependencies = { "nvim-lua/plenary.nvim" },
+      dependencies = {
+	  "nvim-lua/plenary.nvim",
+	  -- if you want to enable coloring of ANSI escape codes in
+	  -- compilation output, add:
+	  -- { "m00qek/baleia.nvim", tag = "v1.3.0" },
+      },
       -- if not using Lazy, make sure to call:
       --   require("compile-mode").setup({})
-      opts = {}
+      opts = {
+	  -- to add ANSI escape code support, add:
+	  -- baleia_setup = true,
+      }
     }
 <
 
@@ -231,6 +241,11 @@ buffer_name                                         *compile-mode.buffer_name*
 debug                                                     *compile-mode.debug*
     Print additional debug information. This is printed using |print|, so you
     can inspect it with |:messages|.
+
+baleia_setup                                       *compile-mode.baleia_setup*
+    When `true`, baleia.nvim will be set up for the compilation buffer, which
+    will color in ANSI escape codes in the compilation output. This option can
+    also be a table of options to pass to `baleia.setup()`.
 
 error_ignore_file_list                   *compile-mode.error_ignore_file_list*
     A list of Vim regexes to run each error’s filename by, to check if this
