@@ -6,21 +6,23 @@ local M = {}
 
 ---COMMANDS
 
----@param args string
----@param smods SMods?
-function M.compile(args, smods)
-	compile_mode.compile({
-		args = args,
-		smods = vim.tbl_extend("force", smods or {}, { silent = true }),
-	})
+---@param param CommandParam?
+function M.compile(param)
+	param = param or {}
+
+	compile_mode.compile(vim.tbl_extend("force", param, {
+		smods = vim.tbl_extend("force", param.smods or {}, { silent = true }),
+	}))
 	M.wait()
 end
 
----@param smods SMods?
-function M.recompile(smods)
-	compile_mode.recompile({
-		smods = vim.tbl_extend("force", smods or {}, { silent = true }),
-	})
+---@param param CommandParam?
+function M.recompile(param)
+	param = param or {}
+
+	compile_mode.recompile(vim.tbl_extend("force", param, {
+		smods = vim.tbl_extend("force", param.smods or {}, { silent = true }),
+	}))
 	M.wait()
 end
 

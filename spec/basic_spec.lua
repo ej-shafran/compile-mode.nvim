@@ -13,7 +13,7 @@ describe(":Compile", function()
 	before_each(helpers.setup_tests)
 
 	it("should run a command and create a buffer with the result", function()
-		helpers.compile(cmd)
+		helpers.compile({ args = cmd })
 
 		assert.are.same({ cmd, echoed }, get_output())
 	end)
@@ -23,7 +23,7 @@ describe(":Recompile", function()
 	before_each(helpers.setup_tests)
 
 	it("should rerun the latest command", function()
-		helpers.compile(cmd)
+		helpers.compile({ args = cmd })
 
 		local expected = get_output()
 		helpers.recompile()

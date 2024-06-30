@@ -1,18 +1,18 @@
-local utils = require("spec.test_helpers")
+local helpers = require("spec.test_helpers")
 local errors = require("compile-mode.errors")
 
 local assert = require("luassert")
 
 describe("error parsing", function()
 	it("should find errors using the default regexes", function()
-		utils.setup_tests()
+		helpers.setup_tests()
 
 		local filename = "README.md"
 		local row = 1
 		local col = 1
-		local error_string = utils.maven_error({ filename = filename, row = row, col = col })
+		local error_string = helpers.maven_error({ filename = filename, row = row, col = col })
 
-		utils.compile("echo '" .. error_string .. "'")
+		helpers.compile({ args = "echo '" .. error_string .. "'" })
 
 		local actual = errors.error_list[5]
 		assert.are.same(actual.full_text, error_string)
@@ -22,19 +22,19 @@ describe("error parsing", function()
 	end)
 
 	it("should use custom regexes", function()
-		utils.setup_tests({
+		helpers.setup_tests({
 			error_regexp_table = {
-				typescript = utils.typescript_regexp_matcher,
+				typescript = helpers.typescript_regexp_matcher,
 			},
 		})
 
 		local filename = "path/to/error-file.ts"
 		local row = 13
 		local col = 23
-		local error_string = utils.typescript_error({ filename = filename, row = row, col = col })
+		local error_string = helpers.typescript_error({ filename = filename, row = row, col = col })
 
-		utils.compile("echo '" .. error_string .. "'")
-		utils.wait()
+		helpers.compile({ args = "echo '" .. error_string .. "'" })
+		helpers.wait()
 
 		local actual = errors.error_list[5]
 		assert.are.same(actual.full_text, error_string)
