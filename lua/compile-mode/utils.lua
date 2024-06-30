@@ -104,7 +104,7 @@ end
 ---@param filename string
 ---@param error Error
 ---@param same_window boolean|nil
-local function goto_file(filename, error, same_window)
+local function jump_to_file(filename, error, same_window)
 	local row = error.row and error.row.value or 1
 	local end_row = error.end_row and error.end_row.value
 
@@ -156,7 +156,7 @@ M.jump_to_error = a.void(function(error, same_window)
 	local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
 
 	if file_exists then
-		goto_file(error.filename.value, error, same_window)
+		jump_to_file(error.filename.value, error, same_window)
 		return
 	end
 
@@ -177,7 +177,7 @@ M.jump_to_error = a.void(function(error, same_window)
 			return
 		end
 
-		goto_file(dir, error, same_window)
+		jump_to_file(dir, error, same_window)
 		return
 	end
 
@@ -187,7 +187,7 @@ M.jump_to_error = a.void(function(error, same_window)
 		return
 	end
 
-	goto_file(nested_filename, error, same_window)
+	jump_to_file(nested_filename, error, same_window)
 end)
 
 function M.match_command_ouput(line, linenum)
