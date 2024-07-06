@@ -8,7 +8,7 @@ rerun that command over and over again as much as you need.
 
 ## Features
 
-[Compile Mode Features](https://github.com/ej-shafran/compile-mode.nvim/assets/116496520/9ec09b34-ec90-4f49-b73e-13c0b8cbe178)
+[Compile Mode Features](https://github.com/ej-shafran/compile-mode.nvim/assets/116496520/5541b9dd-70b7-4647-9c13-9e57813dac27)
 
 ## Installation
 
