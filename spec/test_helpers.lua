@@ -31,6 +31,11 @@ function M.interrupt()
 	M.wait()
 end
 
+function M.next_error()
+	compile_mode.next_error()
+	M.wait()
+end
+
 ---UTILS
 
 function M.get_compilation_bufnr()
@@ -54,6 +59,11 @@ end
 ---@param param CreateError
 function M.maven_error(param)
 	return param.filename .. ":[" .. param.row .. "," .. param.col .. "] "
+end
+
+---@param param CreateError
+function M.sun_ada_error(param)
+	return param.filename .. ", line " .. param.row .. ", char " .. param.col .. ":"
 end
 
 ---@type RegexpMatcher
