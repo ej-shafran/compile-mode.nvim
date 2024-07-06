@@ -33,8 +33,9 @@ function M.interrupt()
 	M.wait()
 end
 
-function M.next_error()
-	compile_mode.next_error()
+---@param param CommandParam?
+function M.next_error(param)
+	compile_mode.next_error(param)
 	M.wait()
 end
 
@@ -94,6 +95,11 @@ end
 ---@param error_string string
 function M.compile_error(error_string)
 	M.compile({ args = "echo '" .. error_string .. "'" })
+end
+
+---@param error_strings string[]
+function M.compile_multiple_errors(error_strings)
+	M.compile({ args = "echo -e '" .. vim.fn.join(error_strings, "\\n") .. "'" })
 end
 
 ---@param expected CreateError

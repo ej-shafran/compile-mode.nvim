@@ -55,6 +55,26 @@ describe("jumping to errors", function()
 
 		helpers.assert_at_error_locus(expected)
 	end)
+
+	it("should skip ahead by a count", function()
+		---@type CreateError
+		local expected = {
+			filename = "README.md",
+			row = 1,
+			col = 1,
+		}
+		local errors = {
+			helpers.sun_ada_error({ filename = "todos.org", row = 1, col = 1 }),
+			helpers.sun_ada_error({ filename = "todos.org", row = 2, col = 1 }),
+			helpers.sun_ada_error(expected),
+		}
+
+		helpers.compile_multiple_errors(errors)
+
+		helpers.next_error({ count = 3 })
+
+		helpers.assert_at_error_locus(expected)
+	end)
 end)
 
 describe("moving to errors", function()
