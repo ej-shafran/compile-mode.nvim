@@ -64,4 +64,19 @@ describe("error parsing", function()
 		assert.are.same(actual_row, row)
 		assert.are.same(actual_col + 1, col)
 	end)
+
+	it("should move to an error's location in the compilation buffer", function()
+		helpers.setup_tests()
+
+		local filename = "README.md"
+		local row = 1
+		local col = 1
+		local error_string = helpers.sun_ada_error({ filename = filename, row = row, col = col })
+
+		compile_error(error_string)
+		helpers.move_to_next_error()
+
+		local compilation_row = unpack(vim.api.nvim_win_get_cursor(0))
+		assert.are.same(compilation_row, 5)
+	end)
 end)
