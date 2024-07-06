@@ -242,7 +242,7 @@ end)
 --- * "prev" means work backwards from the current error
 ---This also determines the printed message if there is no match in the specified direction.
 ---@param different_file boolean whether to only match errors that occur in different files from the current error
----@return fun(param: CommandParam) command an async callback that performs the created action
+---@return fun(param: CommandParam?) command an async callback that performs the created action
 local function act_from_current_error(action, direction, different_file)
 	return a.void(function(param)
 		param = param or {}
