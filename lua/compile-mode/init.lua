@@ -398,13 +398,9 @@ M.current_error = a.void(function()
 end)
 
 ---Jump to the next error in the error list.
----
----@type fun()
 M.next_error = act_from_current_error("jump", "next", false)
 
 ---Jump to the previous error in the error list.
----
----@type fun()
 M.prev_error = act_from_current_error("jump", "prev", false)
 
 ---Load all compilation errors into the quickfix list, replacing the existing list.
