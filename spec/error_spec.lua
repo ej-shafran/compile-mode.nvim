@@ -3,6 +3,11 @@ local errors = require("compile-mode.errors")
 
 local assert = require("luassert")
 
+---@param error_string string
+local function compile_error(error_string)
+	helpers.compile({ args = "echo '" .. error_string .. "'" })
+end
+
 describe("error parsing", function()
 	it("should find errors using the default regexes", function()
 		helpers.setup_tests()
@@ -12,7 +17,7 @@ describe("error parsing", function()
 		local col = 1
 		local error_string = helpers.maven_error({ filename = filename, row = row, col = col })
 
-		helpers.compile({ args = "echo '" .. error_string .. "'" })
+		compile_error(error_string)
 
 		local actual = errors.error_list[5]
 		assert.are.same(actual.full_text, error_string)
@@ -33,7 +38,7 @@ describe("error parsing", function()
 		local col = 23
 		local error_string = helpers.typescript_error({ filename = filename, row = row, col = col })
 
-		helpers.compile({ args = "echo '" .. error_string .. "'" })
+		compile_error(error_string)
 
 		local actual = errors.error_list[5]
 		assert.are.same(actual.full_text, error_string)
@@ -50,8 +55,7 @@ describe("error parsing", function()
 		local col = 1
 		local error_string = helpers.sun_ada_error({ filename = filename, row = row, col = col })
 
-		helpers.compile({ args = "echo '" .. error_string .. "'" })
-
+		compile_error(error_string)
 		helpers.next_error()
 
 		local actual_filename = vim.fn.expand("%:t")
