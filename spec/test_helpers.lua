@@ -42,6 +42,11 @@ function M.get_compilation_bufnr()
 	return vim.fn.bufnr(vim.fn.fnameescape("*compilation*"))
 end
 
+function M.get_output()
+	local bufnr = M.get_compilation_bufnr()
+	return vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+end
+
 ---@param opts Config|nil
 function M.setup_tests(opts)
 	require("plugin.command")
