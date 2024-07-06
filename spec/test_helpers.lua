@@ -104,7 +104,17 @@ end
 
 ---@param error_strings string[]
 function M.compile_multiple_errors(error_strings)
-	M.compile({ args = "echo -e '" .. vim.fn.join(error_strings, "\\n") .. "'" })
+	local errors_with_quotes = vim.tbl_map(function(error_string)
+		return "'" .. error_string .. "'"
+	end, error_strings)
+	local printf_args = vim.fn.join(errors_with_quotes, " ")
+
+	local format_strings = vim.tbl_map(function()
+		return "%s"
+	end, error_strings)
+	local printf_fmt = vim.fn.join(format_strings, "\\n")
+
+	M.compile({ args = "printf '" .. printf_fmt .. "' " .. printf_args })
 end
 
 ---@param expected CreateError
