@@ -16,6 +16,6 @@ describe("`auto_jump_to_first_error` option", function()
 
 		helpers.compile_error(error_string)
 
-		helpers.assert_parsed_error(error_string, expected)
+		helpers.assert_at_error_locus(expected)
 	end)
 end)
