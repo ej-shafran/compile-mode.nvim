@@ -44,6 +44,11 @@ function M.move_to_next_error()
 	M.wait()
 end
 
+function M.move_to_next_file()
+	compile_mode.move_to_next_file()
+	M.wait()
+end
+
 ---UTILS
 
 function M.get_compilation_bufnr()

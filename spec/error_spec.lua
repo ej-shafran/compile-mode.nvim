@@ -94,4 +94,23 @@ describe("moving to errors", function()
 
 		helpers.assert_cursor_at_error(error_string)
 	end)
+
+	it("should skip to another file if specified", function()
+		local first_file = "todos.org"
+		local second_file = "README.md"
+		local errors = {
+			helpers.sun_ada_error({ filename = first_file, row = 1, col = 1 }),
+			helpers.sun_ada_error({ filename = first_file, row = 2, col = 1 }),
+
+			helpers.sun_ada_error({ filename = second_file, row = 1, col = 1 }),
+		}
+
+		helpers.compile_multiple_errors(errors)
+
+		helpers.move_to_next_error()
+		helpers.assert_cursor_at_error(errors[1])
+
+		helpers.move_to_next_file()
+		helpers.assert_cursor_at_error(errors[3])
+	end)
 end)
