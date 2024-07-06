@@ -150,13 +150,19 @@ local function jump_to_file(filename, error, same_window)
 	end
 end
 
----@param error Error
----@type fun(error: Error, same_window: boolean|nil)
-M.jump_to_error = a.void(function(error, same_window)
-	local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
+---@type fun(error: Error, current_dir: string, same_window: boolean|nil)
+M.jump_to_error = a.void(function(error, current_dir, same_window)
+	current_dir = string.gsub(current_dir or "", "/$", "")
+
+	local filename = error.filename.value
+	if not M.is_absolute(filename) then
+		filename = current_dir .. "/" .. filename
+	end
+
+	local file_exists = vim.fn.filereadable(filename) ~= 0
 
 	if file_exists then
-		jump_to_file(error.filename.value, error, same_window)
+		jump_to_file(filename, error, same_window)
 		return
 	end
 
@@ -167,7 +173,7 @@ M.jump_to_error = a.void(function(error, same_window)
 	if not dir then
 		return
 	end
-	dir = dir:gsub("(.)/$", "%1")
+	dir = string.gsub(dir, "/$", "")
 
 	M.wait()
 
@@ -243,6 +249,16 @@ function M.ask_to_save(smods)
 	end
 
 	return false
+end
+
+---@param path string
+---@return boolean is_absolute whether `path` is absolute or relative.
+function M.is_absolute(path)
+	if vim.uv.os_uname().sysname == "Windows_NT" then
+		return path:match("^%a:[/\\]") or path:match("^//") or path:match("^\\\\")
+	else
+		return path:sub(1, 1) == "/"
+	end
 end
 
 return M

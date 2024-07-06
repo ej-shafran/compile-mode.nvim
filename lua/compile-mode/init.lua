@@ -15,8 +15,14 @@ local M = {}
 ---acts as an index of `errors.error_list`
 local error_cursor = 0
 
+---The previous directory used for compilation.
 ---@type string|nil
 local prev_dir = nil
+
+---A table which keeps track of the changes in directory for the compilation buffer,
+---based on "Entering directory" and "Leaving directory" messages.
+---@type table<integer, string>
+local dir_changes = {}
 
 --- UTILITY FUNCTIONS
 
@@ -36,6 +42,53 @@ local function set_lines(bufnr, start, end_, data)
 	vim.api.nvim_buf_call(bufnr, function()
 		vim.cmd("normal G")
 	end)
+end
+
+---Get the directory to look in for a specific line in the compilation buffer,
+---while respecting "Entering directory" and "Leaving directory" messages.
+---@param linenum integer the line number to check the directory for
+---@return string
+local function find_directory_for_line(linenum)
+	local latest_linenum = nil
+	local dir = prev_dir or vim.fn.getcwd()
+	for old_linenum, old_dir in pairs(dir_changes) do
+		if old_linenum < linenum and (not latest_linenum or latest_linenum <= old_linenum) then
+			latest_linenum = old_linenum
+			dir = old_dir
+		end
+	end
+	return dir
+end
+
+---Like `:find`, but splits unless `same_window` is configured.
+---@param file string the file to find
+---@param same_window boolean if `true`, do not split
+local function file_find(file, same_window)
+	if not same_window and vim.fn.filereadable(file) ~= 0 then
+		vim.cmd("split")
+	end
+
+	local ok, msg = pcall(vim.cmd.find, file)
+	if not ok then
+		vim.notify(string.gsub(msg, "^Vim:", ""), vim.log.levels.ERROR)
+	end
+end
+
+---Returns a function that acts like `gf` or `CTRL-W_f` (depending on the `same_window` parameter),
+---while respecting "Entering directory" and "Leaving directory" messages.
+---@param same_window boolean whether to split (i.e. act like `gf`) or not (i.e. act like `CTRL-W_f`)
+---@return fun()
+local function goto_file(same_window)
+	return function()
+		local cfile = vim.fn.expand("<cfile>")
+		local linenum = unpack(vim.api.nvim_win_get_cursor(0))
+
+		local dir = find_directory_for_line(linenum)
+
+		vim.cmd("set path+=" .. dir)
+		file_find(cfile, same_window)
+		vim.cmd("set path-=" .. dir)
+	end
 end
 
 ---@type fun(cmd: string, bufnr: integer, sync: boolean | nil): integer, integer, integer
@@ -74,10 +127,29 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 				errors.error_list[linenum] = error
 
 				if M.config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
-					utils.jump_to_error(error, M.config.same_window_errors)
+					local dir = find_directory_for_line(linenum)
+					utils.jump_to_error(error, dir, M.config.same_window_errors)
 					error_cursor = linenum
 				end
 			else
+				local dirchange = vim.fn.matchlist(line, "\\%(Entering\\|Leavin\\(g\\)\\) directory [`']\\(.\\+\\)'$")
+				if #dirchange > 0 then
+					local leaving = dirchange[2] ~= ""
+					local dir = dirchange[3]
+
+					local latest_dir = find_directory_for_line(linenum)
+
+					if utils.is_absolute(dir) then
+						dir_changes[linenum] = vim.fn.fnamemodify(dir, leaving and ":h" or "")
+					else
+						if leaving then
+							dir_changes[linenum] = vim.fn.fnamemodify(latest_dir, ":h")
+						else
+							dir_changes[linenum] = vim.fn.resolve(latest_dir .. "/" .. dir)
+						end
+					end
+				end
+
 				local highlights = utils.match_command_ouput(line, linenum)
 				table.move(highlights, 1, #highlights, #output_highlights + 1, output_highlights)
 			end
@@ -151,6 +223,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 
 	error_cursor = 0
 	errors.error_list = {}
+	dir_changes = {}
 
 	debug("== runcommand() ==")
 	if vim.g.compile_job_id then
@@ -249,10 +322,7 @@ local function act_from_current_error(action, direction, different_file)
 		local count = param.count or 1
 		local current_error = errors.error_list[error_cursor]
 
-		local lines = {}
-		for line, _ in pairs(errors.error_list) do
-			table.insert(lines, line)
-		end
+		local lines = vim.tbl_keys(errors.error_list)
 		table.sort(lines)
 
 		local error_line = nil
@@ -289,7 +359,8 @@ local function act_from_current_error(action, direction, different_file)
 
 		error_cursor = error_line
 		if action == "jump" then
-			utils.jump_to_error(errors.error_list[error_line], M.config.same_window_errors)
+			local dir = find_directory_for_line(error_line)
+			utils.jump_to_error(errors.error_list[error_line], dir, M.config.same_window_errors)
 		else
 			vim.api.nvim_win_set_cursor(0, { error_line, 0 })
 		end
@@ -394,7 +465,8 @@ M.current_error = a.void(function()
 		return
 	end
 
-	utils.jump_to_error(error, M.config.same_window_errors)
+	local dir = find_directory_for_line(error_cursor)
+	utils.jump_to_error(error, dir, M.config.same_window_errors)
 end)
 
 ---Jump to the next error in the error list.
@@ -442,8 +514,10 @@ M.goto_error = a.void(function()
 		return
 	end
 
+	local dir = find_directory_for_line(linenum)
+
 	error_cursor = linenum
-	utils.jump_to_error(error, M.config.same_window_errors)
+	utils.jump_to_error(error, dir, M.config.same_window_errors)
 end)
 
 ---Interrupt the currently running compilation command.
@@ -492,5 +566,9 @@ M.move_to_prev_error = act_from_current_error("move", "prev", false)
 ---Move to the location of the previous error within the compilation buffer that has a different file to the current one.
 ---Does not jump to the error's actual locus.
 M.move_to_prev_file = act_from_current_error("move", "prev", true)
+
+M._gf = goto_file(false)
+
+M._CTRL_W_f = goto_file(true)
 
 return M

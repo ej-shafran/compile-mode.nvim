@@ -12,6 +12,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - The ability to use `:tab` on `:Compile` and `:Recompile`.
 - The ability to use a count with `NextError` and `PrevError`.
+- Jumping to errors now respects "Entering directory" and "Leaving directory"
+  messages from make to determine what directory a file might be in
 - The `CompileNextError` and `CompilePrevError` commands, which quickly scroll
   to an error without opening its locus (i.e. source file).
 - The `CompileNextFile` and `CompilePrevFile` commands, which act similarly to
@@ -34,6 +36,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
   table of options to pass to the `baleia.setup` call.
 - Proper logs for segmentation faults and command termination
 - Several new keymaps within the compilation buffer
+  - ...including an override of `gf` and `CTRL-W_f` that respects "Entering
+    directory" and "Leaving directory" messages, as noted above for jumping to
+    errors
 
 ### Changed
 

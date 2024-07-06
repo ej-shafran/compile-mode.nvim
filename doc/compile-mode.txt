@@ -145,6 +145,10 @@ Additional keymaps within the compilation buffer are:
 
 - `q` is mapped to `<CMD>q<CR>` for easy closing of the compilation buffer.
 - `<C-r>` is mapped to `<CMD>Recompile<CR>` for quick recompilation.
+- `gf` is mapped to a custom function that behaves similarly to how |gf| does
+  regularly, but respects "Entering directory" and "Leaving directory"
+  messages from `make` to tell what directory a file might be in.
+- `<C-w>f` is mapped like `gf`, but behaves like |CTRL-W_f| instead.
 
 The compilation buffer is deleted automatically when Neovim would be closed, so
 unsaved changes don’t get in the way. It also has the |'buftype'| option set
@@ -155,7 +159,9 @@ to `nofile`.
 
 The compilation buffer is checked for errors in real-time, which can then be
 navigated between using |:CompileGotoError|, |:NextError|, |:PrevError| and
-|:CurrentError|.
+|:CurrentError|. *Note:* these commands all respect "Entering directory" and
+"Leaving directory" messages from `make` in order to determine which directory
+a certain error's file might be in.
 
 Errors are defined using the `error_regexp_table` option. Each field in the
 table consists of a key (the name of the error’s source, used for debug
@@ -179,7 +185,7 @@ information) and a table value. This table has the following keys:
       the error is considered of type `WARNING`. If the second capture group
       matched, the error is considered to be of type `INFO`.
 
-**Note:** a type alias - `RegexpMatcher` - is available for the values of
+*Note:* a type alias - `RegexpMatcher` - is available for the values of
 `error_regexp_table`.
 
 For example, to add TypeScript errors:

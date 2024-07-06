@@ -93,12 +93,14 @@ This gets tacked on the end of the generated expressions.")
 * DONE Add compilation environment
   CLOSED: [2024-06-19 Wed 02:12]
 
-* TODO Parse entering/leaving directory messages
+* DONE Parse entering/leaving directory messages
+  CLOSED: [2024-07-07 Sun 00:48]
 
 ** DONE Use for highlighting
    CLOSED: [2024-06-20 Thu 22:29]
 
-** TODO Use for determining relative paths
+** DONE Use for determining relative paths
+   CLOSED: [2024-07-07 Sun 00:48]
 
 * DONE Add ask-to-interrupt
   CLOSED: [2024-06-22 Sat 17:31]
