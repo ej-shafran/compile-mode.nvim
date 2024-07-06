@@ -10,16 +10,19 @@ Table of Contents                             *compile-mode-table-of-contents*
 5. API                                                      |compile-mode-api|
   - setup()                                             |compile-mode.setup()|
     - error_regexp_table                     |compile-mode.error_regexp_table|
-    - no_baleia_support                       |compile-mode.no_baleia_support|
     - default_command                           |compile-mode.default_command|
     - time_format                                   |compile-mode.time_format|
-    - baleia_options                             |compile-mode.baleia_options|
     - buffer_name                                   |compile-mode.buffer_name|
-    - error_highlights                         |compile-mode.error_highlights|
     - debug                                               |compile-mode.debug|
+    - baleia_setup                                 |compile-mode.baleia_setup|
     - error_ignore_file_list             |compile-mode.error_ignore_file_list|
-    - compilation_hidden_output       |compile-mode.compilation_hidden_output|
+    - hidden_output                               |compile-mode.hidden_output|
     - recompile_no_fail                       |compile-mode.recompile_no_fail|
+    - auto_jump_to_first_error         |compile-mode.auto_jump_to_first_error|
+    - ask_about_save                             |compile-mode.ask_about_save|
+    - ask_to_interrupt                         |compile-mode.ask_to_interrupt|
+    - environment                                   |compile-mode.environment|
+    - clear_environment                       |compile-mode.clear_environment|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
   - current_error()                             |compile-mode.current_error()|
@@ -28,6 +31,10 @@ Table of Contents                             *compile-mode-table-of-contents*
   - send_to_qflist()                           |compile-mode.send_to_qflist()|
   - add_to_qflist()                             |compile-mode.add_to_qflist()|
   - goto_error()                                   |compile-mode.goto_error()|
+  - move_to_next_error()                                |move_to_next_error()|
+  - move_to_next_file()                                  |move_to_next_file()|
+  - move_to_prev_error()                                |move_to_prev_error()|
+  - move_to_prev_file()                                  |move_to_prev_file()|
   - interrupt()                                     |compile-mode.interrupt()|
 6. Commands                                            |compile-mode-commands|
   - :Compile                                                        |:Compile|
@@ -37,7 +44,23 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :PrevError                                                    |:PrevError|
   - :QuickfixErrors                                          |:QuickfixErrors|
   - :CompileGotoError                                      |:CompileGotoError|
+  - :CompileNextError                                      |:CompileNextError|
+  - :CompileNextFile                                        |:CompileNextFile|
+  - :CompilePrevError                                      |:CompilePrevError|
+  - :CompilePrevFile                                        |:CompilePrevFile|
   - :CompileInterrupt                                      |:CompileInterrupt|
+7. Highlights                                        |compile-mode-highlights|
+  - CompileModeError                                     |hl-CompileModeError|
+  - CompileModeInfo                                       |hl-CompileModeInfo|
+  - CompileModeWarning                                 |hl-CompileModeWarning|
+  - CompileModeMessage                                 |hl-CompileModeMessage|
+  - CompileModeMessageRow                           |hl-CompileModeMessageRow|
+  - CompileModeMessageCol                           |hl-CompileModeMessageCol|
+  - CompileModeCommandOutput                     |hl-CompileModeCommandOutput|
+  - CompileModeOutputFile                           |hl-CompileModeOutputFile|
+  - CompileModeCheckResult                         |hl-CompileModeCheckResult|
+  - CompileModeCheckTarget                               |hl-CompileModeError|
+  - CompileModeDirectoryMessage               |hl-CompileModeDirectoryMessage|
 
 ==============================================================================
 1. Introduction                                    *compile-mode-introduction*
@@ -53,9 +76,8 @@ for more details.
 2. Installation                                    *compile-mode-installation*
 
 Use your favorite plugin manager. `compile-mode.nvim` depends on plenary.nvim
-<https://github.com/nvim-lua/plenary.nvim> and on baleia.nvim
-<https://github.com/m00qek/baleia.nvim> (unless the
-|compile-mode.no_baleia_support| option is set).
+<https://github.com/nvim-lua/plenary.nvim> (and optionally baleia.nvim
+<https://github.com/m00qek/baleia.nvim>).
 
 Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
 `compile-mode.nvim`:
@@ -65,15 +87,18 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
       "ej-shafran/compile-mode.nvim",
       branch = "latest",
       -- or a specific version:
-      -- tag = "v2.0.0"
+      -- tag = "v3.0.0"
       dependencies = {
-        "nvim-lua/plenary.nvim",
-        { "m00qek/baleia.nvim", tag = "v1.3.0" },
+	  "nvim-lua/plenary.nvim",
+	  -- if you want to enable coloring of ANSI escape codes in
+	  -- compilation output, add:
+	  -- { "m00qek/baleia.nvim", tag = "v1.3.0" },
       },
+      -- if not using Lazy, make sure to call:
+      --   require("compile-mode").setup({})
       opts = {
-        -- you can disable colors by uncommenting this line
-        -- no_baleia_support = true,
-        default_command = "npm run build"
+	  -- to add ANSI escape code support, add:
+	  -- baleia_setup = true,
       }
     }
 <
@@ -89,23 +114,41 @@ and the like).
 
 After a command has been run, the buffer’s output will contain:
 
-- the "default directory" - i.e., the current working directory from which the
-    command was run
+- a modeline specifying the filetype and modifying the path to include the
+  directory from which the command was run
 - the time at which compilation started
 - the compilation command which was executed
 - the output (`stdout` and `stderr`) of the command
-- the exit status of the command (a command can exit successfully, abnormally,
-    or by interruption) and when it occurred
+- the exit status of the command and when it occurred; a command can exit
+  successfully (exit code 0), abnormally (non-zero exit code), by interruption
+  (running another compilation command or calling |:CompileInterrupt|), by
+  segfault (SIGSEGV), or by termination (SIGTERM)
 
-If a compilation command is running and another one is triggered, the first
-command is terminated (using |jobstop|) and this interruption is reported in
-the compilation buffer. Then, after a tiny delay, the compilation buffer is
+If a compilation command is running and another one is triggered, the user is
+prompted whether to interrupt the already running process (unless
+|compile-mode.ask_to_interrupt| is `false`). If they confirm, the original
+command is interrupted (using |jobstop()|) and this is reported in the
+compilation buffer. Then, after a short delay, the compilation buffer is
 cleared and the new command starts running.
 
 The compilation buffer has a few local commands and keymaps. The local
-commands are |:CompileGotoError| and |:CompileInterrupt|, mapped to `<CR>` and
-`<C-c>` respectively. Additionally, `q` is mapped to `<CMD>q<CR>` to allow for
-easy closing of the compilation buffer.
+commands (and their keymaps, if mentioned) are:
+
+- |:CompileGotoError| - mapped to `<CR>`
+- |:CompileInterrupt| - mapped to `<C-c>`
+- |:CompileNextError| - mapped to `<C-g>n`
+- |:CompileNextFile| - mapped to `<C-g>]`
+- |:CompilePrevError| - mapped to `<C-g>p`
+- |:CompilePrevFile| - mapped to `<C-g>[`
+
+Additional keymaps within the compilation buffer are:
+
+- `q` is mapped to `<CMD>q<CR>` for easy closing of the compilation buffer.
+- `<C-r>` is mapped to `<CMD>Recompile<CR>` for quick recompilation.
+- `gf` is mapped to a custom function that behaves similarly to how |gf| does
+  regularly, but respects "Entering directory" and "Leaving directory"
+  messages from `make` to tell what directory a file might be in.
+- `<C-w>f` is mapped like `gf`, but behaves like |CTRL-W_f| instead.
 
 The compilation buffer is deleted automatically when Neovim would be closed, so
 unsaved changes don’t get in the way. It also has the |'buftype'| option set
@@ -116,15 +159,17 @@ to `nofile`.
 
 The compilation buffer is checked for errors in real-time, which can then be
 navigated between using |:CompileGotoError|, |:NextError|, |:PrevError| and
-|:CurrentError|.
+|:CurrentError|. *Note:* these commands all respect "Entering directory" and
+"Leaving directory" messages from `make` in order to determine which directory
+a certain error's file might be in.
 
 Errors are defined using the `error_regexp_table` option. Each field in the
 table consists of a key (the name of the error’s source, used for debug
 information) and a table value. This table has the following keys:
 
 - {regex} (string) a Vim regex which captures the error and the relevant
-  capture groups; if this regex matches a line an error is determined to be on
-  that line
+  capture groups; if this regex matches a line, an error is determined to
+  exist on that line
 - {filename} (integer) the capture group number for the error’s filename
   (capture groups start at 1)
 - {row} (integer|[integer, integer]) either the capture group for the row on
@@ -138,9 +183,9 @@ information) and a table value. This table has the following keys:
   capture groups (optional, default `ERROR`)
     - If capture groups are provided and the first capture group is matched,
       the error is considered of type `WARNING`. If the second capture group
-      matched, the error is considered to be of type `INFO`. -
+      matched, the error is considered to be of type `INFO`.
 
-**Note:** a type alias - `RegexpMatcher` - is available for the values of
+*Note:* a type alias - `RegexpMatcher` - is available for the values of
 `error_regexp_table`.
 
 For example, to add TypeScript errors:
@@ -167,16 +212,19 @@ itself).
 ==============================================================================
 5. API                                                      *compile-mode-api*
 
-setup({opts})                                           *compile-mode.setup()*
+							*compile-mode.setup()*
+setup({opts}) ~
     Sets up the plugin for use.
 
-    Usage:
+    The defaults for `setup` are:
 
     >lua
 	require("compile-mode").setup({
-	 -- you can disable colors by uncommenting this line
-	 -- no_baleia_support = true,
-	 default_command = "npm run build",
+		buffer_name = "*compilation*",
+		default_command = "make -k",
+		time_format = "%a %b %e %H:%M:%S",
+		ask_about_save = true,
+		ask_to_interrupt = true,
 	})
 <
 
@@ -184,11 +232,6 @@ Valid keys and values for {opts}:
 
 error_regexp_table                            *compile-mode.error_regexp_table
     See |compile-mode-errors|.
-
-no_baleia_support                             *compile-mode.no_baleia_support*
-    By default, `compile-mode.nvim` uses `baleia.nvim` to color in ANSI color
-    escape sequences in the compilation buffer. You can disable this behavior
-    by setting this config option to `true`.
 
 default_command                                 *compile-mode.default_command*
     The string to show in the |compile-mode.compile()| prompt as a default.
@@ -198,79 +241,24 @@ time_format                                         *compile-mode.time_format*
     The way to format the time displayed at the top of the compilation buffer.
     Passed into |strftime()|. Defaults to: `"%a %b %e %H:%M:%S"`.
 
-baleia_options                                   *compile-mode.baleia_options*
-    Table of options to pass into `baleia.setup()`. Defaults to an empty
-    table.
-
 buffer_name                                         *compile-mode.buffer_name*
     The name for the compilation buffer. Defaults to `"*compilation*"`.
-
-error_highlights                               *compile-mode.error_highlights*
-    A table of highlights to use for errors in the compilation buffer.
-
-    The possible keys are:
-
-    - {error} applied to the entire captured error (optional)
-    - {error_row} applied to the number that specifies the row (or range of
-      rows) of the error (optional)
-    - {error_col} applied to the number that specifies the column (or range of
-      columns) of the error (optional)
-    - {error_filename} applied to the filename in which the error ocurred,
-      when the error is of type `ERROR` (optional)
-    - {warning_filename} applied to the filename in which the error ocurred,
-      when the error is of type `WARNING` (optional)
-    - {info_filename} applied to the filename in which the error ocurred, when
-      the error is of type `INFO` (optional)
-
-    Each of the values is a table, with the following keys:
-
-    - {background} (string) sets the |guibg| of the highlight group (optional)
-    - {foreground} (string) sets the |guifg| of the highlight group (optional)
-    - {gui} (string) sets the |highlight-gui| of the highlight group, and can
-      be a comma-seperated list of attributes (optional)
-
-    You can use an empty table to remove all styles from a group.
-
-    The defaults for `error_highlights` are:
-
-    >lua
-        default_highlights = {
-            error = {
-                gui = "underline",
-            },
-            error_row = {
-                gui = "underline",
-                foreground = theme[2],
-            },
-            error_col = {
-                gui = "underline",
-                foreground = theme[8],
-            },
-            error_filename = {
-                gui = "bold,underline",
-                foreground = theme[9],
-            },
-            warning_filename = {
-                gui = "underline",
-                foreground = theme[3],
-            },
-            info_filename = {
-                gui = "underline",
-                foreground = theme[14],
-            },
-        }
-<
 
 debug                                                     *compile-mode.debug*
     Print additional debug information. This is printed using |print|, so you
     can inspect it with |:messages|.
+
+baleia_setup                                       *compile-mode.baleia_setup*
+    When `true`, baleia.nvim will be set up for the compilation buffer, which
+    will color in ANSI escape codes in the compilation output. This option can
+    also be a table of options to pass to `baleia.setup()`.
 
 error_ignore_file_list                   *compile-mode.error_ignore_file_list*
     A list of Vim regexes to run each error’s filename by, to check if this
     file should be ignored. Defaults to: `{ "/bin/[a-z]*sh$" }`. Passing in
     this option does not override this, but instead extends the list.
 
-compilation_hidden_output             *compile-mode.compilation_hidden_output*
+hidden_output                                     *compile-mode.hidden_output*
     A Vim regex or list of Vim regexes run on every line in the compilation
     buffer which will be substituted with empty strings.
 
@@ -278,28 +266,60 @@ recompile_no_fail                             *compile-mode.recompile_no_fail*
     When `true`, running |:Recompile| without a prior command will not fail,
     but instead simply trigger a call to |:Compile|.
 
+auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
+    When `true`, compiling jumps to the first error as soon as it is
+    available.
+
+ask_about_save                                   *compile-mode.ask_about_save*
+    When `true`, compiling asks about each unsaved buffer, checking whether to
+    save it or not, before running the compilation command. Defaults to
+    `true`.
+
+ask_to_interrupt                               *compile-mode.ask_to_interrupt*
+    When `true`, compiling when another compilation command is currently
+    running will confirm whether to interrupt instead of interrupting
+    automatically. Defaults to `true`.
+
+environment                                         *compile-mode.environment*
+    A table of string values and string keys, defining additional environment
+    variables which each compilation command should inherit.
+
+    Uses the `env` option of |jobstart()|. |jobstart-env| |jobstart-options|
+
+    For example:
+
+    >lua
+	require("compile-mode").setup({
+	  environment = {
+	    CI = "true"
+	  }
+	})
+<
+
+clear_environment                             *compile-mode.clear_environment*
+    When `true`, `environment` defines each compilation command's environment
+    exactly, instead of merging with the current environment.
+
+    Uses the `clear_env` option of |jobstart()|. |jobstart-options|
+
 						      *compile-mode.compile()*
 compile({param}) ~
     Run a command and place its output in the compilation buffer, reporting on
     its result. See |:Compile|.
 
     Parameters:
-	- {param} (table) a table, identical to the tables passed into Neovim
-	  commands (optional)
+	- {param} (table) command param (optional)
 	    - {param.args}: the string of the command itself, or `nil` if the
 	      user should be prompted to enter a command
-	    - {param.smods}: a table - see the mods field of
-	      |nvim_parse_cmd()| for more
+	    - {param.smods}: a table - see |:command-modifiers| for more
 
 						    *compile-mode.recompile()*
 recompile({param}) ~
     Reruns the last compiled command. See |:Recompile|.
 
     Parameters:
-	- {param} (table) a table, identical to the tables passed into Neovim
-	  commands (optional)
-	    - {param.smods}: a table - see the `mods` field of
-	      |nvim_parse_cmd()| for more
+	- {param} (table) command param (optional)
+	    - {param.smods}: a table - see |:command-modifiers| for more
 
 						*compile-mode.current_error()*
 current_error() ~
@@ -307,12 +327,20 @@ current_error() ~
     |:CurrentError|.
 
 						   *compile-mode.next_error()*
-next_error() ~
+next_error({param}) ~
     Jumps to the next error within the compilation buffer. See |:NextError|.
 
+    Parameters:
+	- {param} (table) command param (optional)
+	    - {param.count}: how many errors forwards to jump; default `1`
+
 						   *compile-mode.prev_error()*
-prev_error() ~
+prev_error({param}) ~
     Jumps to a prior error within the compilation buffer. See |:PrevError|.
+
+    Parameters:
+	- {param} (table) command param (optional)
+	    - {param.count}: how many errors backwards to jump; default `1`
 
 					       *compile-mode.send_to_qflist()*
 send_to_qflist() ~
@@ -328,6 +356,46 @@ add_to_qflist() ~
 goto_error() ~
     Jumps to the error under the cursor. See |:CompileGotoError|.
 
+					   *compile-mode.move_to_next_error()*
+move_to_next_error({param}) ~
+    Move to the line of the next error within the compilation buffer. See
+    |:CompileNextError|.
+
+    Parameters:
+	- {param} (table) command param (optional)
+	    - {param.count}: how many errors forwards to move; default `1`
+
+
+					   *compile-mode.move_to_next_file()*
+move_to_next_file({param}) ~
+    Move to the line of the next error within the compilation buffer that has
+    a different file to the current error. See |:CompileNextFile|.
+
+    Parameters:
+	- {param} (table) command parameter (optional)
+	    - {param.count}: how many files forwards to move; default `1`
+
+
+					   *compile-mode.move_to_prev_error()*
+move_to_prev_error({param}) ~
+    Move to the line of the previous error within the compilation buffer. See
+    |:CompilePrevError|.
+
+    Parameters:
+	- {param} (table) command parameter (optional)
+	    - {param.count}: how many errors backwards to move; default `1`
+
+
+					    *compile-mode.move_to_prev_file()*
+move_to_prev_file({param}) ~
+    Move to the line of the previous error within the compilation buffer that
+    has a different file to the current error. See |:CompilePrevFile|.
+
+    Parameters:
+	- {param} (table) command parameter (optional)
+	    - {param.count}: how many files backwards to move; default `1`
+
+
 						    *compile-mode.interrupt()*
 interrupt() ~
     Interrupts the currently running compilation. See |:CompileInterrupt|.
@@ -336,13 +404,16 @@ interrupt() ~
 6. Commands                                            *compile-mode-commands*
 
 
-								    *:Compile*
-:Compile ~
+:Compile[!]                                                         *:Compile*
     Runs a command and places its output in the compilation buffer. The
     command is run from the current working directory. The compilation buffer
     is opened in a new split if it isn’t already opened. If an argument is
     present, it is used as the command. Otherwise, the user is prompted using
     |vim.ui.input()|.
+
+    With a bang (`:Compile!`), the compilation buffer will only be updated
+    once the command finishes (i.e. the compilation command will be run
+    synchronously).
 
     The following commands work when prefixed to `:Compile`:
 
@@ -350,16 +421,20 @@ interrupt() ~
     - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
     - |:silent|
     - |:hide|
+    - |:tab|
 
     Additionally, you can run the command with a |count| to set the size of
     the opened window, like with |:split|.
 
-								  *:Recompile*
-:Recompile ~
+:Recompile[!]                                                     *:Recompile*
     Reruns the last compiled command. If there isn’t one, the error is
     reported using |vim.notify()|. The compilation buffer is opened in a new
     split if it isn’t already opened. The command is rerun from the directory
     in which it was originally run.
+
+    With a bang (`:Recompile!`), the compilation buffer will only be updated
+    once the command finishes (i.e. the compilation command will be run
+    synchronously).
 
     The following commands work when prefixed to `:Recompile`:
 
@@ -367,12 +442,14 @@ interrupt() ~
     - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
     - |:silent|
     - |:hide|
+    - |:tab|
 
     Additionally, you can run the command with a |count| to set the size of the
     opened window, like with |:split|.
 
-							       *:CurrentError*
-:CurrentError ~
+    Mapped to `<C-r>` within the compilation buffer.
+
+:CurrentError                                                  *:CurrentError*
     Jump to the current error in the compilation buffer. This works using the
     same cursor that |:NextError| and |:PrevError| operate on, and acts as a
     way to jump back to the error you were working after a bit of iteration
@@ -380,41 +457,208 @@ interrupt() ~
     first error (the default until |:NextError| has not yet been used) this
     command has no effect and reports on this fact.
 
-								  *:NextError*
-:NextError ~
+:NextError                                                        *:NextError*
+:[N]NextError
     Jump to the next error in the compilation buffer. This does not take the
     cursor into effect - it simply starts at the first error in the buffer and
     continues, one by one, from there. Once the last error in the buffer is
     reached the command has no effect and reports on this fact.
 
-								  *:PrevError*
-:PrevError ~
+    If passed a count, jumps N errors forwards instead.
+
+:PrevError                                                        *:PrevError*
+:[N]PrevError
     Jump to a prior error in the compilation buffer. This does not take the
     cursor into effect - it simply starts at the current error in the buffer
     and continues backwards, one by one, from there. As long as the current
     error is before the first error (the default until |:NextError| has not
     yet been used) this command has no effect and reports on this fact.
 
-							     *:QuickfixErrors*
-:QuickfixErrors ~
+    If passed a count, jumps N errors backwards instead.
+
+:QuickfixErrors                                              *:QuickfixErrors*
     Load all compilation errors into the quickfix list, replacing it (uses
     |compile-mode.send_to_qflist()|), and then opens the quickfix window using
     `:botright copen` (see |:botright| and |:copen|).
 
-							   *:CompileGotoError*
-:CompileGotoError ~
+    Mapped to `<C-q>` within the compilation buffer.
+
+:CompileGotoError                                          *:CompileGotoError*
     Only available within the compilation buffer itself.
 
     Jump to the error present in the line under the cursor. If no such error
     exists, the command reports on this fact.
 
-							   *:CompileInterrupt*
-:CompileInterrupt ~
+    Mapped to `<CR>` within the compilation buffer.
+
+:CompileNextError                                          *:CompileNextError*
+:[N]CompileNextError
+    Only available within the compilation buffer itself.
+
+    Move to the line of the next error within the compilation buffer. Does not
+    jump to the error's actual file.
+
+    If passed a count, moves N errors forwards instead.
+
+    Mapped to `<C-g>n` within the compilation buffer.
+
+:CompileNextFile                                            *:CompileNextFile*
+:[N]CompileNextFile
+    Only available within the compilation buffer itself.
+
+    Move to the line of the next error within the compilation buffer that has
+    a different file to the current error. Does not jump to the error's actual
+    file.
+
+    If passed a count, moves N files forwards instead.
+
+    Mapped to `<C-g>]` within the compilation buffer.
+
+:CompilePrevError                                          *:CompilePrevError*
+:[N]CompilePrevError
+    Only available within the compilation buffer itself.
+
+    Move to the line of the previous error within the compilation buffer. Does
+    not jump to the error's actual file.
+
+    If passed a count, moves N errors backwards instead.
+
+    Mapped to `<C-g>p` within the compilation buffer.
+
+:CompilePrevFile                                            *:CompilePrevFile*
+:[N]CompilePrevFile
+    Only available within the compilation buffer itself.
+
+    Move to the line of the previous error within the compilation buffer that
+    has a different file to the current error. Does not jump to the error's
+    actual file.
+
+    If passed a count, moves N files backwards instead.
+
+    Mapped to `<C-g>[` within the compilation buffer.
+
+:CompileInterrupt                                          *:CompileInterrupt*
+:[N]CompileInterrupt
     Only available within the compilation buffer itself.
 
     Interrupt the currently running compilation command, reporting on this in
     the compilation buffer.
 
     Mapped to `<C-c>` within the compilation buffer.
+
+==============================================================================
+7. Highlights                                        *compile-mode-highlights*
+
+CompileModeError                                         *hl-CompileModeError*
+    The filename of compilation errors.
+
+    Example:
+
+    >
+    README.md:[1,1] error
+    ^^^^^^^^^
+<
+
+CompileModeInfo                                           *hl-CompileModeInfo*
+    The filename of `INFO` level errors.
+
+    Example:
+
+    >
+    [INFO] README.md:[1,1] error
+           ^^^^^^^^^
+<
+
+CompileModeWarning                                     *hl-CompileModeWarning*
+    The filename of `WARNING` level errors.
+
+    Example:
+
+    >
+    [WARNING] README.md:[1,1] error
+              ^^^^^^^^^
+<
+
+CompileModeMessage                                     *hl-CompileModeMessage*
+    The entirety of the compilation error message (i.e. the entire match of
+    the regex from `error_regexp_table`).
+
+    Example:
+
+    >
+    README.md:[1,1] error
+    ^^^^^^^^^^^^^^^^
+<
+
+CompileModeMessageRow                               *hl-CompileModeMessageRow*
+    The row number of compilation errors.
+
+    Example:
+
+    >
+    README.md:[1,1] error
+               ^
+<
+CompileModeMessageCol                               *hl-CompileModeMessageCol*
+    The column number of compilation errors.
+
+    Example:
+
+    >
+    README.md:[1,1] error
+                 ^
+<
+
+CompileModeCommandOutput                         *hl-CompileModeCommandOutput*
+    The prefix of a command output (anything that prefixes an output with a
+    colon).
+
+    Example:
+
+    >
+    make: Nothing to be done for 'all'.
+    ^^^^^
+<
+
+CompileModeOutputFile                               *hl-CompileModeOutputFile*
+    The output file of a certain command, found after the `-o`, `--output`, or
+    `--output-file` flag of a command.
+
+    Example:
+
+    >
+    gcc -o main main.c
+           ^^^^
+<
+
+CompileModeCheckTarget                             *hl-CompileModeCheckTarget*
+    The target of a "checking" message (usually from `./configure`).
+
+    Example:
+
+    >
+    checking for gcc... gcc
+                 ^^^
+<
+
+CompileModeCheckResult                             *hl-CompileModeCheckResult*
+    The result of a "checking" message (usually from `./configure`).
+
+    Example:
+
+    >
+    checking for gcc... gcc
+                        ^^^
+<
+
+CompileModeDirectoryMessage                   *hl-CompileModeDirectoryMessage*
+    The directory name in a "Leaving directory"/"Entering directory" message.
+
+    Example:
+
+    >
+    make[1]: Entering directory '/home/user/build/directory'
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^
+<
 
  vim:tw=78:ts=8:noet:ft=help:norl:

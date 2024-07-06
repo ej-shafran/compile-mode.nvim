@@ -69,22 +69,26 @@ end
 ---@param count integer
 ---@return integer bufnr the identifier of the buffer for `fname`
 function M.split_unless_open(fname, smods, count)
-	local bufnum = vim.fn.bufadd(fname)
+	local bufnr = vim.fn.bufadd(fname)
 
 	if smods.hide then
-		return bufnum
+		return bufnr
 	end
 
-	local winnum = vim.fn.bufwinnr(bufnum)
+	local winnrs = vim.fn.win_findbuf(bufnr)
 
-	if winnum == -1 then
-		local cmd = "sbuffer " .. bufnum
+	if #winnrs == 0 then
+		local cmd = "sbuffer " .. bufnr
 		if smods.vertical then
 			cmd = "vert " .. cmd
 		end
 
 		if smods.split and smods.split ~= "" then
 			cmd = smods.split .. " " .. cmd
+		end
+
+		if smods.tab and smods.tab ~= -1 then
+			cmd = tostring(smods.tab) .. "tab " .. cmd
 		end
 
 		vim.cmd(cmd)
@@ -94,13 +98,13 @@ function M.split_unless_open(fname, smods, count)
 		end
 	end
 
-	return bufnum
+	return bufnr
 end
 
 ---@param filename string
 ---@param error Error
 ---@param same_window boolean|nil
-local function goto_file(filename, error, same_window)
+local function jump_to_file(filename, error, same_window)
 	local row = error.row and error.row.value or 1
 	local end_row = error.end_row and error.end_row.value
 
@@ -146,13 +150,19 @@ local function goto_file(filename, error, same_window)
 	end
 end
 
----@param error Error
----@type fun(error: Error, same_window: boolean|nil)
-M.jump_to_error = a.void(function(error, same_window)
-	local file_exists = vim.fn.filereadable(error.filename.value) ~= 0
+---@type fun(error: Error, current_dir: string, same_window: boolean|nil)
+M.jump_to_error = a.void(function(error, current_dir, same_window)
+	current_dir = string.gsub(current_dir or "", "/$", "")
+
+	local filename = error.filename.value
+	if not M.is_absolute(filename) then
+		filename = current_dir .. "/" .. filename
+	end
+
+	local file_exists = vim.fn.filereadable(filename) ~= 0
 
 	if file_exists then
-		goto_file(error.filename.value, error, same_window)
+		jump_to_file(filename, error, same_window)
 		return
 	end
 
@@ -163,7 +173,7 @@ M.jump_to_error = a.void(function(error, same_window)
 	if not dir then
 		return
 	end
-	dir = dir:gsub("(.)/$", "%1")
+	dir = string.gsub(dir, "/$", "")
 
 	M.wait()
 
@@ -173,7 +183,7 @@ M.jump_to_error = a.void(function(error, same_window)
 			return
 		end
 
-		goto_file(dir, error, same_window)
+		jump_to_file(dir, error, same_window)
 		return
 	end
 
@@ -183,7 +193,72 @@ M.jump_to_error = a.void(function(error, same_window)
 		return
 	end
 
-	goto_file(nested_filename, error, same_window)
+	jump_to_file(nested_filename, error, same_window)
 end)
+
+function M.match_command_ouput(line, linenum)
+	local highlights = {}
+
+	local result = M.matchlistpos(line, "^\\([[:alnum:]_/.+-]\\+\\)\\%(\\[\\([0-9]\\+\\)\\]\\)\\?[ \t]*:")
+	if result then
+		local entire = result[1]
+		if entire then
+			table.insert(highlights, { "CompileModeCommandOutput", linenum, entire })
+		end
+
+		local num = result[3]
+		if num then
+			table.insert(highlights, { "CompileModeMessageRow", linenum, num })
+		end
+	end
+
+	return highlights
+end
+
+function M.highlight_command_outputs(bufnr, command_output_highlights)
+	for _, highlight in ipairs(command_output_highlights) do
+		M.add_highlight(bufnr, unpack(highlight))
+	end
+end
+
+---Ask user whether to save each modified buffer, and save them as requested.
+---@param smods SMods
+---@return boolean quit whether to quit or not
+function M.ask_to_save(smods)
+	local buffers = vim.api.nvim_list_bufs()
+	local buffers_with_changes = vim.tbl_filter(function(bufnr)
+		return vim.api.nvim_get_option_value("modified", { buf = bufnr })
+	end, buffers)
+
+	for _, bufnr in ipairs(buffers_with_changes) do
+		local bufname = vim.api.nvim_buf_get_name(bufnr)
+		local result = vim.fn.confirm("Save changes to " .. bufname .. "?", "&Yes\n&No\nSkip &All\n&Quit")
+
+		if result == 1 then
+			vim.cmd(tostring(bufnr) .. "bufdo w")
+		end
+
+		if result == 3 then
+			break
+		end
+
+		if result == 4 and not smods.silent then
+			vim.notify("Quit")
+			return true
+		end
+	end
+
+	return false
+end
+
+---@param path string
+---@return boolean is_absolute whether `path` is absolute or relative.
+function M.is_absolute(path)
+	if vim.uv.os_uname().sysname == "Windows_NT" then
+		return path:match("^%a:[/\\]") or path:match("^//") or path:match("^\\\\")
+	else
+		return path:sub(1, 1) == "/"
+	end
+end
 
 return M

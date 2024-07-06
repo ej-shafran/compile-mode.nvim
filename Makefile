@@ -5,9 +5,9 @@ fmt:
 test:
 	@echo "===> Test"
 	nvim --headless --clean \
-		-u tests/configs/tests.vim \
-		-c "PlenaryBustedDirectory tests/compile-mode/ {minimal_init = 'tests/configs/tests.vim', sequential = true}"
+		-u spec/configs/tests.vim \
+		-c "PlenaryBustedDirectory spec/ {minimal_init = 'spec/configs/tests.vim', sequential = true}"
 
 setup-ci:
 	@echo "===> Set Up CI"
-	nvim --headless --clean -u tests/configs/ci.vim -c "q"
+	nvim --headless --clean -u spec/configs/ci.vim -c "q"
