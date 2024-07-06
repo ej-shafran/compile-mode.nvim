@@ -3,42 +3,61 @@
 
 * DONE Add goto error message outputs
   CLOSED: [2023-10-29 Sun 01:30]
+
 * DONE Place previous command in vim.o or vim.g
   CLOSED: [2023-10-29 Sun 01:36]
+
 * DONE Support split modifier
   CLOSED: [2023-10-29 Sun 01:42]
+
 * DONE Configure compilation buffer name
   CLOSED: [2023-10-29 Sun 01:48]
+
 * DONE Configure highlight colors
   CLOSED: [2023-11-04 Sat 19:40]
+
 * DONE Configure highlight of text that starts with `:`
   CLOSED: [2023-11-04 Sat 19:43]
+
 * DONE Goto error - patterns for different compilation types
   CLOSED: [2023-11-03 Fri 21:08]
+
 * DONE Goto error - go to a certain line and column
   CLOSED: [2023-11-03 Fri 21:08]
+
 * DONE Goto error - next error and previous error
   CLOSED: [2023-11-04 Sat 19:40]
+
 * DONE Goto error - customize patterns
   CLOSED: [2023-11-13 Mon 21:56]
+
 * DONE Goto error - use less ugly colors
   CLOSED: [2023-11-03 Fri 23:16]
+
 * DONE Refactoring - use plenary async for vim.schedule
   CLOSED: [2023-10-29 Sun 01:49]
+
 * DONE Refactoring - extract keymap handler for <CR>
   CLOSED: [2023-10-29 Sun 01:49]
+
 * DONE Add highlights for lines starting with `Text:`
   CLOSED: [2023-10-17 Tue 03:13]
+
 * DONE Update README/docs
   CLOSED: [2023-11-13 Mon 22:47]
+
 ** DONE Add `Compilation Buffer` section
    CLOSED: [2023-11-13 Mon 22:47]
+
 ** DONE Add `Goto Error` section
    CLOSED: [2023-11-13 Mon 22:47]
+
 * DONE Organize code
   CLOSED: [2023-11-04 Sat 19:40]
+
 * DONE Add tests, at some point
   CLOSED: [2023-11-13 Mon 21:56]
+
 * DONE Add compilation-hidden-output
   CLOSED: [2023-11-13 Mon 22:15]
 
@@ -114,11 +133,6 @@ This gets tacked on the end of the generated expressions.")
 * DONE Add documentation for highlights
   CLOSED: [2024-06-22 Sat 18:08]
 
-* TODO Update docs to use language similar to Emacs docs
-
-* TODO Add diagnostic windows
-  As configuration option, probably
-
 * DONE Support :tab
   CLOSED: [2024-06-22 Sat 17:47]
 
@@ -131,11 +145,14 @@ This gets tacked on the end of the generated expressions.")
 * DONE Add lots of new tests
   CLOSED: [2024-07-06 Sat 20:02]
 
-* TODO Add Next Error Follow
-
 * DONE Document behavior of :Compile!
   CLOSED: [2024-07-01 Mon 00:19]
 
 * DONE Re-add optional Baleia support
   CLOSED: [2024-07-01 Mon 00:57]
+
+* TODO Add Next Error Follow
+
+* TODO Add diagnostic windows
+  As configuration option, probably
 
