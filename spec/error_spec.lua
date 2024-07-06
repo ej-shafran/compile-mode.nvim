@@ -34,7 +34,6 @@ describe("error parsing", function()
 		local error_string = helpers.typescript_error({ filename = filename, row = row, col = col })
 
 		helpers.compile({ args = "echo '" .. error_string .. "'" })
-		helpers.wait()
 
 		local actual = errors.error_list[5]
 		assert.are.same(actual.full_text, error_string)
