@@ -152,7 +152,8 @@ This gets tacked on the end of the generated expressions.")
   CLOSED: [2024-07-01 Mon 00:57]
 
 * TODO Add Next Error Follow
+  Mode that "preview" the locus of errors in a split next to the compilation window.
 
 * TODO Add diagnostic windows
-  As configuration option, probably
+  As configuration option, probably...
 
