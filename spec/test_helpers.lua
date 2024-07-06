@@ -1,6 +1,8 @@
 ---@alias CreateError {filename: string, row: integer, col: integer}
 
 local compile_mode = require("compile-mode")
+local errors = require("compile-mode.errors")
+local assert = require("luassert")
 
 local M = {}
 
@@ -87,6 +89,55 @@ M.typescript_regexp_matcher = {
 ---@param param CreateError
 function M.typescript_error(param)
 	return param.filename .. "(" .. param.row .. "," .. param.col .. "): error TS22: "
+end
+
+---@param error_string string
+function M.compile_error(error_string)
+	M.compile({ args = "echo '" .. error_string .. "'" })
+end
+
+---@param expected CreateError
+function M.assert_parsed_error(error_string, expected)
+	---@type Error|nil
+	local actual = nil
+	for _, error in pairs(errors.error_list) do
+		if error.full_text == error_string then
+			actual = error
+		end
+	end
+	assert.is_not_nil(actual)
+	if not actual then
+		return
+	end
+
+	assert.are.same(actual.full_text, error_string)
+	assert.are.same(actual.filename.value, expected.filename)
+	assert.are.same(actual.row.value, expected.row)
+	assert.are.same(actual.col.value, expected.col)
+end
+
+---@param expected CreateError
+function M.assert_at_error_locus(expected)
+	local actual_filename = vim.fn.expand("%:t")
+	assert.are.same(actual_filename, expected.filename)
+	local actual_row, actual_col = unpack(vim.api.nvim_win_get_cursor(0))
+	assert.are.same(actual_row, expected.row)
+	assert.are.same(actual_col + 1, expected.col)
+end
+
+---@param error_string string
+function M.assert_cursor_at_error(error_string)
+	---@type integer|nil
+	local line = nil
+	for i, error in pairs(errors.error_list) do
+		if error.full_text == error_string then
+			line = i
+		end
+	end
+	assert.is_not_nil(line)
+
+	local actual_row = unpack(vim.api.nvim_win_get_cursor(0))
+	assert.are.same(actual_row, line)
 end
 
 return M
