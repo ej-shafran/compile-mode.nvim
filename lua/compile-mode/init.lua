@@ -394,20 +394,6 @@ function M.setup(opts)
 	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})
 	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})
 
-	vim.cmd("highlight default CompileModeMessage guifg=NONE gui=underline")
-	vim.cmd("highlight default CompileModeMessageRow guifg=Magenta")
-	vim.cmd("highlight default CompileModeMessageCol guifg=Cyan")
-
-	vim.cmd("highlight default CompileModeError guifg=Red")
-	vim.cmd("highlight default CompileModeWarning guifg=DarkYellow")
-	vim.cmd("highlight default CompileModeInfo guifg=Green")
-
-	vim.cmd("highlight default CompileModeCommandOutput guifg=#6699ff")
-	vim.cmd("highlight default CompileModeDirectoryMessage guifg=#6699ff")
-	vim.cmd("highlight default CompileModeOutputFile guifg=#9966cc")
-	vim.cmd("highlight default CompileModeCheckResult cterm=bold gui=bold guifg=#ff9966")
-	vim.cmd("highlight default CompileModeCheckTarget guifg=#ff9966")
-
 	debug("config = " .. vim.inspect(M.config))
 end
 
