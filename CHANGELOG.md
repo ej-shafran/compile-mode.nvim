@@ -8,6 +8,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [3.0.1] - 2024-07-08
+
+### Fixed
+
+- Issue with duplicate tags in docs.
+
+## [3.0.0] - 2024-07-07
+
 ### Added
 
 - The ability to use `:tab` on `:Compile` and `:Recompile`.
@@ -287,6 +295,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[3.0.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v3.0.0...v3.0.1
+[3.0.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.8.0...v3.0.0
 [2.8.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.7.1...v2.8.0
 [2.7.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.7.0...v2.7.1
 [2.7.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.6.1...v2.7.0

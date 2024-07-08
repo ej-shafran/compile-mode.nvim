@@ -159,7 +159,7 @@ to `nofile`.
 
 The compilation buffer is checked for errors in real-time, which can then be
 navigated between using |:CompileGotoError|, |:NextError|, |:PrevError| and
-|:CurrentError|. *Note:* these commands all respect "Entering directory" and
+|:CurrentError|. Note: these commands all respect "Entering directory" and
 "Leaving directory" messages from `make` in order to determine which directory
 a certain error's file might be in.
 
@@ -185,7 +185,7 @@ information) and a table value. This table has the following keys:
       the error is considered of type `WARNING`. If the second capture group
       matched, the error is considered to be of type `INFO`.
 
-*Note:* a type alias - `RegexpMatcher` - is available for the values of
+Note: a type alias - `RegexpMatcher` - is available for the values of
 `error_regexp_table`.
 
 For example, to add TypeScript errors:
