@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Issue with duplicate tags in docs.
+
 ## [3.0.0] - 2024-07-07
 
 ### Added
