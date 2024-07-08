@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Healthchecks; you can now troubleshoot the plugin using `:checkhealth compile-mode`
+
 ### Changed
 
 - **(Breaking)** The `setup` function has been removed. Instead, configuration uses the `vim.g.compile_mode`.

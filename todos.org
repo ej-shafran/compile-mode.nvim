@@ -179,7 +179,8 @@ This gets tacked on the end of the generated expressions.")
 
   Use a Lua class.
 
-* TODO Add general health checks
+* DONE Add general health checks
+  CLOSED: [2024-07-08 Mon 21:45]
 
 * TODO Refactor debug logic
 
