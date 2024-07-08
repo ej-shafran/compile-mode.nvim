@@ -402,7 +402,8 @@ end
 ---@param line string the line to parse
 ---@return Error|nil
 function M.parse(line)
-	for group, matcher in pairs(M.error_regexp_table) do
+	local config = require("compile-mode.config.internal")
+	for group, matcher in pairs(config.error_regexp_table) do
 		local result = parse_matcher(matcher, line)
 
 		if result then

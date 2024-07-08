@@ -60,10 +60,11 @@ function M.get_output()
 	return vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
 end
 
----@param opts Config|nil
+---@param opts CompileModeOpts|nil
 function M.setup_tests(opts)
 	require("plugin.command")
-	require("compile-mode").setup(opts or {})
+	vim.g.compile_mode = opts or {}
+	package.loaded["compile-mode.config.internal"] = nil
 end
 
 function M.wait()
@@ -124,6 +125,7 @@ function M.assert_parsed_error(error_string, expected)
 	for _, error in pairs(errors.error_list) do
 		if error.full_text == error_string then
 			actual = error
+			break
 		end
 	end
 	assert.is_not_nil(actual)

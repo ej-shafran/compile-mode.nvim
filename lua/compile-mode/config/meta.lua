@@ -1,0 +1,49 @@
+---@class CompileModeOpts
+---
+---For more info, run `:h compile-mode.default_command`
+---@field default_command? string
+---
+---For more info, run `:h compile_mode.time_format`
+---@field time_format? string
+---
+---For more info, run `:h compile_mode.buffer_name`
+---@field buffer_name? string
+---
+---For more info, run `:h compile_mode.error_regexp_table`
+---@field error_regexp_table? ErrorRegexpTable
+---
+---For more info, run `:h compile_mode.debug`
+---@field debug? boolean
+---
+---For more info, run `:h compile_mode.error_ignore_file_list`
+---@field error_ignore_file_list? string[]
+---
+---For more info, run `:h compile_mode.hidden_output`
+---@field hidden_output? (string|string[])
+---
+---For more info, run `:h compile_mode.recompile_no_fail`
+---@field recompile_no_fail? boolean
+---
+---For more info, run `:h compile_mode.same_window_errors`
+---@field same_window_errors? boolean
+---
+---For more info, run `:h compile_mode.auto_jump_to_first_error`
+---@field auto_jump_to_first_error? boolean
+---
+---For more info, run `:h compile_mode.ask_about_save`
+---@field ask_about_save? boolean
+---
+---For more info, run `:h compile_mode.environment`
+---@field environment? table<string| string>
+---
+---For more info, run `:h compile_mode.clear_environment`
+---@field clear_environment? boolean
+---
+---For more info, run `:h compile_mode.ask_to_interrupt`
+---@field ask_to_interrupt? boolean
+---
+---For more info, run `:h compile_mode.baleia_setup`
+---@field baleia_setup? boolean|table
+
+---@type CompileModeOpts
+vim.g.compile_mode = vim.g.compile_mode

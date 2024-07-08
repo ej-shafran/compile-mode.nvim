@@ -157,17 +157,19 @@ This gets tacked on the end of the generated expressions.")
 * TODO Add diagnostic windows
   As configuration option, probably...
 
-* TODO Refactor configuration logic
+* DONE Refactor configuration logic
+  CLOSED: [2024-07-08 Mon 14:00]
 
   Read more [[https://github.com/nvim-neorocks/nvim-best-practices?tab=readme-ov-file#wrench-configuration][here]].
 
-** TODO Use `vim.g` variable
+** DONE Use `vim.g` variable
+   CLOSED: [2024-07-08 Mon 14:00]
 
-** TODO Use internal config type VS. opts type
+** DONE Use internal config type VS. opts type
+   CLOSED: [2024-07-08 Mon 14:00]
 
-** TODO Add validation
-
-** TODO Add healthcheck
+** DONE Add validation
+   CLOSED: [2024-07-08 Mon 14:00]
 
 * TODO Use `busted` for tests instead of `pleanry.nvim`
 

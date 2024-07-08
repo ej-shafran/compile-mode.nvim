@@ -1,11 +1,12 @@
 local compile_mode = require("compile-mode")
+local config = require("compile-mode.config.internal")
 
-if compile_mode.config.baleia_setup then
+if config.baleia_setup then
 	local ok, baleia_mod = pcall(require, "baleia")
 	if ok then
 		local opts = {}
-		if type(compile_mode.config.baleia_setup) == "table" then
-			opts = compile_mode.config.baleia_setup --[[@as table]]
+		if type(config.baleia_setup) == "table" then
+			opts = config.baleia_setup --[[@as table]]
 		end
 
 		local baleia = baleia_mod.setup(opts)
