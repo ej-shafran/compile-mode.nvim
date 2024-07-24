@@ -529,7 +529,8 @@ end)
 ---@param opts CompileModeOpts
 ---@deprecated set `vim.g.compile_mode` instead
 function M.setup(opts)
-	vim.notify("`compile-mode.setup()` is deprecated; set the `vim.g.compile_mode` object instead", vim.log.levels.WARN)
+	vim.notify([[compile-mode: `setup()` is deprecated; set the `vim.g.compile_mode` object instead
+compile-mode: `setup()` will be removed in the next major version]], vim.log.levels.WARN)
 
 	vim.g.compile_mode = opts
 	local config = require("compile-mode.config.internal")
