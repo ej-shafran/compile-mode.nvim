@@ -16,7 +16,7 @@ local error_cursor = 0
 
 ---The previous directory used for compilation.
 ---@type string|nil
-local prev_dir = nil
+vim.g.compilation_directory = nil
 
 ---A table which keeps track of the changes in directory for the compilation buffer,
 ---based on "Entering directory" and "Leaving directory" messages.
@@ -50,7 +50,7 @@ end
 ---@return string
 local function find_directory_for_line(linenum)
 	local latest_linenum = nil
-	local dir = prev_dir or vim.fn.getcwd()
+	local dir = vim.g.compilation_directory or vim.fn.getcwd()
 	for old_linenum, old_dir in pairs(dir_changes) do
 		if old_linenum < linenum and (not latest_linenum or latest_linenum <= old_linenum) then
 			latest_linenum = old_linenum
@@ -162,7 +162,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 	debug("== starting job ==")
 	local job_id = vim.fn.jobstart(cmd, {
-		cwd = prev_dir,
+		cwd = vim.g.compilation_directory,
 		on_stdout = on_either,
 		on_stderr = on_either,
 		on_exit = function(id, code)
@@ -398,9 +398,13 @@ M.compile = a.void(function(param)
 	end
 
 	vim.g.compile_command = command
-	prev_dir = vim.fn.getcwd()
+	if not vim.g.compilation_directory then
+		vim.g.compilation_directory = vim.fn.getcwd()
+	end
 
 	runcommand(command, param.smods or {}, param.count, param.bang)
+
+	vim.g.compilation_directory = nil
 end)
 
 ---Rerun the last command.
@@ -529,8 +533,11 @@ end)
 ---@param opts CompileModeOpts
 ---@deprecated set `vim.g.compile_mode` instead
 function M.setup(opts)
-	vim.notify([[compile-mode: `setup()` is deprecated; set the `vim.g.compile_mode` object instead
-compile-mode: `setup()` will be removed in the next major version]], vim.log.levels.WARN)
+	vim.notify(
+		[[compile-mode: `setup()` is deprecated; set the `vim.g.compile_mode` object instead
+compile-mode: `setup()` will be removed in the next major version]],
+		vim.log.levels.WARN
+	)
 
 	vim.g.compile_mode = opts
 	local config = require("compile-mode.config.internal")
