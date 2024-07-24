@@ -14,7 +14,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
-- **(Breaking)** The `setup` function has been removed. Instead, configuration uses the `vim.g.compile_mode`.
+- The `setup` function is now deprecated. Instead, configuration should use the `vim.g.compile_mode` object, which can be given the type `CompileModeOpts`.
 
 ## [3.0.1] - 2024-07-08
 

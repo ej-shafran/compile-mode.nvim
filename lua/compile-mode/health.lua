@@ -7,6 +7,13 @@ function health.check()
 	local config = require("compile-mode.config.internal")
 
 	---@diagnostic disable-next-line: undefined-field
+	if config.health_info.called_setup then
+		all_ok = false
+		vim.health.warn([[`setup()` is deprecated; set the `vim.g.compile_mode` object instead
+`setup()` will be removed in the next major version]])
+	end
+
+	---@diagnostic disable-next-line: undefined-field
 	vim.iter(config.health_info.unrecognized_keys)
 		:map(function(key)
 			all_ok = false
