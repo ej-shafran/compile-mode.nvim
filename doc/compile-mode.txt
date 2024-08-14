@@ -186,8 +186,8 @@ information) and a table value. This table has the following keys:
       the error is considered of type `WARNING`. If the second capture group
       matched, the error is considered to be of type `INFO`.
 
-Note: a type alias - `RegexpMatcher` - is available for the values of
-`error_regexp_table`.
+Note: a type alias - `CompileModeRegexpMatcher` - is available for the values
+of `error_regexp_table`.
 
 For example, to add TypeScript errors:
 
