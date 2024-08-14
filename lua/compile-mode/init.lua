@@ -91,8 +91,8 @@ local function goto_file(same_window)
 	end
 end
 
----@type fun(cmd: string, bufnr: integer, sync: boolean | nil): integer, integer, integer
-local runjob = a.wrap(function(cmd, bufnr, sync, callback)
+---@type fun(cmd: string, bufnr: integer, param: CommandParam): integer, integer, integer
+local runjob = a.wrap(function(cmd, bufnr, param, callback)
 	debug("== runjob() ==")
 
 	local config = require("compile-mode.config.internal")
@@ -127,7 +127,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 				if config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
 					local dir = find_directory_for_line(linenum)
-					utils.jump_to_error(error, dir, config.same_window_errors)
+					utils.jump_to_error(error, dir, param.smods)
 					error_cursor = linenum
 				end
 			else
@@ -180,7 +180,7 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 	vim.g.compile_job_id = job_id
 
-	if sync then
+	if param.bang then
 		debug("== sync mode - waiting for job to finish ==")
 		vim.fn.jobwait({ job_id })
 	end
@@ -215,10 +215,10 @@ local exit_code = {
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
----@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
-local runcommand = a.void(function(command, smods, count, sync)
+---@type fun(command: string, param: CommandParam)
+local runcommand = a.void(function(command, param)
 	local config = require("compile-mode.config.internal")
-	if config.ask_about_save and utils.ask_to_save(smods) then
+	if config.ask_about_save and utils.ask_to_save(param.smods) then
 		return
 	end
 
@@ -242,7 +242,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 
 	debug("== opening compilation buffer ==")
 
-	local bufnr = utils.split_unless_open(config.buffer_name, smods, count)
+	local bufnr = utils.split_unless_open(config.buffer_name, param.smods, param.count)
 	debug("bufnr = " .. bufnr)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
@@ -269,7 +269,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	errors.highlight(bufnr)
 
 	debug("== running command: `" .. string.gsub(command, "\\`", "\\`") .. "` ==")
-	local line_count, code, job_id = runjob(command, bufnr, sync)
+	local line_count, code, job_id = runjob(command, bufnr, param)
 	if job_id ~= vim.g.compile_job_id then
 		return
 	end
@@ -295,7 +295,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 		"",
 	})
 
-	if not smods.silent then
+	if not param.smods or not param.smods.silent then
 		vim.notify(compilation_message)
 	end
 
@@ -319,8 +319,6 @@ end)
 ---@return fun(param: CommandParam?) command an async callback that performs the created action
 local function act_from_current_error(action, direction, different_file)
 	return a.void(function(param)
-		local config = require("compile-mode.config.internal")
-
 		param = param or {}
 		local count = param.count or 1
 		local current_error = errors.error_list[error_cursor]
@@ -363,7 +361,7 @@ local function act_from_current_error(action, direction, different_file)
 		error_cursor = error_line
 		if action == "jump" then
 			local dir = find_directory_for_line(error_line)
-			utils.jump_to_error(errors.error_list[error_line], dir, config.same_window_errors)
+			utils.jump_to_error(errors.error_list[error_line], dir, param.smods or {})
 		else
 			vim.api.nvim_win_set_cursor(0, { error_line, 0 })
 		end
@@ -402,7 +400,7 @@ M.compile = a.void(function(param)
 		vim.g.compilation_directory = vim.fn.getcwd()
 	end
 
-	runcommand(command, param.smods or {}, param.count, param.bang)
+	runcommand(command, param)
 
 	vim.g.compilation_directory = nil
 end)
@@ -416,7 +414,7 @@ M.recompile = a.void(function(param)
 	local config = require("compile-mode.config.internal")
 
 	if vim.g.compile_command then
-		runcommand(vim.g.compile_command, param.smods or {}, param.count, param.bang)
+		runcommand(vim.g.compile_command, param)
 	elseif config.recompile_no_fail then
 		M.compile(param)
 	else
@@ -426,11 +424,9 @@ end)
 
 ---Jump to the current error in the error list
 ---
----@type fun()
-M.current_error = a.void(function()
+---@type fun(param: CommandParam?)
+M.current_error = a.void(function(param)
 	debug("== current_error() ==")
-
-	local config = require("compile-mode.config.internal")
 
 	debug("line = " .. error_cursor)
 
@@ -441,7 +437,7 @@ M.current_error = a.void(function()
 	end
 
 	local dir = find_directory_for_line(error_cursor)
-	utils.jump_to_error(error, dir, config.same_window_errors)
+	utils.jump_to_error(error, dir, param.smods or {})
 end)
 
 ---Jump to the next error in the error list.
@@ -476,11 +472,9 @@ end)
 
 ---Go to the error on the current line
 ---
----@type fun()
-M.goto_error = a.void(function()
+---@type fun(param: CommandParam?)
+M.goto_error = a.void(function(param)
 	debug("== goto_error() ==")
-
-	local config = require("compile-mode.config.internal")
 
 	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 	local error = errors.error_list[linenum]
@@ -494,7 +488,7 @@ M.goto_error = a.void(function()
 	local dir = find_directory_for_line(linenum)
 
 	error_cursor = linenum
-	utils.jump_to_error(error, dir, config.same_window_errors)
+	utils.jump_to_error(error, dir, param or {})
 end)
 
 ---Interrupt the currently running compilation command.
