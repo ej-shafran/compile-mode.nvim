@@ -182,7 +182,8 @@ This gets tacked on the end of the generated expressions.")
 * DONE Add general health checks
   CLOSED: [2024-07-08 Mon 21:45]
 
-* TODO Refactor debug logic
+* DONE Refactor debug logic
+  CLOSED: [2024-08-15 Thu 01:29]
 
   Don't use `print`; do something neater and cleaner.
 

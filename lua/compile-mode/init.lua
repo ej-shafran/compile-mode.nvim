@@ -5,6 +5,7 @@
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
 local utils = require("compile-mode.utils")
+local log = require("compile-mode.log")
 
 local M = {}
 
@@ -24,14 +25,6 @@ vim.g.compilation_directory = nil
 local dir_changes = {}
 
 --- UTILITY FUNCTIONS
-
-local debug = a.void(function(...)
-	local config = require("compile-mode.config.internal")
-	if config.debug == true then
-		utils.wait()
-		print(...)
-	end
-end)
 
 ---@param bufnr integer
 ---@param start integer
@@ -93,9 +86,9 @@ end
 
 ---@type fun(cmd: string, bufnr: integer, param: CommandParam): integer, integer, integer
 local runjob = a.wrap(function(cmd, bufnr, param, callback)
-	debug("== runjob() ==")
-
 	local config = require("compile-mode.config.internal")
+
+	log.debug("calling runjob()")
 
 	local count = 0
 	local partial_line = ""
@@ -160,7 +153,7 @@ local runjob = a.wrap(function(cmd, bufnr, param, callback)
 		errors.highlight(bufnr)
 	end)
 
-	debug("== starting job ==")
+	log.debug("starting job...")
 	local job_id = vim.fn.jobstart(cmd, {
 		cwd = vim.g.compilation_directory,
 		on_stdout = on_either,
@@ -171,7 +164,7 @@ local runjob = a.wrap(function(cmd, bufnr, param, callback)
 		env = config.environment,
 		clear_env = config.clear_environment,
 	})
-	debug("job_id = " .. job_id)
+	log.debug("job_id = ", job_id)
 
 	if job_id <= 0 then
 		vim.notify("Failed to start job with command " .. cmd, vim.log.levels.ERROR)
@@ -181,7 +174,7 @@ local runjob = a.wrap(function(cmd, bufnr, param, callback)
 	vim.g.compile_job_id = job_id
 
 	if param.bang then
-		debug("== sync mode - waiting for job to finish ==")
+		log.debug("sync mode - waiting for job to finish...")
 		vim.fn.jobwait({ job_id })
 	end
 
@@ -226,7 +219,7 @@ local runcommand = a.void(function(command, param)
 	errors.error_list = {}
 	dir_changes = {}
 
-	debug("== runcommand() ==")
+	log.debug("calling runcommand()")
 	if vim.g.compile_job_id then
 		if config.ask_to_interrupt then
 			local response = vim.fn.confirm("Interrupt running process?", "&Yes\n&No")
@@ -240,10 +233,10 @@ local runcommand = a.void(function(command, param)
 		utils.delay(1000)
 	end
 
-	debug("== opening compilation buffer ==")
+	log.debug("opening compilation buffer...")
 
 	local bufnr = utils.split_unless_open(config.buffer_name, param.smods, param.count)
-	debug("bufnr = " .. bufnr)
+	log.debug("bufnr = ", bufnr)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
 	utils.buf_set_opt(bufnr, "modifiable", true)
@@ -268,7 +261,7 @@ local runcommand = a.void(function(command, param)
 	utils.wait()
 	errors.highlight(bufnr)
 
-	debug("== running command: `" .. string.gsub(command, "\\`", "\\`") .. "` ==")
+	log.debug("running command: `", string.gsub(command, "\\`", "\\`"), "`")
 	local line_count, code, job_id = runjob(command, bufnr, param)
 	if job_id ~= vim.g.compile_job_id then
 		return
@@ -378,9 +371,9 @@ M.level = errors.level
 ---
 ---@type fun(param: CommandParam)
 M.compile = a.void(function(param)
-	debug("== compile() ==")
-
 	local config = require("compile-mode.config.internal")
+
+	log.debug("calling compile()")
 
 	param = param or {}
 
@@ -409,9 +402,9 @@ end)
 ---
 ---@type fun(param: CommandParam)
 M.recompile = a.void(function(param)
-	debug("==recompile()==")
-
 	local config = require("compile-mode.config.internal")
+
+	log.debug("calling recompile()")
 
 	if vim.g.compile_command then
 		runcommand(vim.g.compile_command, param)
@@ -426,9 +419,9 @@ end)
 ---
 ---@type fun(param: CommandParam?)
 M.current_error = a.void(function(param)
-	debug("== current_error() ==")
+	log.debug("calling current_error()")
 
-	debug("line = " .. error_cursor)
+	log.debug("line = ", error_cursor)
 
 	local error = errors.error_list[error_cursor]
 	if error == nil then
@@ -450,7 +443,7 @@ M.prev_error = act_from_current_error("jump", "prev", false)
 ---
 ---@type fun()
 M.send_to_qflist = a.void(function()
-	debug("== send_to_qflist() ==")
+	log.debug("calling send_to_qflist()")
 
 	vim.api.nvim_exec_autocmds("QuickFixCmdPre", {})
 	vim.fn.setqflist(errors.toqflist(errors.error_list), "r")
@@ -461,7 +454,7 @@ end)
 ---
 ---@type fun()
 M.add_to_qflist = a.void(function()
-	debug("== add_to_qflist() ==")
+	log.debug("calling add_to_qflist()")
 
 	vim.api.nvim_exec_autocmds("QuickFixCmdPre", {})
 	vim.fn.setqflist(errors.toqflist(errors.error_list), "a")
@@ -474,11 +467,11 @@ end)
 ---
 ---@type fun(param: CommandParam?)
 M.goto_error = a.void(function(param)
-	debug("== goto_error() ==")
+	log.debug("calling goto_error()")
 
 	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 	local error = errors.error_list[linenum]
-	debug("error = " .. vim.inspect(error))
+	log.debug("error = ", vim.inspect(error))
 
 	if not error then
 		vim.notify("No error here")
@@ -495,20 +488,20 @@ end)
 ---
 ---@type fun()
 M.interrupt = a.void(function()
-	debug("== interrupt() ==")
-
 	local config = require("compile-mode.config.internal")
 
+	log.debug("calling interrupt()")
+
 	if not vim.g.compile_job_id then
-		debug("== nothing to interrupt ==")
+		log.debug("nothing to interrupt")
 		return
 	end
 
-	debug("== interrupting compilation ==")
-	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
+	log.debug("interrupting compilation")
+	log.debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
 
 	local bufnr = vim.fn.bufnr(vim.fn.fnameescape(config.buffer_name))
-	debug("bufnr = " .. bufnr)
+	log.debug("bufnr = ", bufnr)
 
 	local interrupt_message = "Compilation interrupted"
 
@@ -527,11 +520,8 @@ end)
 ---@param opts CompileModeOpts
 ---@deprecated set `vim.g.compile_mode` instead
 function M.setup(opts)
-	vim.notify(
-		[[compile-mode: `setup()` is deprecated; set the `vim.g.compile_mode` object instead
-compile-mode: `setup()` will be removed in the next major version]],
-		vim.log.levels.WARN
-	)
+	log.warn([[`setup()` is deprecated; set the `vim.g.compile_mode` object instead
+compile-mode: `setup()` will be removed in the next major version]])
 
 	vim.g.compile_mode = opts
 	local config = require("compile-mode.config.internal")

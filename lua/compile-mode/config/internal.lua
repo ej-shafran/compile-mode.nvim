@@ -1,6 +1,7 @@
 local config = {}
 
 local check = require("compile-mode.config.check")
+local log = require("compile-mode.log")
 
 ---@class CompileModeConfig
 local default_config = {
@@ -55,15 +56,16 @@ config.error_ignore_file_list = vim.list_extend({ "/bin/[a-z]*sh$" }, config.err
 
 local ok, err = check.validate(config)
 if not ok then
-	vim.notify("compile-mode: " .. err, vim.log.levels.ERROR)
+	log.error(err)
 end
 
 if #config.health_info.unrecognized_keys > 0 then
-	vim.notify(
-		"compile-mode: found unrecognized options: " .. vim.fn.join(config.health_info.unrecognized_keys, ", "),
-		vim.log.levels.WARN
-	)
+	log.warn("found unrecognized options: " .. vim.fn.join(config.health_info.unrecognized_keys, ", "))
 end
 
 ---@cast config CompileModeConfig
+
+--- Modify the log level based off the parsed config
+log.new({ level = config.debug and "debug" or "info" }, true)
+
 return config
