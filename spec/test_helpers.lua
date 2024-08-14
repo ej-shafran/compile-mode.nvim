@@ -85,7 +85,7 @@ function M.sun_ada_error(param)
 	return param.filename .. ", line " .. param.row .. ", char " .. param.col .. ":"
 end
 
----@type RegexpMatcher
+---@type CompileModeRegexpMatcher
 M.typescript_regexp_matcher = {
 	regex = "^\\(.\\+\\)(\\([1-9][0-9]*\\),\\([1-9][0-9]*\\)): error TS[1-9][0-9]*:",
 	filename = 1,
@@ -120,7 +120,7 @@ end
 
 ---@param expected CreateError
 function M.assert_parsed_error(error_string, expected)
-	---@type Error|nil
+	---@type CompileModeError|nil
 	local actual = nil
 	for _, error in pairs(errors.error_list) do
 		if error.full_text == error_string then

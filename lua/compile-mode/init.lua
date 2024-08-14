@@ -114,8 +114,8 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 		local output_highlights = {}
 		for i, line in ipairs(new_lines) do
-			local error = errors.parse(line)
 			local linenum = linecount + i - 1
+			local error = errors.parse(line, linenum)
 
 			for _, re in ipairs(config.hidden_output) do
 				line = vim.fn.substitute(line, re, "", "")
@@ -253,7 +253,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	set_lines(bufnr, 0, -1, {})
 	utils.wait()
 
-	local error = errors.parse(command)
+	local error = errors.parse(command, 4)
 	if error then
 		errors.error_list[4] = error
 	end

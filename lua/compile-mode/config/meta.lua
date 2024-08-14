@@ -10,7 +10,7 @@
 ---@field buffer_name? string
 ---
 ---For more info, run `:h compile_mode.error_regexp_table`
----@field error_regexp_table? ErrorRegexpTable
+---@field error_regexp_table? table<string, CompileModeRegexpMatcher>
 ---
 ---For more info, run `:h compile_mode.debug`
 ---@field debug? boolean

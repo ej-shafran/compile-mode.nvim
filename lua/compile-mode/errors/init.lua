@@ -1,20 +1,15 @@
----@alias StringRange { start: integer, end_: integer }
----@alias Error { highlighted: boolean, level: level, full: StringRange, filename: { value: string, range: StringRange }, row: { value: integer, range: StringRange }?, end_row: { value: integer, range: StringRange }?, col: { value: integer, range: StringRange }?, end_col: { value: integer, range: StringRange }?, group: string, full_text: string }
----@alias RegexpMatcher { regex: string, filename: integer, row: integer|IntByInt|nil, col: integer|IntByInt|nil, type: nil|level|IntByInt }
----@alias ErrorRegexpTable table<string, RegexpMatcher>
-
 local utils = require("compile-mode.utils")
 
 local M = {}
 
----@enum level
+---@enum CompileModeLevel
 M.level = {
 	ERROR = 2,
 	WARNING = 1,
 	INFO = 0,
 }
 
----@type table<integer, Error>
+---@type table<integer, CompileModeError>
 M.error_list = {}
 
 M.ignore_file_list = {
@@ -24,7 +19,7 @@ M.ignore_file_list = {
 ---This mirrors the `error_regexp_alist` variable from Emacs.
 ---See `error_regexp_table` in the README to understand this more in depth.
 ---
----@type ErrorRegexpTable
+---@type table<string, CompileModeRegexpMatcher>
 M.error_regexp_table = {
 	absoft = {
 		regex = '^\\%([Ee]rror on \\|[Ww]arning on\\( \\)\\)\\?[Ll]ine[ \t]\\+\\([0-9]\\+\\)[ \t]\\+of[ \t]\\+"\\?\\([a-zA-Z]\\?:\\?[^":\n]\\+\\)"\\?:',
@@ -284,10 +279,10 @@ M.error_regexp_table = {
 
 ---Given a `matchlistpos` result and a capture-group matcher, return the location of the relevant capture group(s).
 ---
----@param result (StringRange|nil)[]
----@param group integer|IntByInt|nil
----@return StringRange|nil
----@return StringRange|nil
+---@param result (CompileModeRange|nil)[]
+---@param group integer|CompileModeIntByInt|nil
+---@return CompileModeRange|nil
+---@return CompileModeRange|nil
 local function parse_matcher_group(result, group)
 	if not group then
 		return nil
@@ -303,8 +298,8 @@ end
 
 ---Get the range and its value from a certain line
 ---@param line string
----@param range StringRange
----@return { value: any, range: StringRange }
+---@param range CompileModeRange
+---@return CompileModeValueAndRange<string>
 local function range_and_value(line, range)
 	return {
 		value = line:sub(range.start, range.end_),
@@ -314,28 +309,27 @@ end
 
 ---Get the range and its numeric value, if it contains a number.
 ---@param line string
----@param range StringRange|nil
----@return ({ value: number, range: StringRange })|nil
+---@param range CompileModeRange|nil
+---@return CompileModeValueAndRange<number>|nil
 local function numeric_range_and_value(line, range)
 	if not range then
 		return nil
 	end
 
 	local raw = range_and_value(line, range)
-
-	raw.value = tonumber(raw.value)
-	if not raw.value then
+	local parsed = tonumber(raw.value)
+	if not parsed then
 		return nil
 	end
-
-	return raw
+	return { value = parsed, range = raw.range }
 end
 
 ---Parse a line for errors using a specific matcher from `error_regexp_table`.
----@param matcher RegexpMatcher|nil
+---@param matcher CompileModeRegexpMatcher|nil
 ---@param line string
----@return Error|nil
-local function parse_matcher(matcher, line)
+---@param linenum integer
+---@return CompileModeError|nil
+local function parse_matcher(matcher, line, linenum)
 	if not matcher then
 		return nil
 	end
@@ -380,10 +374,11 @@ local function parse_matcher(matcher, line)
 		end_row = numeric_range_and_value(line, end_row_range),
 		end_col = numeric_range_and_value(line, end_col_range),
 		group = nil,
+		linenum = linenum,
 	}
 end
 
----@param error_list table<integer, Error> table of compilation errors, usually `errors.error_list`
+---@param error_list table<integer, CompileModeError> table of compilation errors, usually `errors.error_list`
 ---@return unknown[] qflist values which can be inserted into the quickfix list using `setqflist()`
 function M.toqflist(error_list)
 	return vim.tbl_values(vim.tbl_map(function(error)
@@ -400,11 +395,12 @@ end
 
 ---Parses error syntax from a given line.
 ---@param line string the line to parse
----@return Error|nil
-function M.parse(line)
+---@param linenum integer the line number of the parsed line
+---@return CompileModeError|nil
+function M.parse(line, linenum)
 	local config = require("compile-mode.config.internal")
 	for group, matcher in pairs(config.error_regexp_table) do
-		local result = parse_matcher(matcher, line)
+		local result = parse_matcher(matcher, line, linenum)
 
 		if result then
 			for _, pattern in ipairs(M.ignore_file_list) do
@@ -424,7 +420,7 @@ end
 
 ---Highlight a single error in the compilation buffer.
 ---@param bufnr integer
----@param error Error
+---@param error CompileModeError
 ---@param linenum integer
 local function highlight_error(bufnr, error, linenum)
 	if error.highlighted then

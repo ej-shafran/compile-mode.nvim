@@ -1,5 +1,3 @@
----@alias IntByInt { [1]: integer, [2]: integer }
-
 local a = require("plenary.async")
 
 local M = {}
@@ -9,18 +7,18 @@ local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
 ---@param bufnr integer
 ---@param hlname string
 ---@param linenum integer
----@param range StringRange
+---@param range CompileModeRange
 function M.add_highlight(bufnr, hlname, linenum, range)
 	vim.api.nvim_buf_add_highlight(bufnr, compile_mode_ns, hlname, linenum - 1, range.start - 1, range.end_)
 end
 
 ---@param input string
 ---@param pattern string
----@return (StringRange|nil)[]
+---@return (CompileModeRange|nil)[]
 function M.matchlistpos(input, pattern)
 	local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
 
-	---@type (IntByInt|nil)[]
+	---@type (CompileModeIntByInt|nil)[]
 	local result = {}
 
 	local latest_index = vim.fn.match(input, pattern)
@@ -102,7 +100,7 @@ function M.split_unless_open(fname, smods, count)
 end
 
 ---@param filename string
----@param error Error
+---@param error CompileModeError
 ---@param same_window boolean|nil
 local function jump_to_file(filename, error, same_window)
 	local row = error.row and error.row.value or 1
@@ -150,7 +148,7 @@ local function jump_to_file(filename, error, same_window)
 	end
 end
 
----@type fun(error: Error, current_dir: string, same_window: boolean|nil)
+---@type fun(error: CompileModeError, current_dir: string, same_window: boolean|nil)
 M.jump_to_error = a.void(function(error, current_dir, same_window)
 	current_dir = string.gsub(current_dir or "", "/$", "")
 

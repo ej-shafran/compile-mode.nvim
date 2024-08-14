@@ -11,7 +11,7 @@ local default_config = {
 	---@type string
 	default_command = "make -k ",
 
-	---@type ErrorRegexpTable
+	---@type table<string, CompileModeRegexpMatcher>
 	error_regexp_table = {},
 	---@type string[]
 	error_ignore_file_list = {},
