@@ -3,14 +3,14 @@
 
 ---@class CompileModeRange
 ---@field start integer
----@field end_ integer
+---@field end_  integer
 
 ---@class CompileModeRegexpMatcher
----@field regex string
+---@field regex    string
 ---@field filename integer
----@field row integer|CompileModeIntByInt|nil
----@field col integer|CompileModeIntByInt|nil
----@field type nil|CompileModeLevel|CompileModeIntByInt
+---@field row      integer|CompileModeIntByInt|nil
+---@field col      integer|CompileModeIntByInt|nil
+---@field type     nil|CompileModeLevel|CompileModeIntByInt
 
 ---@class CompileModeError
 ---@field highlighted boolean
@@ -21,6 +21,6 @@
 ---@field end_row     CompileModeValueAndRange<integer>?
 ---@field col         CompileModeValueAndRange<integer>?
 ---@field end_col     CompileModeValueAndRange<integer>?
----@field group       string
+---@field group       string?
 ---@field full_text   string
 ---@field linenum     integer

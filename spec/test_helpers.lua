@@ -1,4 +1,8 @@
----@alias CreateError {filename: string, row: integer, col: integer}
+---@class CreateError
+---
+---@field row      integer
+---@field col      integer
+---@field filename string
 
 local compile_mode = require("compile-mode")
 local errors = require("compile-mode.errors")

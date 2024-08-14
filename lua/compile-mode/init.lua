@@ -1,6 +1,24 @@
----@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
----@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier?, hide: boolean?, tab: integer? }
----@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
+---@alias SplitModifier
+---|"aboveleft"
+---|"belowright"
+---|"topleft"
+---|"botright"
+---|""
+
+---@class SMods
+---
+---@field vertical? boolean
+---@field silent?   boolean
+---@field hide?     boolean
+---@field tab?      integer
+---@field split?    SplitModifier
+
+---@class CommandParam
+---
+---@field args?  string
+---@field smods? SMods
+---@field bang?  boolean
+---@field count? integer
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")

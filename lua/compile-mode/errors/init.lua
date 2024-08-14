@@ -348,21 +348,24 @@ local function parse_matcher(matcher, line, linenum)
 	local row_range, end_row_range = parse_matcher_group(result, matcher.row)
 	local col_range, end_col_range = parse_matcher_group(result, matcher.col)
 
+	---@type CompileModeLevel
 	local error_level
-	if matcher.type == nil then
+	local type = matcher.type
+	if type == nil then
 		error_level = M.level.ERROR
-	elseif type(matcher.type) == "number" then
-		error_level = matcher.type
-	elseif type(matcher.type) == "table" then
-		if result[matcher.type[1] + 1] then
+	elseif type(type) == "number" then
+		error_level = type
+	elseif type(type) == "table" then
+		if result[type[1] + 1] then
 			error_level = M.level.WARNING
-		elseif matcher.type[2] and result[matcher.type[2] + 1] then
+		elseif type[2] and result[type[2] + 1] then
 			error_level = M.level.INFO
 		else
 			error_level = M.level.ERROR
 		end
 	end
 
+	---@type CompileModeError
 	return {
 		highlighted = false,
 		level = error_level,
