@@ -10,11 +10,24 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
-- Healthchecks; you can now troubleshoot the plugin using `:checkhealth compile-mode`
+- Healthchecks; you can now troubleshoot the plugin using `:checkhealth compile-mode`.
+- The ability to configure the plugin using the `vim.g.compile_mode` table.
+- A new type annotation for the configuration options - `CompileModeOpts`
+- The plugin's logs are now also placed in `compile-mode.nvim.log` in users' `data` directory (usually something like `~/.local/share/nvim`).
+- The ability to use command modifiers such as `:vert` and `:tab` with `:NextError`, `:PrevError`, `:CurrentError`, and `:CompileGotoError`. These modifiers affect the way windows are opened when jumping to errors, if a new window must be created.
 
 ### Changed
 
 - The `setup` function is now deprecated. Instead, configuration should use the `vim.g.compile_mode` object, which can be given the type `CompileModeOpts`.
+- The splitting behavior for jumping to errors; the new behavior mimics the way the Emacs mode works - use the current window, unless that window is the compilation buffer, in which case use another existing window or create a split if none exists - but enables the usage of commands like `:vertical` and other modifiers to determine the manner in which splits occur.
+- Several of the type annotations have been changed to include a `CompileMode` prefix, such as:
+  - `Error` -> `CompileModeError`
+  - `level` -> `CompileModeLevel`
+  - `RegexpMatcher` -> `CompileModeRegexpMatcher`
+
+### Removed
+
+- The (mostly undocumented) `same_window_errors` option.
 
 ## [3.0.1] - 2024-07-08
 
