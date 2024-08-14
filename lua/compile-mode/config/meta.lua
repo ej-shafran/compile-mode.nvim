@@ -24,9 +24,6 @@
 ---For more info, run `:h compile_mode.recompile_no_fail`
 ---@field recompile_no_fail? boolean
 ---
----For more info, run `:h compile_mode.same_window_errors`
----@field same_window_errors? boolean
----
 ---For more info, run `:h compile_mode.auto_jump_to_first_error`
 ---@field auto_jump_to_first_error? boolean
 ---

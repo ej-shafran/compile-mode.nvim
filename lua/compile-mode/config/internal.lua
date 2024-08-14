@@ -26,8 +26,6 @@ local default_config = {
 	---@type boolean
 	recompile_no_fail = false,
 	---@type boolean
-	same_window_errors = false,
-	---@type boolean
 	auto_jump_to_first_error = false,
 
 	---@type table<string, string>|nil

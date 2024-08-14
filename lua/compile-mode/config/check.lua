@@ -86,7 +86,6 @@ function check.validate(cfg)
 		ask_about_save = { cfg.ask_about_save, "boolean" },
 		ask_to_interrupt = { cfg.ask_to_interrupt, "boolean" },
 		recompile_no_fail = { cfg.recompile_no_fail, "boolean" },
-		same_window_errors = { cfg.same_window_errors, "boolean" },
 		auto_jump_to_first_error = { cfg.auto_jump_to_first_error, "boolean" },
 		environment = { cfg.environment, "table", true },
 		clear_environment = { cfg.clear_environment, "boolean" },
