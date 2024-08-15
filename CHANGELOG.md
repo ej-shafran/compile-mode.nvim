@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [4.0.0] - 2024-08-15
+
 ### Added
 
 - Healthchecks; you can now troubleshoot the plugin using `:checkhealth compile-mode`.
@@ -316,6 +318,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[4.0.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v3.0.1...v4.0.0
 [3.0.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v3.0.0...v3.0.1
 [3.0.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.8.0...v3.0.0
 [2.8.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v2.7.1...v2.8.0
