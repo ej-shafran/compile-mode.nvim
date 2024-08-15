@@ -12,10 +12,6 @@ M.level = {
 ---@type table<integer, CompileModeError>
 M.error_list = {}
 
-M.ignore_file_list = {
-	"/bin/[a-z]*sh$",
-}
-
 ---This mirrors the `error_regexp_alist` variable from Emacs.
 ---See `error_regexp_table` in the README to understand this more in depth.
 ---
@@ -406,7 +402,7 @@ function M.parse(line, linenum)
 		local result = parse_matcher(matcher, line, linenum)
 
 		if result then
-			for _, pattern in ipairs(M.ignore_file_list) do
+			for _, pattern in ipairs(config.error_ignore_file_list) do
 				if vim.fn.match(result.filename.value, pattern) ~= -1 then
 					return nil
 				end
