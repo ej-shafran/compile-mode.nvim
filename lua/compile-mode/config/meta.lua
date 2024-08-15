@@ -3,43 +3,43 @@
 ---For more info, run `:h compile-mode.default_command`
 ---@field default_command?          string
 ---
----For more info, run `:h compile_mode.time_format`
+---For more info, run `:h compile-mode.time_format`
 ---@field time_format?              string
 ---
----For more info, run `:h compile_mode.buffer_name`
+---For more info, run `:h compile-mode.buffer_name`
 ---@field buffer_name?              string
 ---
----For more info, run `:h compile_mode.error_regexp_table`
+---For more info, run `:h compile-mode.error_regexp_table`
 ---@field error_regexp_table?       table<string, CompileModeRegexpMatcher>
 ---
----For more info, run `:h compile_mode.debug`
+---For more info, run `:h compile-mode.debug`
 ---@field debug?                    boolean
 ---
----For more info, run `:h compile_mode.error_ignore_file_list`
+---For more info, run `:h compile-mode.error_ignore_file_list`
 ---@field error_ignore_file_list?   string[]
 ---
----For more info, run `:h compile_mode.hidden_output`
+---For more info, run `:h compile-mode.hidden_output`
 ---@field hidden_output?            (string|string[])
 ---
----For more info, run `:h compile_mode.recompile_no_fail`
+---For more info, run `:h compile-mode.recompile_no_fail`
 ---@field recompile_no_fail?        boolean
 ---
----For more info, run `:h compile_mode.auto_jump_to_first_error`
+---For more info, run `:h compile-mode.auto_jump_to_first_error`
 ---@field auto_jump_to_first_error? boolean
 ---
----For more info, run `:h compile_mode.ask_about_save`
+---For more info, run `:h compile-mode.ask_about_save`
 ---@field ask_about_save?           boolean
 ---
----For more info, run `:h compile_mode.environment`
+---For more info, run `:h compile-mode.environment`
 ---@field environment?              table<string| string>
 ---
----For more info, run `:h compile_mode.clear_environment`
+---For more info, run `:h compile-mode.clear_environment`
 ---@field clear_environment?        boolean
 ---
----For more info, run `:h compile_mode.ask_to_interrupt`
+---For more info, run `:h compile-mode.ask_to_interrupt`
 ---@field ask_to_interrupt?         boolean
 ---
----For more info, run `:h compile_mode.baleia_setup`
+---For more info, run `:h compile-mode.baleia_setup`
 ---@field baleia_setup?             boolean|table
 
 ---@type CompileModeOpts
