@@ -45,11 +45,12 @@ local user_config = type(vim.g.compile_mode) == "function" and vim.g.compile_mod
 
 local health_info = {
 	health_info = {
-		unrecognized_keys = check.unrecognized_keys(user_config, default_config),
+		unrecognized_keys = check.unrecognized_keys(user_config or {}, default_config),
+		no_user_config = user_config == nil,
 	},
 }
 
-config = vim.tbl_extend("force", health_info, default_config, user_config)
+config = vim.tbl_extend("force", health_info, default_config, user_config or {})
 config.error_regexp_table =
 	vim.tbl_extend("force", require("compile-mode.errors").error_regexp_table, config.error_regexp_table)
 config.error_ignore_file_list = vim.list_extend({ "/bin/[a-z]*sh$" }, config.error_ignore_file_list)
@@ -61,6 +62,10 @@ end
 
 if #config.health_info.unrecognized_keys > 0 then
 	log.warn("found unrecognized options: " .. vim.fn.join(config.health_info.unrecognized_keys, ", "))
+end
+
+if config.health_info.no_user_config then
+	log.warn("no configuration found; did you forget to set the `vim.g.compile_mode` table?")
 end
 
 ---@cast config CompileModeConfig
