@@ -1,26 +1,29 @@
 local compile_mode = require("compile-mode")
+local config = require("compile-mode.config.internal")
 
-if compile_mode.config.baleia_setup then
+local bufnr = vim.fn.bufnr(vim.fn.fnameescape(config.buffer_name))
+
+if config.baleia_setup then
 	local ok, baleia_mod = pcall(require, "baleia")
 	if ok then
 		local opts = {}
-		if type(compile_mode.config.baleia_setup) == "table" then
-			opts = compile_mode.config.baleia_setup --[[@as table]]
+		if type(config.baleia_setup) == "table" then
+			opts = config.baleia_setup --[[@as table]]
 		end
 
 		local baleia = baleia_mod.setup(opts)
-		baleia.automatically(0)
+		baleia.automatically(bufnr)
 	end
 end
 
 local matchadd = vim.fn.matchadd
 
 local function command(cmd, expr, opts)
-	vim.api.nvim_buf_create_user_command(0, cmd, expr, opts or {})
+	vim.api.nvim_buf_create_user_command(bufnr, cmd, expr, opts or {})
 end
 
 local function set(mode, key, expr, opts)
-	vim.keymap.set(mode, key, expr, vim.tbl_extend("force", { silent = true }, opts or {}, { buffer = 0 }))
+	vim.keymap.set(mode, key, expr, vim.tbl_extend("force", { silent = true }, opts or {}, { buffer = bufnr }))
 end
 
 matchadd("CompileModeInfo", "^Compilation \\zsfinished\\ze.*")

@@ -1,11 +1,29 @@
----@alias SplitModifier "aboveleft"|"belowright"|"topleft"|"botright"|""
----@alias SMods { vertical: boolean?, silent: boolean?, split: SplitModifier?, hide: boolean?, tab: integer? }
----@alias CommandParam { args: string?, smods: SMods?, bang: boolean?, count: integer }
----@alias Config { default_command: string?, time_format: string?, buffer_name: string?, error_regexp_table: ErrorRegexpTable?, debug: boolean?, error_ignore_file_list: string[]?, hidden_output: (string|string[])?, recompile_no_fail: boolean?, same_window_errors: boolean?, auto_jump_to_first_error: boolean?, ask_about_save: boolean?, environment: table<string, string>?, clear_environment: boolean?, ask_to_interrupt: boolean?, baleia_setup: true|table? }
+---@alias SplitModifier
+---|"aboveleft"
+---|"belowright"
+---|"topleft"
+---|"botright"
+---|""
+
+---@class SMods
+---
+---@field vertical? boolean
+---@field silent?   boolean
+---@field hide?     boolean
+---@field tab?      integer
+---@field split?    SplitModifier
+
+---@class CommandParam
+---
+---@field args?  string
+---@field smods? SMods
+---@field bang?  boolean
+---@field count? integer
 
 local a = require("plenary.async")
 local errors = require("compile-mode.errors")
 local utils = require("compile-mode.utils")
+local log = require("compile-mode.log")
 
 local M = {}
 
@@ -17,7 +35,7 @@ local error_cursor = 0
 
 ---The previous directory used for compilation.
 ---@type string|nil
-local prev_dir = nil
+vim.g.compilation_directory = nil
 
 ---A table which keeps track of the changes in directory for the compilation buffer,
 ---based on "Entering directory" and "Leaving directory" messages.
@@ -25,13 +43,6 @@ local prev_dir = nil
 local dir_changes = {}
 
 --- UTILITY FUNCTIONS
-
-local debug = a.void(function(...)
-	if M.config.debug == true then
-		utils.wait()
-		print(...)
-	end
-end)
 
 ---@param bufnr integer
 ---@param start integer
@@ -50,7 +61,7 @@ end
 ---@return string
 local function find_directory_for_line(linenum)
 	local latest_linenum = nil
-	local dir = prev_dir or vim.fn.getcwd()
+	local dir = vim.g.compilation_directory or vim.fn.getcwd()
 	for old_linenum, old_dir in pairs(dir_changes) do
 		if old_linenum < linenum and (not latest_linenum or latest_linenum <= old_linenum) then
 			latest_linenum = old_linenum
@@ -91,9 +102,11 @@ local function goto_file(same_window)
 	end
 end
 
----@type fun(cmd: string, bufnr: integer, sync: boolean | nil): integer, integer, integer
-local runjob = a.wrap(function(cmd, bufnr, sync, callback)
-	debug("== runjob() ==")
+---@type fun(cmd: string, bufnr: integer, param: CommandParam): integer, integer, integer
+local runjob = a.wrap(function(cmd, bufnr, param, callback)
+	local config = require("compile-mode.config.internal")
+
+	log.debug("calling runjob()")
 
 	local count = 0
 	local partial_line = ""
@@ -112,23 +125,20 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 		local output_highlights = {}
 		for i, line in ipairs(new_lines) do
-			local error = errors.parse(line)
 			local linenum = linecount + i - 1
+			local error = errors.parse(line, linenum)
 
-			if M.config.hidden_output then
-				local hide = M.config.hidden_output --[[@as string[] ]]
-				for _, re in ipairs(hide) do
-					line = vim.fn.substitute(line, re, "", "")
-					new_lines[i] = line
-				end
+			for _, re in ipairs(config.hidden_output) do
+				line = vim.fn.substitute(line, re, "", "")
+				new_lines[i] = line
 			end
 
 			if error then
 				errors.error_list[linenum] = error
 
-				if M.config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
+				if config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
 					local dir = find_directory_for_line(linenum)
-					utils.jump_to_error(error, dir, M.config.same_window_errors)
+					utils.jump_to_error(error, dir, param.smods)
 					error_cursor = linenum
 				end
 			else
@@ -161,18 +171,18 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 		errors.highlight(bufnr)
 	end)
 
-	debug("== starting job ==")
+	log.debug("starting job...")
 	local job_id = vim.fn.jobstart(cmd, {
-		cwd = prev_dir,
+		cwd = vim.g.compilation_directory,
 		on_stdout = on_either,
 		on_stderr = on_either,
 		on_exit = function(id, code)
 			callback(count, code, id)
 		end,
-		env = M.config.environment,
-		clear_env = M.config.clear_environment,
+		env = config.environment,
+		clear_env = config.clear_environment,
 	})
-	debug("job_id = " .. job_id)
+	log.debug("job_id = ", job_id)
 
 	if job_id <= 0 then
 		vim.notify("Failed to start job with command " .. cmd, vim.log.levels.ERROR)
@@ -181,8 +191,8 @@ local runjob = a.wrap(function(cmd, bufnr, sync, callback)
 
 	vim.g.compile_job_id = job_id
 
-	if sync then
-		debug("== sync mode - waiting for job to finish ==")
+	if param.bang then
+		log.debug("sync mode - waiting for job to finish...")
 		vim.fn.jobwait({ job_id })
 	end
 
@@ -196,7 +206,8 @@ end, 4)
 
 ---Get the current time, formatted.
 local function time()
-	return vim.fn.strftime(M.config.time_format)
+	local config = require("compile-mode.config.internal")
+	return vim.fn.strftime(config.time_format)
 end
 
 ---Get the default directory, formatted.
@@ -215,9 +226,10 @@ local exit_code = {
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
----@type fun(command: string, smods: SMods, count: integer, sync: boolean | nil)
-local runcommand = a.void(function(command, smods, count, sync)
-	if M.config.ask_about_save and utils.ask_to_save(smods) then
+---@type fun(command: string, param: CommandParam)
+local runcommand = a.void(function(command, param)
+	local config = require("compile-mode.config.internal")
+	if config.ask_about_save and utils.ask_to_save(param.smods) then
 		return
 	end
 
@@ -225,9 +237,9 @@ local runcommand = a.void(function(command, smods, count, sync)
 	errors.error_list = {}
 	dir_changes = {}
 
-	debug("== runcommand() ==")
+	log.debug("calling runcommand()")
 	if vim.g.compile_job_id then
-		if M.config.ask_to_interrupt then
+		if config.ask_to_interrupt then
 			local response = vim.fn.confirm("Interrupt running process?", "&Yes\n&No")
 			if response ~= 1 then
 				return
@@ -239,10 +251,10 @@ local runcommand = a.void(function(command, smods, count, sync)
 		utils.delay(1000)
 	end
 
-	debug("== opening compilation buffer ==")
+	log.debug("opening compilation buffer...")
 
-	local bufnr = utils.split_unless_open(M.config.buffer_name, smods, count)
-	debug("bufnr = " .. bufnr)
+	local bufnr = utils.split_unless_open(config.buffer_name, param.smods, param.count)
+	log.debug("bufnr = ", bufnr)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
 	utils.buf_set_opt(bufnr, "modifiable", true)
@@ -252,7 +264,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 	set_lines(bufnr, 0, -1, {})
 	utils.wait()
 
-	local error = errors.parse(command)
+	local error = errors.parse(command, 4)
 	if error then
 		errors.error_list[4] = error
 	end
@@ -267,8 +279,8 @@ local runcommand = a.void(function(command, smods, count, sync)
 	utils.wait()
 	errors.highlight(bufnr)
 
-	debug("== running command: `" .. string.gsub(command, "\\`", "\\`") .. "` ==")
-	local line_count, code, job_id = runjob(command, bufnr, sync)
+	log.debug("running command: `", string.gsub(command, "\\`", "\\`"), "`")
+	local line_count, code, job_id = runjob(command, bufnr, param)
 	if job_id ~= vim.g.compile_job_id then
 		return
 	end
@@ -294,7 +306,7 @@ local runcommand = a.void(function(command, smods, count, sync)
 		"",
 	})
 
-	if not smods.silent then
+	if not param.smods or not param.smods.silent then
 		vim.notify(compilation_message)
 	end
 
@@ -360,7 +372,7 @@ local function act_from_current_error(action, direction, different_file)
 		error_cursor = error_line
 		if action == "jump" then
 			local dir = find_directory_for_line(error_line)
-			utils.jump_to_error(errors.error_list[error_line], dir, M.config.same_window_errors)
+			utils.jump_to_error(errors.error_list[error_line], dir, param.smods or {})
 		else
 			vim.api.nvim_win_set_cursor(0, { error_line, 0 })
 		end
@@ -369,47 +381,7 @@ end
 
 --- PUBLIC (NON-COMMAND) API
 
----@type Config
-M.config = {
-	buffer_name = "*compilation*",
-	default_command = "make -k ",
-	time_format = "%a %b %e %H:%M:%S",
-	ask_about_save = true,
-	ask_to_interrupt = true,
-}
-
 M.level = errors.level
-
----Configure `compile-mode.nvim`. Also sets up the highlight groups for errors.
----
----@param opts Config
-function M.setup(opts)
-	debug("== setup() ==")
-	M.config = vim.tbl_deep_extend("force", M.config, opts)
-	if type(M.config.hidden_output) == "string" then
-		local hide = M.config.hidden_output--[[@as string]]
-		M.config.hidden_output = { hide }
-	end
-
-	errors.error_regexp_table = vim.tbl_extend("force", errors.error_regexp_table, M.config.error_regexp_table or {})
-	errors.ignore_file_list = vim.list_extend(errors.ignore_file_list, M.config.error_ignore_file_list or {})
-
-	vim.cmd("highlight default CompileModeMessage guifg=NONE gui=underline")
-	vim.cmd("highlight default CompileModeMessageRow guifg=Magenta")
-	vim.cmd("highlight default CompileModeMessageCol guifg=Cyan")
-
-	vim.cmd("highlight default CompileModeError guifg=Red")
-	vim.cmd("highlight default CompileModeWarning guifg=DarkYellow")
-	vim.cmd("highlight default CompileModeInfo guifg=Green")
-
-	vim.cmd("highlight default CompileModeCommandOutput guifg=#6699ff")
-	vim.cmd("highlight default CompileModeDirectoryMessage guifg=#6699ff")
-	vim.cmd("highlight default CompileModeOutputFile guifg=#9966cc")
-	vim.cmd("highlight default CompileModeCheckResult cterm=bold gui=bold guifg=#ff9966")
-	vim.cmd("highlight default CompileModeCheckTarget guifg=#ff9966")
-
-	debug("config = " .. vim.inspect(M.config))
-end
 
 --- GENERAL COMMANDS
 
@@ -417,13 +389,16 @@ end
 ---
 ---@type fun(param: CommandParam)
 M.compile = a.void(function(param)
-	debug("== compile() ==")
+	local config = require("compile-mode.config.internal")
+
+	log.debug("calling compile()")
+
 	param = param or {}
 
 	local command = param.args ~= "" and param.args
 		or utils.input({
 			prompt = "Compile command: ",
-			default = vim.g.compile_command or M.config.default_command,
+			default = vim.g.compile_command or config.default_command,
 			completion = "shellcmd",
 		})
 
@@ -432,19 +407,26 @@ M.compile = a.void(function(param)
 	end
 
 	vim.g.compile_command = command
-	prev_dir = vim.fn.getcwd()
+	if not vim.g.compilation_directory then
+		vim.g.compilation_directory = vim.fn.getcwd()
+	end
 
-	runcommand(command, param.smods or {}, param.count, param.bang)
+	runcommand(command, param)
+
+	vim.g.compilation_directory = nil
 end)
 
 ---Rerun the last command.
 ---
 ---@type fun(param: CommandParam)
 M.recompile = a.void(function(param)
-	debug("==recompile()==")
+	local config = require("compile-mode.config.internal")
+
+	log.debug("calling recompile()")
+
 	if vim.g.compile_command then
-		runcommand(vim.g.compile_command, param.smods or {}, param.count, param.bang)
-	elseif M.config.recompile_no_fail then
+		runcommand(vim.g.compile_command, param)
+	elseif config.recompile_no_fail then
 		M.compile(param)
 	else
 		vim.notify("Cannot recompile without previous command; compile first", vim.log.levels.ERROR)
@@ -453,11 +435,11 @@ end)
 
 ---Jump to the current error in the error list
 ---
----@type fun()
-M.current_error = a.void(function()
-	debug("== current_error() ==")
+---@type fun(param: CommandParam?)
+M.current_error = a.void(function(param)
+	log.debug("calling current_error()")
 
-	debug("line = " .. error_cursor)
+	log.debug("line = ", error_cursor)
 
 	local error = errors.error_list[error_cursor]
 	if error == nil then
@@ -466,7 +448,7 @@ M.current_error = a.void(function()
 	end
 
 	local dir = find_directory_for_line(error_cursor)
-	utils.jump_to_error(error, dir, M.config.same_window_errors)
+	utils.jump_to_error(error, dir, param.smods or {})
 end)
 
 ---Jump to the next error in the error list.
@@ -479,7 +461,7 @@ M.prev_error = act_from_current_error("jump", "prev", false)
 ---
 ---@type fun()
 M.send_to_qflist = a.void(function()
-	debug("== send_to_qflist() ==")
+	log.debug("calling send_to_qflist()")
 
 	vim.api.nvim_exec_autocmds("QuickFixCmdPre", {})
 	vim.fn.setqflist(errors.toqflist(errors.error_list), "r")
@@ -490,7 +472,7 @@ end)
 ---
 ---@type fun()
 M.add_to_qflist = a.void(function()
-	debug("== add_to_qflist() ==")
+	log.debug("calling add_to_qflist()")
 
 	vim.api.nvim_exec_autocmds("QuickFixCmdPre", {})
 	vim.fn.setqflist(errors.toqflist(errors.error_list), "a")
@@ -501,13 +483,13 @@ end)
 
 ---Go to the error on the current line
 ---
----@type fun()
-M.goto_error = a.void(function()
-	debug("== goto_error() ==")
+---@type fun(param: CommandParam?)
+M.goto_error = a.void(function(param)
+	log.debug("calling goto_error()")
 
 	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 	local error = errors.error_list[linenum]
-	debug("error = " .. vim.inspect(error))
+	log.debug("error = ", vim.inspect(error))
 
 	if not error then
 		vim.notify("No error here")
@@ -517,25 +499,27 @@ M.goto_error = a.void(function()
 	local dir = find_directory_for_line(linenum)
 
 	error_cursor = linenum
-	utils.jump_to_error(error, dir, M.config.same_window_errors)
+	utils.jump_to_error(error, dir, param or {})
 end)
 
 ---Interrupt the currently running compilation command.
 ---
 ---@type fun()
 M.interrupt = a.void(function()
-	debug("== interrupt() ==")
+	local config = require("compile-mode.config.internal")
+
+	log.debug("calling interrupt()")
 
 	if not vim.g.compile_job_id then
-		debug("== nothing to interrupt ==")
+		log.debug("nothing to interrupt")
 		return
 	end
 
-	debug("== interrupting compilation ==")
-	debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
+	log.debug("interrupting compilation")
+	log.debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
 
-	local bufnr = vim.fn.bufnr(vim.fn.fnameescape(M.config.buffer_name))
-	debug("bufnr = " .. bufnr)
+	local bufnr = vim.fn.bufnr(vim.fn.fnameescape(config.buffer_name))
+	log.debug("bufnr = ", bufnr)
 
 	local interrupt_message = "Compilation interrupted"
 
@@ -550,6 +534,18 @@ M.interrupt = a.void(function()
 	vim.fn.jobstop(vim.g.compile_job_id)
 	vim.g.compile_job_id = nil
 end)
+
+---@param opts CompileModeOpts
+---@deprecated set `vim.g.compile_mode` instead
+function M.setup(opts)
+	log.warn([[`setup()` is deprecated; set the `vim.g.compile_mode` object instead
+compile-mode: `setup()` will be removed in the next major version]])
+
+	vim.g.compile_mode = opts
+	local config = require("compile-mode.config.internal")
+	---@diagnostic disable-next-line: undefined-field
+	config.health_info.called_setup = true
+end
 
 ---Move to the location of the next error within the compilation buffer.
 ---Does not jump to the error's actual locus.

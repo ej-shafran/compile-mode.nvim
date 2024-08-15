@@ -157,3 +157,35 @@ This gets tacked on the end of the generated expressions.")
 * TODO Add diagnostic windows
   As configuration option, probably...
 
+* DONE Refactor configuration logic
+  CLOSED: [2024-07-08 Mon 14:00]
+
+  Read more [[https://github.com/nvim-neorocks/nvim-best-practices?tab=readme-ov-file#wrench-configuration][here]].
+
+** DONE Use `vim.g` variable
+   CLOSED: [2024-07-08 Mon 14:00]
+
+** DONE Use internal config type VS. opts type
+   CLOSED: [2024-07-08 Mon 14:00]
+
+** DONE Add validation
+   CLOSED: [2024-07-08 Mon 14:00]
+
+* TODO Use `busted` for tests instead of `pleanry.nvim`
+
+* TODO Publish to LuaRocks
+
+* TODO Refactor errors logic
+
+  Use a Lua class.
+
+* DONE Add general health checks
+  CLOSED: [2024-07-08 Mon 21:45]
+
+* DONE Refactor debug logic
+  CLOSED: [2024-08-15 Thu 01:29]
+
+  Don't use `print`; do something neater and cleaner.
+
+* TODO Add typecheck action
+

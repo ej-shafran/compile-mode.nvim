@@ -1,5 +1,3 @@
----@alias IntByInt { [1]: integer, [2]: integer }
-
 local a = require("plenary.async")
 
 local M = {}
@@ -9,18 +7,18 @@ local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
 ---@param bufnr integer
 ---@param hlname string
 ---@param linenum integer
----@param range StringRange
+---@param range CompileModeRange
 function M.add_highlight(bufnr, hlname, linenum, range)
 	vim.api.nvim_buf_add_highlight(bufnr, compile_mode_ns, hlname, linenum - 1, range.start - 1, range.end_)
 end
 
 ---@param input string
 ---@param pattern string
----@return (StringRange|nil)[]
+---@return (CompileModeRange|nil)[]
 function M.matchlistpos(input, pattern)
 	local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
 
-	---@type (IntByInt|nil)[]
+	---@type (CompileModeIntByInt|nil)[]
 	local result = {}
 
 	local latest_index = vim.fn.match(input, pattern)
@@ -102,9 +100,16 @@ function M.split_unless_open(fname, smods, count)
 end
 
 ---@param filename string
----@param error Error
----@param same_window boolean|nil
-local function jump_to_file(filename, error, same_window)
+---@param error CompileModeError
+---@param smods SMods
+local function jump_to_file(filename, error, smods)
+	local config = require("compile-mode.config.internal")
+
+	local compilation_bufnr = M.split_unless_open(config.buffer_name, smods, 0)
+	local compilation_winnr = vim.fn.win_findbuf(compilation_bufnr)[1]
+
+	vim.api.nvim_win_set_cursor(compilation_winnr, { error.linenum, 0 })
+
 	local row = error.row and error.row.value or 1
 	local end_row = error.end_row and error.end_row.value
 
@@ -117,15 +122,23 @@ local function jump_to_file(filename, error, same_window)
 		end_col = 0
 	end
 
-	if not same_window then
-		vim.cmd.wincmd("p")
+	if vim.api.nvim_get_current_buf() ~= compilation_bufnr then
+		vim.cmd.e(filename)
+	elseif #vim.api.nvim_list_wins() > 1 then
+		vim.cmd("wincmd p")
+		vim.cmd.e(filename)
+	else
+		M.split_unless_open(filename, smods, 0)
 	end
-	vim.cmd.e(filename)
-	local last_row = vim.api.nvim_buf_line_count(0)
+
+	local target_bufnr = vim.fn.bufnr(vim.fn.fnameescape(filename))
+	local target_winnr = vim.fn.win_findbuf(target_bufnr)[1]
+
+	local last_row = vim.api.nvim_buf_line_count(target_bufnr)
 	if row > last_row then
 		row = last_row
 	end
-	vim.api.nvim_win_set_cursor(0, { row, col })
+	vim.api.nvim_win_set_cursor(target_winnr, { row, col })
 
 	if end_row or end_col then
 		local cmd = ""
@@ -143,15 +156,14 @@ local function jump_to_file(filename, error, same_window)
 			cmd = cmd .. tostring(end_col - col) .. "l"
 		end
 
-		-- TODO: maybe use select mode by doing:
-		-- cmd = cmd .. "gh"
-
-		vim.cmd.normal(cmd)
+		vim.api.nvim_buf_call(target_bufnr, function()
+			vim.cmd.normal(cmd)
+		end)
 	end
 end
 
----@type fun(error: Error, current_dir: string, same_window: boolean|nil)
-M.jump_to_error = a.void(function(error, current_dir, same_window)
+---@type fun(error: CompileModeError, current_dir: string, smods: SMods)
+M.jump_to_error = a.void(function(error, current_dir, smods)
 	current_dir = string.gsub(current_dir or "", "/$", "")
 
 	local filename = error.filename.value
@@ -162,7 +174,7 @@ M.jump_to_error = a.void(function(error, current_dir, same_window)
 	local file_exists = vim.fn.filereadable(filename) ~= 0
 
 	if file_exists then
-		jump_to_file(filename, error, same_window)
+		jump_to_file(filename, error, smods)
 		return
 	end
 
@@ -183,7 +195,7 @@ M.jump_to_error = a.void(function(error, current_dir, same_window)
 			return
 		end
 
-		jump_to_file(dir, error, same_window)
+		jump_to_file(dir, error, smods)
 		return
 	end
 
@@ -193,7 +205,7 @@ M.jump_to_error = a.void(function(error, current_dir, same_window)
 		return
 	end
 
-	jump_to_file(nested_filename, error, same_window)
+	jump_to_file(nested_filename, error, smods)
 end)
 
 function M.match_command_ouput(line, linenum)

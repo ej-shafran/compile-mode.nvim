@@ -1,4 +1,8 @@
----@alias CreateError {filename: string, row: integer, col: integer}
+---@class CreateError
+---
+---@field row      integer
+---@field col      integer
+---@field filename string
 
 local compile_mode = require("compile-mode")
 local errors = require("compile-mode.errors")
@@ -60,10 +64,11 @@ function M.get_output()
 	return vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
 end
 
----@param opts Config|nil
+---@param opts CompileModeOpts|nil
 function M.setup_tests(opts)
 	require("plugin.command")
-	require("compile-mode").setup(opts or {})
+	vim.g.compile_mode = vim.tbl_extend("force", { debug = true }, opts or {})
+	package.loaded["compile-mode.config.internal"] = nil
 end
 
 function M.wait()
@@ -84,7 +89,7 @@ function M.sun_ada_error(param)
 	return param.filename .. ", line " .. param.row .. ", char " .. param.col .. ":"
 end
 
----@type RegexpMatcher
+---@type CompileModeRegexpMatcher
 M.typescript_regexp_matcher = {
 	regex = "^\\(.\\+\\)(\\([1-9][0-9]*\\),\\([1-9][0-9]*\\)): error TS[1-9][0-9]*:",
 	filename = 1,
@@ -119,11 +124,12 @@ end
 
 ---@param expected CreateError
 function M.assert_parsed_error(error_string, expected)
-	---@type Error|nil
+	---@type CompileModeError|nil
 	local actual = nil
 	for _, error in pairs(errors.error_list) do
 		if error.full_text == error_string then
 			actual = error
+			break
 		end
 	end
 	assert.is_not_nil(actual)

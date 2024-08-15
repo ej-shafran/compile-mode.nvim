@@ -33,4 +33,4 @@ PASTE HERE
 Specify what version of `compile-mode.nvim` you are using.
 
 **Additional context**
-Add any other context about the problem here.
+Add any other context about the problem here, including any errors mentioned in `:checkhealth compile-mode`.
