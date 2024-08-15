@@ -350,15 +350,15 @@ local function parse_matcher(matcher, line, linenum)
 
 	---@type CompileModeLevel
 	local error_level
-	local type = matcher.type
-	if type == nil then
+	local matcher_type = matcher.type
+	if matcher_type == nil then
 		error_level = M.level.ERROR
-	elseif type(type) == "number" then
-		error_level = type
-	elseif type(type) == "table" then
-		if result[type[1] + 1] then
+	elseif type(matcher_type) == "number" then
+		error_level = matcher_type
+	elseif type(matcher_type) == "table" then
+		if result[matcher_type[1] + 1] then
 			error_level = M.level.WARNING
-		elseif type[2] and result[type[2] + 1] then
+		elseif matcher_type[2] and result[matcher_type[2] + 1] then
 			error_level = M.level.INFO
 		else
 			error_level = M.level.ERROR
