@@ -10,6 +10,17 @@ local function env_variable(var)
 	end
 end
 
+local function invalid_env_value(var)
+	-- For `cmd`, an invalid environment variable results in that variable's string
+	-- whereas for `*sh` shells, it results in an empty string
+
+	if vim.o.shell:match("cmd.exe$") then
+		return "%" .. var .. "%"
+	else
+		return ""
+	end
+end
+
 local assert = require("luassert")
 
 describe("`environment` option", function()
@@ -46,7 +57,6 @@ describe("`clear_environment` option", function()
 
 		helpers.compile({ args = cmd })
 
-		-- The value of $OTHER should be empty
-		assert.are.same({ cmd, "" }, helpers.get_output())
+		assert.are.same({ cmd, invalid_env_value("OTHER") }, helpers.get_output())
 	end)
 end)
