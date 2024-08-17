@@ -45,11 +45,16 @@ jobs:
       - name: Install Neovim (Windows)
         run: |
           choco install neovim --version=${{ env.NVIM_VERSION }}
-          dir C:\tools\neovim\nvim-win64\bin
+          C:\tools\neovim\nvim-win64\bin\nvim.exe --version
         if: matrix.os == 'windows-latest'
 
       - name: Print Neovim Version
         run: nvim --version
+        if: matrix.os != 'windows-latest'
+
+      - name: Print Neovim Version (Windows)
+        run: nvim.exe --version
+        if: matrix.os == 'windows-latest'
 
       - name: Run Tests
         run: |
