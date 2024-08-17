@@ -128,9 +128,9 @@ log.new = function(config, standalone)
 			return log_at_level(i, x, make_string, ...)
 		end
 
-		obj[("fmt_%s"):format(x.name)] = function()
-			return log_at_level(i, x, function(...)
-				local passed = { ... }
+		obj[("fmt_%s"):format(x.name)] = function(...)
+			local passed = { ... }
+			return log_at_level(i, x, function()
 				local fmt = table.remove(passed, 1)
 				local inspected = {}
 				for _, v in ipairs(passed) do
