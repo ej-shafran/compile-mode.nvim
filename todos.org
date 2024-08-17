@@ -195,5 +195,6 @@ This gets tacked on the end of the generated expressions.")
 * DONE Fix `hidden_output` warning
   CLOSED: [2024-08-17 Sat 16:07]
 
-* TODO Fix environment variable tests on Windows
+* DONE Fix environment variable tests on Windows
+  CLOSED: [2024-08-17 Sat 17:22]
 
