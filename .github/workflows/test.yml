@@ -11,9 +11,18 @@ on:
 jobs:
   test:
     name: Plenary Busted Tests
-    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+
+    runs-on: ${{ matrix.os }}
+
     steps:
-      - name: Checkout
+      - name: Checkout Code
         uses: actions/checkout@v4
         with:
           path: compile-mode.nvim
@@ -25,10 +34,7 @@ jobs:
           path: plenary.nvim
 
       - name: Install Neovim
-        run: |
-          sudo apt-get update
-          sudo add-apt-repository ppa:neovim-ppa/unstable
-          sudo apt-get install neovim
+        uses: MunifTanjim/setup-neovim-action@v1
 
       - name: Run Tests
         run: |
