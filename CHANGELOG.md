@@ -10,7 +10,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
+- Issue with compilation buffer name on Windows which resulted in "-1 is not a valid buffer id" errors.
 - Passing `hidden_output` as a string now works as documented.
+- Suggested commands in config type annotations.
 
 ## [4.0.0] - 2024-08-15
 
