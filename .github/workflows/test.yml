@@ -43,9 +43,7 @@ jobs:
         if: matrix.os != 'windows-latest'
 
       - name: Install Neovim (Windows)
-        run: |
-          choco install neovim --version=${{ env.NVIM_VERSION }}
-          echo "C:\tools\neovim\nvim-win64\bin" >> $GITHUB_PATH
+        run: "choco install neovim --version=${{ env.NVIM_VERSION }}"
         if: matrix.os == 'windows-latest'
 
       - name: Print Neovim Version
@@ -53,7 +51,7 @@ jobs:
         if: matrix.os != 'windows-latest'
 
       - name: Print Neovim Version (Windows)
-        run: nvim.exe --version
+        run: C:\tools\neovim\nvim-win64\bin\nvim.exe --version
         if: matrix.os == 'windows-latest'
 
       - name: Run Tests
