@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Passing `hidden_output` as a string now works as documented.
+
 ## [4.0.0] - 2024-08-15
 
 ### Added

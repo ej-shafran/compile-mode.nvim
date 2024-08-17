@@ -54,6 +54,7 @@ config = vim.tbl_extend("force", health_info, default_config, user_config or {})
 config.error_regexp_table =
 	vim.tbl_extend("force", require("compile-mode.errors").error_regexp_table, config.error_regexp_table)
 config.error_ignore_file_list = vim.list_extend({ "/bin/[a-z]*sh$" }, config.error_ignore_file_list)
+config.hidden_output = type(config.hidden_output) == "string" and { config.hidden_output } or config.hidden_output
 
 local ok, err = check.validate(config)
 if not ok then

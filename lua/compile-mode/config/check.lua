@@ -9,10 +9,14 @@ local function validate(tbl)
 	return ok or false, "invalid config" .. (err and (": " .. err) or "")
 end
 
-local function validate_string_list(value)
+local function validate_string_list(value, or_string)
 	return {
 		value,
 		function(lst)
+			if or_string and type(lst) == "string" then
+				return true
+			end
+
 			return type(lst) == "table" and vim.iter(lst):all(function(str)
 				return type(str) == "string"
 			end)
@@ -92,7 +96,7 @@ function check.validate(cfg)
 		baleia_setup = { cfg.baleia_setup, { "boolean", "table" } },
 		debug = { cfg.debug, "boolean" },
 		error_ignore_file_list = validate_string_list(cfg.error_ignore_file_list),
-		hidden_output = validate_string_list(cfg.hidden_output),
+		hidden_output = validate_string_list(cfg.hidden_output, true),
 		error_regexp_table = validate_error_regexp_table(cfg.error_regexp_table),
 	})
 end
