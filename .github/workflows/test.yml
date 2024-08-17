@@ -40,6 +40,7 @@ jobs:
       - name: Install Neovim (Windows)
         run: |
           choco install neovim
+          refreshenv
           nvim -v
         if: matrix.os == 'windows-latest'
 
