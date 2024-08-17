@@ -1,4 +1,13 @@
 local helpers = require("spec.test_helpers")
+local utils = require("compile-mode.utils")
+
+local function env_variable(var)
+	if utils.is_windows() then
+		return "echo $Env:" .. var
+	else
+		return "echo $" .. var
+	end
+end
 
 local assert = require("luassert")
 
@@ -10,7 +19,7 @@ describe("`environment` option", function()
 	end)
 
 	it("should set an environment variable for commands", function()
-		local cmd = "echo $TESTING"
+		local cmd = env_variable("TESTING")
 
 		helpers.compile({ args = cmd })
 
@@ -18,7 +27,7 @@ describe("`environment` option", function()
 	end)
 
 	it("should not override existing environment variables", function()
-		local cmd = "echo $OTHER"
+		local cmd = env_variable("OTHER")
 		vim.env.OTHER = "some value"
 
 		helpers.compile({ args = cmd })
@@ -31,7 +40,7 @@ describe("`clear_environment` option", function()
 	it("should override existing environment variables", function()
 		helpers.setup_tests({ clear_environment = true })
 
-		local cmd = "echo $OTHER"
+		local cmd = env_variable("OTHER")
 		vim.env.OTHER = "some value"
 
 		helpers.compile({ args = cmd })
