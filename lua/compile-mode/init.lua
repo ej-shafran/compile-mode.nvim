@@ -518,7 +518,7 @@ M.interrupt = a.void(function()
 	log.debug("interrupting compilation")
 	log.debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
 
-	local bufnr = vim.fn.bufnr(vim.fn.fnameescape(config.buffer_name))
+	local bufnr = vim.fn.bufadd(config.buffer_name)
 	log.debug("bufnr = ", bufnr)
 
 	local interrupt_message = "Compilation interrupted"

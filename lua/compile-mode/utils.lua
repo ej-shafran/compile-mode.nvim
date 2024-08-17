@@ -131,7 +131,7 @@ local function jump_to_file(filename, error, smods)
 		M.split_unless_open(filename, smods, 0)
 	end
 
-	local target_bufnr = vim.fn.bufnr(vim.fn.fnameescape(filename))
+	local target_bufnr = vim.fn.bufadd(filename)
 	local target_winnr = vim.fn.win_findbuf(target_bufnr)[1]
 
 	local last_row = vim.api.nvim_buf_line_count(target_bufnr)
