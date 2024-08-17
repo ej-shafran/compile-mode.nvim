@@ -56,12 +56,17 @@ end
 ---UTILS
 
 function M.get_compilation_bufnr()
-	return vim.fn.bufnr(vim.fn.fnameescape("*compilation*"))
+	local config = require("compile-mode.config.internal")
+	return vim.fn.bufadd(config.buffer_name)
 end
 
 function M.get_output()
 	local bufnr = M.get_compilation_bufnr()
-	return vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+	local result = vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+	return vim.tbl_map(function(line)
+		local replaced = line:gsub("\r", "")
+		return replaced
+	end, result)
 end
 
 ---@param opts CompileModeOpts|nil
@@ -104,7 +109,9 @@ end
 
 ---@param error_string string
 function M.compile_error(error_string)
-	M.compile({ args = "echo '" .. error_string .. "'" })
+	-- ECHO in CMD is strange :(
+	local str = vim.o.shell:match("cmd.exe$") and error_string or vim.fn.shellescape(error_string)
+	M.compile({ args = "echo " .. str })
 end
 
 ---@param error_strings string[]
@@ -127,7 +134,8 @@ function M.assert_parsed_error(error_string, expected)
 	---@type CompileModeError|nil
 	local actual = nil
 	for _, error in pairs(errors.error_list) do
-		if error.full_text == error_string then
+		local full_text = error.full_text:gsub("\r", "")
+		if full_text == error_string then
 			actual = error
 			break
 		end
@@ -137,7 +145,8 @@ function M.assert_parsed_error(error_string, expected)
 		return
 	end
 
-	assert.are.same(actual.full_text, error_string)
+	local full_text = actual.full_text:gsub("\r", "")
+	assert.are.same(full_text, error_string)
 	assert.are.same(actual.filename.value, expected.filename)
 	assert.are.same(actual.row.value, expected.row)
 	assert.are.same(actual.col.value, expected.col)
@@ -157,7 +166,8 @@ function M.assert_cursor_at_error(error_string)
 	---@type integer|nil
 	local line = nil
 	for i, error in pairs(errors.error_list) do
-		if error.full_text == error_string then
+		local full_text = error.full_text:gsub("\r", "")
+		if full_text == error_string then
 			line = i
 		end
 	end

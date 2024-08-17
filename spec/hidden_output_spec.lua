@@ -13,7 +13,7 @@ describe("`hidden_output` option", function()
 	end)
 
 	it("should configure parts of the output not to show", function()
-		helpers.compile({ args = 'echo -e "' .. hide .. "\\n" .. non_hide .. '"' })
+		helpers.compile({ args = "printf '%s\\n%s' " .. hide .. " " .. non_hide })
 
 		local bufnr = helpers.get_compilation_bufnr()
 		local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
@@ -21,5 +21,7 @@ describe("`hidden_output` option", function()
 		for _, line in ipairs(lines) do
 			assert.are_not.same(line, hide)
 		end
+
+		assert.are.same(lines[#lines - 2], non_hide)
 	end)
 end)

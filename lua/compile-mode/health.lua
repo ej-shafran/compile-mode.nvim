@@ -14,6 +14,12 @@ function health.check()
 	end
 
 	---@diagnostic disable-next-line: undefined-field
+	if config.health_info.no_user_config then
+		all_ok = false
+		vim.health.warn("no configuration found; did you forget to set the `vim.g.compile_mode` table?")
+	end
+
+	---@diagnostic disable-next-line: undefined-field
 	vim.iter(config.health_info.unrecognized_keys)
 		:map(function(key)
 			all_ok = false

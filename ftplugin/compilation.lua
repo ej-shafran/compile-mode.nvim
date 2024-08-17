@@ -1,7 +1,7 @@
 local compile_mode = require("compile-mode")
 local config = require("compile-mode.config.internal")
 
-local bufnr = vim.fn.bufnr(vim.fn.fnameescape(config.buffer_name))
+local bufnr = vim.fn.bufadd(config.buffer_name)
 
 if config.baleia_setup then
 	local ok, baleia_mod = pcall(require, "baleia")

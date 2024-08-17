@@ -1,0 +1,22 @@
+name: Typecheck
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  typecheck:
+    name: Typecheck Code
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Typecheck
+        uses: mrcjkb/lua-typecheck-action@v1

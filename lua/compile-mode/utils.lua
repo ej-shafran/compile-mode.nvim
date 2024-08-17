@@ -131,7 +131,7 @@ local function jump_to_file(filename, error, smods)
 		M.split_unless_open(filename, smods, 0)
 	end
 
-	local target_bufnr = vim.fn.bufnr(vim.fn.fnameescape(filename))
+	local target_bufnr = vim.fn.bufadd(filename)
 	local target_winnr = vim.fn.win_findbuf(target_bufnr)[1]
 
 	local last_row = vim.api.nvim_buf_line_count(target_bufnr)
@@ -263,10 +263,14 @@ function M.ask_to_save(smods)
 	return false
 end
 
+function M.is_windows()
+	return vim.uv.os_uname().sysname == "Windows_NT"
+end
+
 ---@param path string
 ---@return boolean is_absolute whether `path` is absolute or relative.
 function M.is_absolute(path)
-	if vim.uv.os_uname().sysname == "Windows_NT" then
+	if M.is_windows() then
 		return path:match("^%a:[/\\]") or path:match("^//") or path:match("^\\\\")
 	else
 		return path:sub(1, 1) == "/"
