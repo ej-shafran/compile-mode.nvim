@@ -109,7 +109,7 @@ end
 
 ---@param error_string string
 function M.compile_error(error_string)
-	M.compile({ args = "echo " .. error_string })
+	M.compile({ args = "echo " .. vim.fn.shellescape(error_string) })
 end
 
 ---@param error_strings string[]
