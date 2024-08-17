@@ -48,17 +48,17 @@ body:
     attributes:
       label: Neovim Version
       description: Include the result of `nvim -v` here.
+      render: markdown
     validations:
       required: true
-    render: markdown
 
   - type: textarea
     attributes:
       label: Plugin Version
       description: Specify what version of the plugin you are using.
+      render: markdown
     validations:
       required: true
-    render: markdown
 
   - type: textarea
     attributes:
