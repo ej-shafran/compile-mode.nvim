@@ -56,7 +56,8 @@ end
 ---UTILS
 
 function M.get_compilation_bufnr()
-	return vim.fn.bufnr(vim.fn.fnameescape("*compilation*"))
+	local config = require("compile-mode.config.internal")
+	return vim.fn.bufnr(vim.fn.fnameescape(config.buffer_name))
 end
 
 function M.get_output()
