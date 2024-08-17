@@ -62,7 +62,11 @@ end
 
 function M.get_output()
 	local bufnr = M.get_compilation_bufnr()
-	return vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+	local result = vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+	return vim.tbl_map(function(line)
+		local replaced = line:gsub("\r", "")
+		return replaced
+	end, result)
 end
 
 ---@param opts CompileModeOpts|nil
