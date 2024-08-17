@@ -13,8 +13,6 @@ end
 local assert = require("luassert")
 
 describe("`environment` option", function()
-	print(vim.o.shell)
-
 	local environment = { TESTING = "some value" }
 
 	before_each(function()
