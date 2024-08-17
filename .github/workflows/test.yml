@@ -48,16 +48,6 @@ jobs:
           echo 'C:\tools\neovim\nvim-win64\bin' | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         if: matrix.os == 'windows-latest'
 
-      - name: Print Neovim Version
-        run: nvim --version
-        if: matrix.os != 'windows-latest'
-
-      - name: Print Neovim Version (Windows)
-        run: |
-          echo $env:PATH
-          nvim.exe --version
-        if: matrix.os == 'windows-latest'
-
       - name: Run Tests
         run: |
           cd compile-mode.nvim
