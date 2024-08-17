@@ -1,0 +1,63 @@
+name: Bug report
+about: Create a report to help us improve
+title: ""
+labels: bug
+assignees: "ej-shafran"
+body:
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+    description: Please search to see if an issue already exists for the bug you encountered.
+    options:
+      - label: I have searched the existing issues
+        required: true
+  - type: textarea
+    attributes:
+      label: Describe the Bug
+      description: |
+        A clear and concise description of what the bug is.
+
+        Tip: you can drag-and-drop screenshots into this textarea.
+    validations:
+      required: false
+  - type: textarea
+    label: Steps to Reproduce
+    description: |
+      Steps to reproduce the behavior.
+
+      It might be helpful to create a reproducible config file for someone trying to see the bug - you can use [this file](https://github.com/ej-shafran/compile-mode.nvim/raw/main/spec/configs/repro.lua) as a starting off point.
+    placeholder: |
+      1. Open a buffer
+      2. Run ':SomeCommand...'
+      3. See error
+    validations:
+      required: false
+    render: markdown
+  - type: textarea
+    label: Expected Behavior
+    description: A clear and concise description of what you expected to happen.
+    validations:
+      required: false
+  - type: textarea
+    label: Neovim Version
+    description: Include the result of `nvim -v` here.
+    validations:
+      required: true
+    render: markdown
+  - type: textarea
+    label: Plugin Version
+    description: Specify what version of the plugin you are using.
+    validations:
+      required: true
+    render: markdown
+  - type: textarea
+    label: Configuration
+    description: Include your configuration for this plugin.
+    validations:
+      required: true
+  - type: textarea
+    label: Additional Context
+    description: Add any other context about the problem here, including any errors mentioned in `:checkhealth compile-mode`.
+    validations:
+      required: false
+    render: markdown
