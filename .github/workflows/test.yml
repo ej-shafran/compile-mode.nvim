@@ -45,7 +45,7 @@ jobs:
       - name: Install Neovim (Windows)
         run: |
           choco install neovim --version=${{ env.NVIM_VERSION }}
-          C:\tools\neovim\nvim-win64\bin\nvim.exe --version
+          echo "C:\tools\neovim\nvim-win64\bin" >> $GITHUB_PATH
         if: matrix.os == 'windows-latest'
 
       - name: Print Neovim Version
