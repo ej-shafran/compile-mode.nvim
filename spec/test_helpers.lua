@@ -137,7 +137,8 @@ function M.assert_parsed_error(error_string, expected)
 	---@type CompileModeError|nil
 	local actual = nil
 	for _, error in pairs(errors.error_list) do
-		if error.full_text == error_string then
+		local full_text = error.full_text:gsub("\r", "")
+		if full_text == error_string then
 			actual = error
 			break
 		end
@@ -147,7 +148,8 @@ function M.assert_parsed_error(error_string, expected)
 		return
 	end
 
-	assert.are.same(actual.full_text, error_string)
+	local full_text = actual.full_text:gsub("\r", "")
+	assert.are.same(full_text, error_string)
 	assert.are.same(actual.filename.value, expected.filename)
 	assert.are.same(actual.row.value, expected.row)
 	assert.are.same(actual.col.value, expected.col)
