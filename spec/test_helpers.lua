@@ -129,6 +129,7 @@ end
 
 ---@param expected CreateError
 function M.assert_parsed_error(error_string, expected)
+	print(vim.inspect(M.get_output()))
 	print(vim.inspect(errors.error_list))
 
 	---@type CompileModeError|nil
