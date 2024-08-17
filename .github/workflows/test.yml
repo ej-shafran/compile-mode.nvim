@@ -21,6 +21,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      NVIM_VERSION: 0.10.0
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -35,14 +38,16 @@ jobs:
 
       - name: Install Neovim
         uses: MunifTanjim/setup-neovim-action@v1
+        with:
+          tag: ${{ env.NVIM_VERSION }}
         if: matrix.os != 'windows-latest'
 
       - name: Install Neovim (Windows)
-        run: |
-          choco install neovim
-          refreshenv
-          nvim -v
+        run: "choco install neovim --version=${{ env.NVIM_VERSION }}"
         if: matrix.os == 'windows-latest'
+
+      - name: Print Neovim Version
+        run: nvim --version
 
       - name: Run Tests
         run: |
