@@ -182,7 +182,7 @@ local runjob = a.wrap(function(cmd, bufnr, param, callback)
 		env = config.environment,
 		clear_env = config.clear_environment,
 	})
-	log.debug("job_id = ", job_id)
+	log.fmt_debug("job_id = %d", job_id)
 
 	if job_id <= 0 then
 		vim.notify("Failed to start job with command " .. cmd, vim.log.levels.ERROR)
@@ -254,7 +254,7 @@ local runcommand = a.void(function(command, param)
 	log.debug("opening compilation buffer...")
 
 	local bufnr = utils.split_unless_open(config.buffer_name, param.smods, param.count)
-	log.debug("bufnr = ", bufnr)
+	log.fmt_debug("bufnr = %d", bufnr)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
 	utils.buf_set_opt(bufnr, "modifiable", true)
@@ -279,7 +279,7 @@ local runcommand = a.void(function(command, param)
 	utils.wait()
 	errors.highlight(bufnr)
 
-	log.debug("running command: `", string.gsub(command, "\\`", "\\`"), "`")
+	log.fmt_debug("running command: `%s`", string.gsub(command, "\\`", "\\`"))
 	local line_count, code, job_id = runjob(command, bufnr, param)
 	if job_id ~= vim.g.compile_job_id then
 		return
@@ -439,7 +439,7 @@ end)
 M.current_error = a.void(function(param)
 	log.debug("calling current_error()")
 
-	log.debug("line = ", error_cursor)
+	log.fmt_debug("line = %d", error_cursor)
 
 	local error = errors.error_list[error_cursor]
 	if error == nil then
@@ -489,7 +489,7 @@ M.goto_error = a.void(function(param)
 
 	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 	local error = errors.error_list[linenum]
-	log.debug("error = ", vim.inspect(error))
+	log.fmt_debug("error = %s", vim.inspect(error))
 
 	if not error then
 		vim.notify("No error here")
@@ -516,10 +516,10 @@ M.interrupt = a.void(function()
 	end
 
 	log.debug("interrupting compilation")
-	log.debug("vim.g.compile_job_id = ", vim.g.compile_job_id)
+	log.fmt_debug("vim.g.compile_job_id = %d", vim.g.compile_job_id)
 
 	local bufnr = vim.fn.bufadd(config.buffer_name)
-	log.debug("bufnr = ", bufnr)
+	log.fmt_debug("bufnr = %d", bufnr)
 
 	local interrupt_message = "Compilation interrupted"
 
