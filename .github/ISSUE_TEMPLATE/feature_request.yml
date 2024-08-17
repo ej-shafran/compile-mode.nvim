@@ -1,0 +1,23 @@
+name: Feature Request
+description: Request a feature you would like to see
+title: "[FEAT] <title>"
+labels: enhancement
+assignees: ej-shafran
+body:
+  - type: checkboxes
+    attributes:
+      label: Emacs Interop
+      description: Give the [Emacs package documentation](https://www.gnu.org/software/emacs/manual/html_node/emacs/Compilation-Mode.html) a quick look.
+      options:
+        - label: This feature exists in Emacs' compilation mode
+          required: false
+        - label: This feature would improve quality of life for all users
+          required: false
+
+  - type: textarea
+    attributes:
+      label: Feature Suggestion
+      description: What feature would you like to see?
+      render: markdown
+    validations:
+      required: true

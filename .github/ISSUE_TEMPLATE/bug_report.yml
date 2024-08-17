@@ -6,7 +6,7 @@ assignees: ej-shafran
 body:
   - type: checkboxes
     attributes:
-      label: Is there an existing issue for this?
+      label: Existing Issues
       description: Please search to see if an issue already exists for the bug you encountered.
       options:
         - label: I have searched the existing issues
@@ -14,7 +14,7 @@ body:
 
   - type: textarea
     attributes:
-      label: Describe the Bug
+      label: Describe the bug
       description: |
         A clear and concise description of what the bug is.
 
@@ -24,7 +24,7 @@ body:
 
   - type: textarea
     attributes:
-      label: Steps to Reproduce
+      label: Steps To Reproduce
       description: |
         Steps to reproduce the behavior.
 
