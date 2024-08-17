@@ -109,7 +109,9 @@ end
 
 ---@param error_string string
 function M.compile_error(error_string)
-	M.compile({ args = "echo " .. vim.fn.shellescape(error_string) })
+	-- ECHO in CMD is strange :(
+	local str = vim.o.shell:match("cmd.exe$") and error_string or vim.fn.shellescape(error_string)
+	M.compile({ args = "echo " .. str })
 end
 
 ---@param error_strings string[]
