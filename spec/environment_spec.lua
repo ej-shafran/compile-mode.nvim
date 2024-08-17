@@ -1,8 +1,9 @@
 local helpers = require("spec.test_helpers")
-local utils = require("compile-mode.utils")
 
 local function env_variable(var)
-	if utils.is_windows() then
+	if vim.o.shell:match("cmd.exe$") then
+		return "echo %" .. var .. "%"
+	elseif vim.o.shell:match("pwdh$") or vim.o.shell:match("powershell$") then
 		return "echo $Env:" .. var
 	else
 		return "echo $" .. var
