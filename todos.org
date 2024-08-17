@@ -175,10 +175,6 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Publish to LuaRocks
 
-* TODO Refactor errors logic
-
-  Use a Lua class.
-
 * DONE Add general health checks
   CLOSED: [2024-07-08 Mon 21:45]
 
