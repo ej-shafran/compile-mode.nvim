@@ -189,3 +189,11 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Add typecheck action
 
+* DONE Fix issue with bufnr on Windows
+  CLOSED: [2024-08-17 Sat 16:07]
+
+* DONE Fix `hidden_output` warning
+  CLOSED: [2024-08-17 Sat 16:07]
+
+* TODO Fix environment variable tests on Windows
+
