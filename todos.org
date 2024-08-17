@@ -198,3 +198,5 @@ This gets tacked on the end of the generated expressions.")
 * DONE Fix environment variable tests on Windows
   CLOSED: [2024-08-17 Sat 17:22]
 
+* TODO Add custom completion that uses Vim's `:!` completion
+
