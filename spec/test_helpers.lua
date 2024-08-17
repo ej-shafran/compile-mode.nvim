@@ -131,9 +131,6 @@ end
 
 ---@param expected CreateError
 function M.assert_parsed_error(error_string, expected)
-	print(vim.inspect(M.get_output()))
-	print(vim.inspect(errors.error_list))
-
 	---@type CompileModeError|nil
 	local actual = nil
 	for _, error in pairs(errors.error_list) do
