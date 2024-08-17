@@ -169,7 +169,8 @@ function M.assert_cursor_at_error(error_string)
 	---@type integer|nil
 	local line = nil
 	for i, error in pairs(errors.error_list) do
-		if error.full_text == error_string then
+		local full_text = error.full_text:gsub("\r", "")
+		if full_text == error_string then
 			line = i
 		end
 	end
