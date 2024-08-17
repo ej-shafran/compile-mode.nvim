@@ -394,12 +394,11 @@ M.compile = a.void(function(param)
 	log.debug("calling compile()")
 
 	param = param or {}
-
 	local command = param.args ~= "" and param.args
 		or utils.input({
 			prompt = "Compile command: ",
 			default = vim.g.compile_command or config.default_command,
-			completion = "shellcmd",
+			completion = "customlist,CompileInputComplete",
 		})
 
 	if command == nil then

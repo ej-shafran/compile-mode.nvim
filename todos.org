@@ -175,10 +175,6 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Publish to LuaRocks
 
-* TODO Refactor errors logic
-
-  Use a Lua class.
-
 * DONE Add general health checks
   CLOSED: [2024-07-08 Mon 21:45]
 
@@ -187,7 +183,8 @@ This gets tacked on the end of the generated expressions.")
 
   Don't use `print`; do something neater and cleaner.
 
-* TODO Add typecheck action
+* DONE Add typecheck action
+  CLOSED: [2024-08-18 Sun 00:50]
 
 * DONE Fix issue with bufnr on Windows
   CLOSED: [2024-08-17 Sat 16:07]
@@ -197,4 +194,7 @@ This gets tacked on the end of the generated expressions.")
 
 * DONE Fix environment variable tests on Windows
   CLOSED: [2024-08-17 Sat 17:22]
+
+* DONE Add custom completion that uses Vim's `:!` completion
+  CLOSED: [2024-08-18 Sun 00:49]
 

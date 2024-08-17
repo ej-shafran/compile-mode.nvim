@@ -1,2 +1,3 @@
 *.orig
 doc/tags
+.repro/
