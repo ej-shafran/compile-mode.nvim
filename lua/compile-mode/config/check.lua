@@ -89,6 +89,7 @@ function check.validate(cfg)
 		default_command = { cfg.default_command, "string" },
 		ask_about_save = { cfg.ask_about_save, "boolean" },
 		ask_to_interrupt = { cfg.ask_to_interrupt, "boolean" },
+		use_diagnostics = { cfg.use_diagnostics, "boolean" },
 		recompile_no_fail = { cfg.recompile_no_fail, "boolean" },
 		auto_jump_to_first_error = { cfg.auto_jump_to_first_error, "boolean" },
 		environment = { cfg.environment, "table", true },

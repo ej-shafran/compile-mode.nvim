@@ -17,6 +17,9 @@ local default_config = {
 	---@type string[]
 	error_ignore_file_list = {},
 
+	---@type boolean
+	use_diagnostics = false,
+
 	---@type string[]
 	hidden_output = {},
 
