@@ -10,7 +10,7 @@ Fork the repository and clone it.
 
 ### Makefile
 
-The Makefile has commands for `test`, `fmt`, and `lint`. These commands do exactly what you would expect.
+The Makefile has commands for `test` and `fmt`. These commands do exactly what you would expect.
 
 ### Using your local changes in Neovim
 
