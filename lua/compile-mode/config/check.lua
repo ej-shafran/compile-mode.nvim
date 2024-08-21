@@ -107,14 +107,16 @@ end
 ---@param default_tbl table
 ---@return string[]
 function check.unrecognized_keys(tbl, default_tbl)
+	local skipped_keys = { "error_regexp_table", "environment" }
+
 	local keys = {}
 	for k, _ in pairs(tbl) do
-		if k ~= "error_regexp_table" then
+		if not vim.list_contains(skipped_keys, k) then
 			keys[k] = true
 		end
 	end
 	for k, _ in pairs(default_tbl) do
-		if k ~= "error_regexp_table" then
+		if not vim.list_contains(skipped_keys, k) then
 			keys[k] = false
 		end
 	end
