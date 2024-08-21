@@ -8,6 +8,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [4.1.1] - 2024-08-22
+
+### Fixed
+
+- Incorrect warnings about the `environment` configuration option.
+
 ## [4.1.0] - 2024-08-18
 
 ### Added
@@ -333,6 +339,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[4.1.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.0.0...v4.0.1
 [4.0.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v3.0.1...v4.0.0
