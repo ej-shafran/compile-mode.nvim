@@ -45,12 +45,7 @@ local user_config = type(vim.g.compile_mode) == "function" and vim.g.compile_mod
 
 local health_info = {
 	health_info = {
-		unrecognized_keys = check.unrecognized_keys(
-			user_config or {},
-			vim.tbl_extend("force", default_config, {
-				environment = {},
-			})
-		),
+		unrecognized_keys = check.unrecognized_keys(user_config or {}, default_config),
 		no_user_config = user_config == nil,
 	},
 }
