@@ -566,4 +566,30 @@ M._gf = goto_file(false)
 
 M._CTRL_W_f = goto_file(true)
 
+local in_next_error_mode = false
+
+function M.next_error_follow()
+	in_next_error_mode = not in_next_error_mode
+end
+
+function M._follow_cursor(bufnr)
+	return function()
+		if not in_next_error_mode then
+			return
+		end
+
+		if vim.api.nvim_get_current_buf() ~= bufnr then
+			return
+		end
+
+		local cursor_row = unpack(vim.api.nvim_win_get_cursor(0))
+		local error = errors.error_list[cursor_row]
+		if not error then
+			return
+		end
+
+		print(error.filename.value)
+	end
+end
+
 return M

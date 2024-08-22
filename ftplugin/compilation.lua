@@ -69,3 +69,11 @@ set("n", "<C-g>]", "<cmd>CompileNextFile<cr>")
 set("n", "<C-g>[", "<cmd>CompilePrevFile<cr>")
 set("n", "gf", compile_mode._gf)
 set("n", "<C-w>f", compile_mode._CTRL_W_f)
+set("n", "<C-g>f", "<cmd>NextErrorFollow<cr>")
+
+vim.api.nvim_create_autocmd("CursorMoved", {
+	desc = "Next Error Follow",
+	group = vim.api.nvim_create_augroup("compile-mode.nvim", {}),
+	buffer = bufnr,
+	callback = compile_mode._follow_cursor(bufnr),
+})
