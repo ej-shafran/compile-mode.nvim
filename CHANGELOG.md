@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [4.2.0] - 2024-08-23
+
 ### Added
 
 - The `:NextErrorFollow` command, which previews the error under the cursor in the compilation buffer in another window.
@@ -344,6 +346,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[4.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.1.1...v4.2.0
 [4.1.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.0.1...v4.1.0
 [4.0.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.0.0...v4.0.1
