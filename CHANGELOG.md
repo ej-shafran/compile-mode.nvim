@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `:NextErrorFollow` command, which previews the error under the cursor in the compilation buffer in another window.
+- The ability to use `:silent` on commands which haven't been able to use it so far.
+
 ## [4.1.1] - 2024-08-22
 
 ### Fixed

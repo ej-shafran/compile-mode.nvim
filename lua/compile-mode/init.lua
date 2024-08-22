@@ -42,6 +42,9 @@ vim.g.compilation_directory = nil
 ---@type table<integer, string>
 local dir_changes = {}
 
+---Whether or not to preview the error under the cursor.
+local in_next_error_mode = false
+
 --- UTILITY FUNCTIONS
 
 ---@param bufnr integer
@@ -229,6 +232,9 @@ local exit_code = {
 ---@type fun(command: string, param: CommandParam)
 local runcommand = a.void(function(command, param)
 	local config = require("compile-mode.config.internal")
+
+	log.debug("calling runcommand()")
+
 	if config.ask_about_save and utils.ask_to_save(param.smods) then
 		return
 	end
@@ -237,7 +243,6 @@ local runcommand = a.void(function(command, param)
 	errors.error_list = {}
 	dir_changes = {}
 
-	log.debug("calling runcommand()")
 	if vim.g.compile_job_id then
 		if config.ask_to_interrupt then
 			local response = vim.fn.confirm("Interrupt running process?", "&Yes\n&No")
@@ -329,8 +334,12 @@ end)
 ---@param different_file boolean whether to only match errors that occur in different files from the current error
 ---@return fun(param: CommandParam?) command an async callback that performs the created action
 local function act_from_current_error(action, direction, different_file)
+	local name = (action == "jump" and "" or "move_to_") .. direction .. "_" .. (different_file and "file" or "error")
 	return a.void(function(param)
+		log.debug("calling " .. name .. "()")
+
 		param = param or {}
+
 		local count = param.count or 1
 		local current_error = errors.error_list[error_cursor]
 
@@ -364,8 +373,11 @@ local function act_from_current_error(action, direction, different_file)
 		end
 
 		if not error_line then
-			local message = direction == "next" and "past last" or "back before first"
-			vim.notify("Moved " .. message .. " error")
+			if not param.smods or not param.smods.silent then
+				local message = direction == "next" and "past last" or "back before first"
+				vim.notify("Moved " .. message .. " error")
+			end
+
 			return
 		end
 
@@ -438,11 +450,16 @@ end)
 M.current_error = a.void(function(param)
 	log.debug("calling current_error()")
 
+	param = param or {}
+
 	log.fmt_debug("line = %d", error_cursor)
 
 	local error = errors.error_list[error_cursor]
-	if error == nil then
-		vim.notify("No error currently loaded", vim.log.levels.ERROR)
+	if not error then
+		if not param.smods or not param.smods.silent then
+			vim.notify("No error currently loaded")
+		end
+
 		return
 	end
 
@@ -478,6 +495,12 @@ M.add_to_qflist = a.void(function()
 	vim.api.nvim_exec_autocmds("QuickFixCmdPost", {})
 end)
 
+---Toggle "Next Error Follow", which causes the error under the cursor to be previewed whenever you move in the compilation buffer.
+function M.next_error_follow()
+	in_next_error_mode = not in_next_error_mode
+	M._follow_cursor()
+end
+
 --- COMPILATION BUFFER COMMANDS
 
 ---Go to the error on the current line
@@ -486,12 +509,17 @@ end)
 M.goto_error = a.void(function(param)
 	log.debug("calling goto_error()")
 
+	param = param or {}
+
 	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 	local error = errors.error_list[linenum]
 	log.fmt_debug("error = %s", vim.inspect(error))
 
 	if not error then
-		vim.notify("No error here")
+		if not param.smods or not param.smods.silent then
+			vim.notify("No error here")
+		end
+
 		return
 	end
 
@@ -565,5 +593,63 @@ M.move_to_prev_file = act_from_current_error("move", "prev", true)
 M._gf = goto_file(false)
 
 M._CTRL_W_f = goto_file(true)
+
+function M._follow_cursor()
+	local config = require("compile-mode.config.internal")
+	local compilation_bufnr = vim.fn.bufadd(config.buffer_name)
+
+	if not in_next_error_mode then
+		return
+	end
+
+	if vim.api.nvim_get_current_buf() ~= compilation_bufnr then
+		return
+	end
+
+	local cursor_row = unpack(vim.api.nvim_win_get_cursor(0))
+	local error = errors.error_list[cursor_row]
+	if not error then
+		return
+	end
+
+	local preview_win = nil
+	local winnrs = vim.api.nvim_list_wins()
+	if #winnrs == 1 then
+		-- If there are no other windows, split a new one for the preview
+		preview_win = vim.api.nvim_open_win(vim.api.nvim_create_buf(true, true), false, { split = "below" })
+	else
+		-- If there is already a window for this file, use it
+		preview_win = vim.iter(winnrs):find(function(winnr)
+			local fbuf = vim.fn.bufadd(error.filename.value)
+			local winbuf = vim.api.nvim_win_get_buf(winnr)
+			return fbuf == winbuf
+		end)
+	end
+	-- If we still don't have a preview window,
+	-- use the first existing window that isn't the first compilation window
+	if not preview_win then
+		local past_first_window = false
+		preview_win = vim.iter(winnrs):find(function(winnr)
+			if past_first_window then
+				return true
+			end
+
+			local winbuf = vim.api.nvim_win_get_buf(winnr)
+			if winbuf ~= compilation_bufnr then
+				return true
+			end
+
+			past_first_window = true
+			return false
+		end)
+	end
+
+	vim.schedule(function()
+		vim.api.nvim_win_call(preview_win, function()
+			utils.jump_to_error(error, vim.g.compilation_directory or vim.fn.getcwd(), {})
+		end)
+		vim.notify("Current locus from " .. config.buffer_name)
+	end)
+end
 
 return M

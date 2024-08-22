@@ -30,6 +30,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - prev_error()                                   |compile-mode.prev_error()|
   - send_to_qflist()                           |compile-mode.send_to_qflist()|
   - add_to_qflist()                             |compile-mode.add_to_qflist()|
+  - next_error_follow()                     |compile-mode.next_error_follow()|
   - goto_error()                                   |compile-mode.goto_error()|
   - move_to_next_error()                                |move_to_next_error()|
   - move_to_next_file()                                  |move_to_next_file()|
@@ -43,6 +44,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :NextError                                                    |:NextError|
   - :PrevError                                                    |:PrevError|
   - :QuickfixErrors                                          |:QuickfixErrors|
+  - :NextErrorFollow                                        |:NextErrorFollow|
   - :CompileGotoError                                      |:CompileGotoError|
   - :CompileNextError                                      |:CompileNextError|
   - :CompileNextFile                                        |:CompileNextFile|
@@ -146,6 +148,8 @@ Additional keymaps within the compilation buffer are:
 
 - `q` is mapped to `<CMD>q<CR>` for easy closing of the compilation buffer.
 - `<C-r>` is mapped to `<CMD>Recompile<CR>` for quick recompilation.
+- `<C-g>f` is mapped to `<CMD>NextErrorFollow<CR>` to preview the error under
+  the cursor.
 - `gf` is mapped to a custom function that behaves similarly to how |gf| does
   regularly, but respects "Entering directory" and "Leaving directory"
   messages from `make` to tell what directory a file might be in.
@@ -364,6 +368,9 @@ add_to_qflist()                                 *compile-mode.add_to_qflist()*
     Loads all compilation errors into the quickfix list, appending onto the
     existing list.
 
+next_error_follow()                         *compile-mode.next_error_follow()*
+    Toggles "Next Error Follow" mode. See |:NextErrorFollow|.
+
 goto_error({param})                                *compile-mode.goto_error()*
     Jumps to the error under the cursor. See |:CompileGotoError|.
 
@@ -469,6 +476,7 @@ interrupt()                                         *compile-mode.interrupt()*
 
     - |:vert|
     - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
+    - |:silent|
     - |:hide|
     - |:tab|
 
@@ -488,6 +496,7 @@ interrupt()                                         *compile-mode.interrupt()*
 
     - |:vert|
     - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
+    - |:silent|
     - |:hide|
     - |:tab|
 
@@ -508,6 +517,7 @@ interrupt()                                         *compile-mode.interrupt()*
 
     - |:vert|
     - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
+    - |:silent|
     - |:hide|
     - |:tab|
 
@@ -521,6 +531,13 @@ interrupt()                                         *compile-mode.interrupt()*
 
     Mapped to `<C-q>` within the compilation buffer.
 
+:NextErrorFollow                                            *:NextErrorFollow*
+    Toggles "Next Error Follow" mode, which causes the error under the cursor
+    to be previewed in another window whenever you move a line in the
+    compilation buffer.
+
+    Mapped to `<C-g>f` within the compilation buffer.
+
 :CompileGotoError                                          *:CompileGotoError*
     Only available within the compilation buffer itself.
 
@@ -531,6 +548,7 @@ interrupt()                                         *compile-mode.interrupt()*
 
     - |:vert|
     - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
+    - |:silent|
     - |:hide|
     - |:tab|
 
@@ -548,6 +566,8 @@ interrupt()                                         *compile-mode.interrupt()*
 
     If passed a count, moves N errors forwards instead.
 
+    You can run this command using |:silent| to disable any messages.
+
     Mapped to `<C-g>n` within the compilation buffer.
 
 :CompileNextFile                                            *:CompileNextFile*
@@ -560,6 +580,8 @@ interrupt()                                         *compile-mode.interrupt()*
 
     If passed a count, moves N files forwards instead.
 
+    You can run this command using |:silent| to disable any messages.
+
     Mapped to `<C-g>]` within the compilation buffer.
 
 :CompilePrevError                                          *:CompilePrevError*
@@ -570,6 +592,8 @@ interrupt()                                         *compile-mode.interrupt()*
     not jump to the error's actual file.
 
     If passed a count, moves N errors backwards instead.
+
+    You can run this command using |:silent| to disable any messages.
 
     Mapped to `<C-g>p` within the compilation buffer.
 
@@ -582,6 +606,8 @@ interrupt()                                         *compile-mode.interrupt()*
     actual file.
 
     If passed a count, moves N files backwards instead.
+
+    You can run this command using |:silent| to disable any messages.
 
     Mapped to `<C-g>[` within the compilation buffer.
 
