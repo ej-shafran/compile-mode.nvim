@@ -232,6 +232,9 @@ local exit_code = {
 ---@type fun(command: string, param: CommandParam)
 local runcommand = a.void(function(command, param)
 	local config = require("compile-mode.config.internal")
+
+	log.debug("calling runcommand()")
+
 	if config.ask_about_save and utils.ask_to_save(param.smods) then
 		return
 	end
@@ -240,7 +243,6 @@ local runcommand = a.void(function(command, param)
 	errors.error_list = {}
 	dir_changes = {}
 
-	log.debug("calling runcommand()")
 	if vim.g.compile_job_id then
 		if config.ask_to_interrupt then
 			local response = vim.fn.confirm("Interrupt running process?", "&Yes\n&No")
