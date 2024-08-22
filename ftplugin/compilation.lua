@@ -18,12 +18,30 @@ end
 
 local matchadd = vim.fn.matchadd
 
+---@param cmd string
+---@param expr string|function
+---@param opts vim.api.keyset.user_command|nil
 local function command(cmd, expr, opts)
 	vim.api.nvim_buf_create_user_command(bufnr, cmd, expr, opts or {})
 end
 
+---@param mode string
+---@param key string
+---@param expr string|function
+---@param opts vim.keymap.set.Opts|nil
 local function set(mode, key, expr, opts)
 	vim.keymap.set(mode, key, expr, vim.tbl_extend("force", { silent = true }, opts or {}, { buffer = bufnr }))
+end
+
+---@param event string|string[]
+---@param opts vim.api.keyset.create_autocmd
+local function autocmd(event, opts)
+	vim.api.nvim_create_autocmd(
+		event,
+		vim.tbl_extend("force", {
+			group = vim.api.nvim_create_augroup("compile-mode.nvim", {}),
+		}, opts)
+	)
 end
 
 matchadd("CompileModeInfo", "^Compilation \\zsfinished\\ze.*")
@@ -71,9 +89,8 @@ set("n", "gf", compile_mode._gf)
 set("n", "<C-w>f", compile_mode._CTRL_W_f)
 set("n", "<C-g>f", "<cmd>NextErrorFollow<cr>")
 
-vim.api.nvim_create_autocmd("CursorMoved", {
+autocmd("CursorMoved", {
 	desc = "Next Error Follow",
-	group = vim.api.nvim_create_augroup("compile-mode.nvim", {}),
 	buffer = bufnr,
 	callback = compile_mode._follow_cursor,
 })
