@@ -629,6 +629,7 @@ function M._follow_cursor()
 		vim.api.nvim_win_call(preview_win, function()
 			utils.jump_to_error(error, vim.g.compilation_directory or vim.fn.getcwd(), {})
 		end)
+		vim.notify("Current locus from " .. config.buffer_name)
 	end)
 end
 
