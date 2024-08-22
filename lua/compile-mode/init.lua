@@ -373,8 +373,11 @@ local function act_from_current_error(action, direction, different_file)
 		end
 
 		if not error_line then
-			local message = direction == "next" and "past last" or "back before first"
-			vim.notify("Moved " .. message .. " error")
+			if not param.smods or not param.smods.silent then
+				local message = direction == "next" and "past last" or "back before first"
+				vim.notify("Moved " .. message .. " error")
+			end
+
 			return
 		end
 
@@ -447,11 +450,16 @@ end)
 M.current_error = a.void(function(param)
 	log.debug("calling current_error()")
 
+	param = param or {}
+
 	log.fmt_debug("line = %d", error_cursor)
 
 	local error = errors.error_list[error_cursor]
-	if error == nil then
-		vim.notify("No error currently loaded", vim.log.levels.ERROR)
+	if not error then
+		if not param.smods or not param.smods.silent then
+			vim.notify("No error currently loaded")
+		end
+
 		return
 	end
 
@@ -501,12 +509,17 @@ end
 M.goto_error = a.void(function(param)
 	log.debug("calling goto_error()")
 
+	param = param or {}
+
 	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 	local error = errors.error_list[linenum]
 	log.fmt_debug("error = %s", vim.inspect(error))
 
 	if not error then
-		vim.notify("No error here")
+		if not param.smods or not param.smods.silent then
+			vim.notify("No error here")
+		end
+
 		return
 	end
 
