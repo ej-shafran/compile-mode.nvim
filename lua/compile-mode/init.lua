@@ -334,7 +334,7 @@ end)
 ---@param different_file boolean whether to only match errors that occur in different files from the current error
 ---@return fun(param: CommandParam?) command an async callback that performs the created action
 local function act_from_current_error(action, direction, different_file)
-	local name = action .. "_to_" .. direction .. "_" .. (different_file and "file" or "error")
+	local name = (action == "jump" and "" or "move_to_") .. direction .. "_" .. (different_file and "file" or "error")
 	return a.void(function(param)
 		log.debug("calling " .. name .. "()")
 
