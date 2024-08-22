@@ -75,5 +75,5 @@ vim.api.nvim_create_autocmd("CursorMoved", {
 	desc = "Next Error Follow",
 	group = vim.api.nvim_create_augroup("compile-mode.nvim", {}),
 	buffer = bufnr,
-	callback = compile_mode._follow_cursor(bufnr),
+	callback = compile_mode._follow_cursor,
 })

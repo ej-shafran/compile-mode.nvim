@@ -42,6 +42,9 @@ vim.g.compilation_directory = nil
 ---@type table<integer, string>
 local dir_changes = {}
 
+---Whether or not to preview the error under the cursor.
+local in_next_error_mode = false
+
 --- UTILITY FUNCTIONS
 
 ---@param bufnr integer
@@ -478,6 +481,12 @@ M.add_to_qflist = a.void(function()
 	vim.api.nvim_exec_autocmds("QuickFixCmdPost", {})
 end)
 
+---Toggle "Next Error Follow", which causes the error under the cursor to be previewed whenever you move in the compilation buffer.
+function M.next_error_follow()
+	in_next_error_mode = not in_next_error_mode
+	M._follow_cursor()
+end
+
 --- COMPILATION BUFFER COMMANDS
 
 ---Go to the error on the current line
@@ -566,30 +575,61 @@ M._gf = goto_file(false)
 
 M._CTRL_W_f = goto_file(true)
 
-local in_next_error_mode = false
+function M._follow_cursor()
+	local config = require("compile-mode.config.internal")
+	local compilation_bufnr = vim.fn.bufadd(config.buffer_name)
 
-function M.next_error_follow()
-	in_next_error_mode = not in_next_error_mode
-end
-
-function M._follow_cursor(bufnr)
-	return function()
-		if not in_next_error_mode then
-			return
-		end
-
-		if vim.api.nvim_get_current_buf() ~= bufnr then
-			return
-		end
-
-		local cursor_row = unpack(vim.api.nvim_win_get_cursor(0))
-		local error = errors.error_list[cursor_row]
-		if not error then
-			return
-		end
-
-		print(error.filename.value)
+	if not in_next_error_mode then
+		return
 	end
+
+	if vim.api.nvim_get_current_buf() ~= compilation_bufnr then
+		return
+	end
+
+	local cursor_row = unpack(vim.api.nvim_win_get_cursor(0))
+	local error = errors.error_list[cursor_row]
+	if not error then
+		return
+	end
+
+	local preview_win = nil
+	local winnrs = vim.api.nvim_list_wins()
+	if #winnrs == 1 then
+		-- If there are no other windows, split a new one for the preview
+		preview_win = vim.api.nvim_open_win(vim.api.nvim_create_buf(true, true), false, { split = "below" })
+	else
+		-- If there is already a window for this file, use it
+		preview_win = vim.iter(winnrs):find(function(winnr)
+			local fbuf = vim.fn.bufadd(error.filename.value)
+			local winbuf = vim.api.nvim_win_get_buf(winnr)
+			return fbuf == winbuf
+		end)
+	end
+	-- If we still don't have a preview window,
+	-- use the first existing window that isn't the first compilation window
+	if not preview_win then
+		local past_first_window = false
+		preview_win = vim.iter(winnrs):find(function(winnr)
+			if past_first_window then
+				return true
+			end
+
+			local winbuf = vim.api.nvim_win_get_buf(winnr)
+			if winbuf ~= compilation_bufnr then
+				return true
+			end
+
+			past_first_window = true
+			return false
+		end)
+	end
+
+	vim.schedule(function()
+		vim.api.nvim_win_call(preview_win, function()
+			utils.jump_to_error(error, vim.g.compilation_directory or vim.fn.getcwd(), {})
+		end)
+	end)
 end
 
 return M
