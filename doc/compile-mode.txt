@@ -44,7 +44,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :NextError                                                    |:NextError|
   - :PrevError                                                    |:PrevError|
   - :QuickfixErrors                                          |:QuickfixErrors|
-  - NextErrorFollow                                         |:NextErrorFollow|
+  - :NextErrorFollow                                        |:NextErrorFollow|
   - :CompileGotoError                                      |:CompileGotoError|
   - :CompileNextError                                      |:CompileNextError|
   - :CompileNextFile                                        |:CompileNextFile|
