@@ -200,3 +200,7 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Fix issues with tab splitting
 
+* TODO Switch away from compilation window like in Emacs mode
+
+* TODO Add `NextError` and `PrevError` error threshold
+
