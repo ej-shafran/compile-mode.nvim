@@ -155,7 +155,8 @@ This gets tacked on the end of the generated expressions.")
   CLOSED: [2024-08-23 Fri 02:07]
   Mode that "preview" the locus of errors in a split next to the compilation window.
 
-* TODO Add diagnostic windows
+* DONE Add diagnostic windows
+  CLOSED: [2024-08-23 Fri 12:26]
   As configuration option, probably...
 
 * DONE Refactor configuration logic
