@@ -337,6 +337,8 @@ end)
 local function act_from_current_error(action, direction, different_file)
 	local name = (action == "jump" and "" or "move_to_") .. direction .. "_" .. (different_file and "file" or "error")
 	return a.void(function(param)
+		local config = require("compile-mode.config.internal")
+
 		log.debug("calling " .. name .. "()")
 
 		param = param or {}
@@ -352,6 +354,9 @@ local function act_from_current_error(action, direction, different_file)
 		for i = direction == "prev" and #lines or 1, direction == "prev" and 1 or #lines, direction == "prev" and -1 or 1 do
 			local line = lines[i]
 			local error = errors.error_list[line]
+
+			local fits_threshold_constraint = error.level >= config.error_threshold
+
 			local fits_file_constraint = true
 			if different_file then
 				fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
@@ -364,7 +369,7 @@ local function act_from_current_error(action, direction, different_file)
 				fits_line_constraint = line > error_cursor and (not error_line or error_line > line)
 			end
 
-			if fits_file_constraint and fits_line_constraint then
+			if fits_threshold_constraint and fits_file_constraint and fits_line_constraint then
 				errors_found = errors_found + 1
 				if errors_found == count then
 					error_line = line
