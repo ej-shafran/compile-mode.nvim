@@ -20,9 +20,6 @@ local default_config = {
 	---@type CompileModeLevel
 	error_threshold = compile_mode.level.WARNING,
 
-	---@type boolean
-	use_diagnostics = false,
-
 	---@type string[]
 	hidden_output = {},
 
