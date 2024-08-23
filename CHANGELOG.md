@@ -13,6 +13,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 - The `use_diagnostics` configuration option, which will cause Neovim diagnostics to be used instead of opening the compilation buffer to show errors.
 - **(Breaking)** The `error_threshold` configuration option, which determines what level of errors are considered when jumping/moving between errors (i.e. using `:NextError`, `:CompileNextError`, etc.). This defaults to `compile_mode.level.WARNING`, which means that `INFO` level errors are no longer considered by default. You can set this option to `compile_mode.level.INFO` to revert to the old behavior.
 
+### Changed
+
+- **(Breaking)** The behavior when opening a window for compilation; instead of staying in the compilation buffer's window, compiling will now remain in the window where it originally happened. (You should note this in case you have an `autocmd` that does this behavior manually - it will now have the opposite effect in some cases, so you will likely want to remove it).
+
 ## [4.2.0] - 2024-08-23
 
 ### Added
