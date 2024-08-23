@@ -1,5 +1,6 @@
 local config = {}
 
+local compile_mode = require("compile-mode")
 local check = require("compile-mode.config.check")
 local log = require("compile-mode.log")
 
@@ -16,6 +17,8 @@ local default_config = {
 	error_regexp_table = {},
 	---@type string[]
 	error_ignore_file_list = {},
+	---@type CompileModeLevel
+	error_threshold = compile_mode.level.WARNING,
 
 	---@type boolean
 	use_diagnostics = false,

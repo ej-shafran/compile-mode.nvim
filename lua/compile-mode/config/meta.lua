@@ -44,6 +44,9 @@
 ---
 ---For more info, run `:h compile-mode.use_diagnostics`
 ---@field use_diagnostics?          boolean
+---
+---For more info, run `:h compile-mode.error_threshold`
+---@field error_threshold?          CompileModeLevel
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode
