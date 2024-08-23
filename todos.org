@@ -208,6 +208,7 @@ This gets tacked on the end of the generated expressions.")
 * DONE Add `NextError` and `PrevError` error threshold
   CLOSED: [2024-08-23 Fri 12:47]
 
-* TODO Move all logic to filetype logic
+* DONE Move all logic to filetype logic
+  CLOSED: [2024-08-23 Fri 16:41]
   Such that we enable editing a file with the =compilation= filetype and having the same functionality as the rest of compile-mode.
 
