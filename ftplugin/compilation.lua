@@ -1,7 +1,9 @@
 local compile_mode = require("compile-mode")
+local errors = require("compile-mode.errors")
 local config = require("compile-mode.config.internal")
+local utils = require("compile-mode.utils")
 
-local bufnr = vim.fn.bufadd(config.buffer_name)
+local bufnr = vim.api.nvim_get_current_buf()
 
 if config.baleia_setup then
 	local ok, baleia_mod = pcall(require, "baleia")
@@ -39,10 +41,14 @@ local function autocmd(event, opts)
 	vim.api.nvim_create_autocmd(
 		event,
 		vim.tbl_extend("force", {
-			group = vim.api.nvim_create_augroup("compile-mode.nvim", {}),
+			group = vim.api.nvim_create_augroup("compile-mode.nvim", { clear = false }),
 		}, opts)
 	)
 end
+
+vim.g.compilation_buffer = bufnr
+
+compile_mode._parse_errors(bufnr)
 
 matchadd("CompileModeInfo", "^Compilation \\zsfinished\\ze.*")
 matchadd(
@@ -93,4 +99,12 @@ autocmd("CursorMoved", {
 	desc = "Next Error Follow",
 	buffer = bufnr,
 	callback = compile_mode._follow_cursor,
+})
+
+autocmd({ "TextChanged", "TextChangedI" }, {
+	desc = "Error Parsing",
+	buffer = bufnr,
+	callback = function ()
+		compile_mode._parse_errors(bufnr)
+	end,
 })

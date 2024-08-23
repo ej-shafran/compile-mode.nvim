@@ -12,6 +12,11 @@ function M.add_highlight(bufnr, hlname, linenum, range)
 	vim.api.nvim_buf_add_highlight(bufnr, compile_mode_ns, hlname, linenum - 1, range.start - 1, range.end_)
 end
 
+---@param bufnr integer
+function M.clear_highlights(bufnr)
+	vim.api.nvim_buf_clear_namespace(bufnr, compile_mode_ns, 0, -1)
+end
+
 ---@param input string
 ---@param pattern string
 ---@return (CompileModeRange|nil)[]
@@ -62,12 +67,17 @@ end
 ---If `fname` has a window open, do nothing.
 ---Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
 ---
----@param fname string
+---@param opts { fname: string } | { bufnr: integer }
 ---@param smods SMods
 ---@param count integer
 ---@return integer bufnr the identifier of the buffer for `fname`
-function M.split_unless_open(fname, smods, count)
-	local bufnr = vim.fn.bufadd(fname)
+function M.split_unless_open(opts, smods, count)
+	local bufnr
+	if opts.bufnr then
+		bufnr = opts.bufnr
+	else
+		bufnr = vim.fn.bufadd(opts.fname)
+	end
 
 	if smods.hide then
 		return bufnr
@@ -105,10 +115,20 @@ end
 local function jump_to_file(filename, error, smods)
 	local config = require("compile-mode.config.internal")
 
-	local compilation_bufnr = M.split_unless_open(config.buffer_name, smods, 0)
-	local compilation_winnr = vim.fn.win_findbuf(compilation_bufnr)[1]
+	local compilation_buffer = vim.g.compilation_buffer
+	if config.use_diagnostics then
+		compilation_buffer = compilation_buffer or vim.fn.bufadd(config.buffer_name)
+		vim.iter(vim.fn.win_findbuf(compilation_buffer)):each(function(winnr)
+			vim.api.nvim_win_call(winnr, function()
+				vim.cmd("wincmd q")
+			end)
+		end)
+	else
+		compilation_buffer = M.split_unless_open({ bufnr = compilation_buffer, fname = config.buffer_name }, smods, 0)
+		local compilation_winnr = vim.fn.win_findbuf(compilation_buffer)[1]
 
-	vim.api.nvim_win_set_cursor(compilation_winnr, { error.linenum, 0 })
+		vim.api.nvim_win_set_cursor(compilation_winnr, { error.linenum, 0 })
+	end
 
 	local row = error.row and error.row.value or 1
 	local end_row = error.end_row and error.end_row.value
@@ -122,13 +142,13 @@ local function jump_to_file(filename, error, smods)
 		end_col = 0
 	end
 
-	if vim.api.nvim_get_current_buf() ~= compilation_bufnr then
+	if vim.api.nvim_get_current_buf() ~= compilation_buffer then
 		vim.cmd.e(filename)
 	elseif #vim.api.nvim_list_wins() > 1 then
 		vim.cmd("wincmd p")
 		vim.cmd.e(filename)
 	else
-		M.split_unless_open(filename, smods, 0)
+		M.split_unless_open({ fname = filename }, smods, 0)
 	end
 
 	local target_bufnr = vim.fn.bufadd(filename)
@@ -160,6 +180,18 @@ local function jump_to_file(filename, error, smods)
 			vim.cmd.normal(cmd)
 		end)
 	end
+
+	if config.use_diagnostics then
+		local errors = require("compile-mode.errors")
+		local diagnostics = errors.todiagnostic(target_bufnr, errors.error_list)
+		vim.diagnostic.set(compile_mode_ns, target_bufnr, diagnostics, {})
+		M.delay(100)
+		vim.diagnostic.open_float()
+	end
+end
+
+function M.clear_diagnostics()
+	vim.diagnostic.reset(compile_mode_ns)
 end
 
 ---@type fun(error: CompileModeError, current_dir: string, smods: SMods)

@@ -18,6 +18,8 @@ Table of Contents                             *compile-mode-table-of-contents*
   - hidden_output                                 |compile-mode.hidden_output|
   - recompile_no_fail                         |compile-mode.recompile_no_fail|
   - auto_jump_to_first_error           |compile-mode.auto_jump_to_first_error|
+  - error_threshold                             |compile-mode.error_threshold|
+  - use_diagnostics                             |compile-mode.use_diagnostics|
   - ask_about_save                               |compile-mode.ask_about_save|
   - ask_to_interrupt                           |compile-mode.ask_to_interrupt|
   - environment                                     |compile-mode.environment|
@@ -87,9 +89,11 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
 >lua
     return {
       "ej-shafran/compile-mode.nvim",
-      branch = "latest",
-      -- or a specific version:
-      -- tag = "v4.0.0"
+      tag = "v5.*",
+      -- you can just use the latest version:
+      -- branch = "latest",
+      -- or the most up-to-date updates:
+      -- branch = "nightly",
       dependencies = {
 	  "nvim-lua/plenary.nvim",
 	  -- if you want to enable coloring of ANSI escape codes in
@@ -275,6 +279,12 @@ recompile_no_fail                             *compile-mode.recompile_no_fail*
 auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
     When `true`, compiling jumps to the first error as soon as it is
     available.
+
+error_threshold                                 *compile-mode.error_threshold*
+    An error type (`INFO`, `WARNING`, or `ERROR`, taken from
+    `require("compile-mode").level`) which determines the lowest level of
+    error that should be considered when jumping/moving between errors.
+    Defaults to `WARNING`.
 
 use_diagnostics                                 *compile-mode.use_diagnostics*
     When `true`, jumping to an error will cause Neovim diagnostics to show up
