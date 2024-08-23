@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `use_diagnostics` configuration option, which will cause Neovim diagnostics to be used instead of opening the compilation buffer to show errors.
+
 ## [4.2.0] - 2024-08-23
 
 ### Added
