@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.0.0] - 2024-08-23
+
 ### Added
 
 - The ability to use compile-mode features in any buffer with the `compilation` filetype; this means you can save command outputs in a file and reopen it to go through errors and the like.
@@ -360,6 +362,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.0.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.2.0...v5.0.0
 [4.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.1.1...v4.2.0
 [4.1.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.1.0...v4.1.1
 [4.1.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.0.1...v4.1.0
