@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- The ability to use compile-mode features in any buffer with the `compilation` filetype; this means you can save command outputs in a file and reopen it to go through errors and the like.
 - The `use_diagnostics` configuration option, which will cause Neovim diagnostics to be used instead of opening the compilation buffer to show errors.
 - **(Breaking)** The `error_threshold` configuration option, which determines what level of errors are considered when jumping/moving between errors (i.e. using `:NextError`, `:CompileNextError`, etc.). This defaults to `compile_mode.level.WARNING`, which means that `INFO` level errors are no longer considered by default. You can set this option to `compile_mode.level.INFO` to revert to the old behavior.
 
