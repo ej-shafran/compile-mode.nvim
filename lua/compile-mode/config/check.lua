@@ -11,6 +11,10 @@ local function validate(tbl)
 	return ok or false, "invalid config" .. (err and (": " .. err) or "")
 end
 
+---@param value unknown
+---@param enum table
+---@param fmt string
+---@return table
 local function validate_enum(value, enum, fmt)
 	return {
 		value,
@@ -27,6 +31,9 @@ local function validate_enum(value, enum, fmt)
 	}
 end
 
+---@param value unknown
+---@param or_string boolean|nil
+---@return table
 local function validate_string_list(value, or_string)
 	return {
 		value,
@@ -43,6 +50,8 @@ local function validate_string_list(value, or_string)
 	}
 end
 
+---@param value unknown
+---@return table
 local function validate_regex(value)
 	return {
 		value,
@@ -58,6 +67,8 @@ local function validate_regex(value)
 	}
 end
 
+---@param value unknown
+---@return table
 local function validate_error_regexp_table(value)
 	return {
 		value,
