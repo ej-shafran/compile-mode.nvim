@@ -201,11 +201,9 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Fix issues with tab splitting
 
-* DONE Switch away from compilation window like in Emacs mode
-  CLOSED: [2024-08-23 Fri 12:47]
+* TODO Switch away from compilation window like in Emacs mode
 
-* DONE Add `NextError` and `PrevError` error threshold
-  CLOSED: [2024-08-23 Fri 12:47]
+* TODO Add `NextError` and `PrevError` error threshold
 
 * TODO Move all logic to filetype logic
   Such that we enable editing a file with the =compilation= filetype and having the same functionality as the rest of compile-mode.
