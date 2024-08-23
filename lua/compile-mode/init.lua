@@ -122,59 +122,22 @@ local runjob = a.wrap(function(cmd, bufnr, param, callback)
 			return
 		end
 
-		local linecount = vim.api.nvim_buf_line_count(bufnr)
 		count = count + #data
 
 		local new_lines = { partial_line .. data[1] }
 		table.move(data, 2, #data, #new_lines + 1, new_lines)
 		partial_line = new_lines[#new_lines]
 
-		local output_highlights = {}
 		for i, line in ipairs(new_lines) do
-			local linenum = linecount + i - 1
-			local error = errors.parse(line, linenum)
-
 			for _, re in ipairs(config.hidden_output) do
 				line = vim.fn.substitute(line, re, "", "")
 				new_lines[i] = line
-			end
-
-			if error then
-				errors.error_list[linenum] = error
-
-				if config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
-					local dir = find_directory_for_line(linenum)
-					utils.jump_to_error(error, dir, param.smods)
-					error_cursor = linenum
-				end
-			else
-				local dirchange = vim.fn.matchlist(line, "\\%(Entering\\|Leavin\\(g\\)\\) directory [`']\\(.\\+\\)'$")
-				if #dirchange > 0 then
-					local leaving = dirchange[2] ~= ""
-					local dir = dirchange[3]
-
-					local latest_dir = find_directory_for_line(linenum)
-
-					if utils.is_absolute(dir) then
-						dir_changes[linenum] = vim.fn.fnamemodify(dir, leaving and ":h" or "")
-					else
-						if leaving then
-							dir_changes[linenum] = vim.fn.fnamemodify(latest_dir, ":h")
-						else
-							dir_changes[linenum] = vim.fn.resolve(latest_dir .. "/" .. dir)
-						end
-					end
-				end
-
-				local highlights = utils.match_command_ouput(line, linenum)
-				table.move(highlights, 1, #highlights, #output_highlights + 1, output_highlights)
 			end
 		end
 
 		set_lines(bufnr, -2, -1, new_lines)
 		utils.wait()
-		utils.highlight_command_outputs(bufnr, output_highlights)
-		errors.highlight(bufnr)
+		M._parse_errors(bufnr)
 	end)
 
 	log.debug("starting job...")
@@ -263,7 +226,7 @@ local runcommand = a.void(function(command, param)
 	log.debug("opening compilation buffer...")
 
 	local prev_win = vim.api.nvim_get_current_win()
-	local bufnr = utils.split_unless_open(config.buffer_name, param.smods, param.count)
+	local bufnr = utils.split_unless_open({ fname = config.buffer_name }, param.smods, param.count)
 	utils.wait()
 	vim.api.nvim_set_current_win(prev_win)
 	log.fmt_debug("bufnr = %d", bufnr)
@@ -541,8 +504,6 @@ end)
 ---
 ---@type fun()
 M.interrupt = a.void(function()
-	local config = require("compile-mode.config.internal")
-
 	log.debug("calling interrupt()")
 
 	if not vim.g.compile_job_id then
@@ -553,18 +514,16 @@ M.interrupt = a.void(function()
 	log.debug("interrupting compilation")
 	log.fmt_debug("vim.g.compile_job_id = %d", vim.g.compile_job_id)
 
-	local bufnr = vim.fn.bufadd(config.buffer_name)
+	local bufnr = vim.g.compilation_buffer
 	log.fmt_debug("bufnr = %d", bufnr)
 
 	local interrupt_message = "Compilation interrupted"
 
-	utils.buf_set_opt(bufnr, "modifiable", true)
 	set_lines(bufnr, -1, -1, {
 		"",
 		interrupt_message .. " at " .. time(),
 	})
 	utils.wait()
-	utils.buf_set_opt(bufnr, "modifiable", false)
 
 	vim.fn.jobstop(vim.g.compile_job_id)
 	vim.g.compile_job_id = nil
@@ -590,15 +549,63 @@ M._gf = goto_file(false)
 
 M._CTRL_W_f = goto_file(true)
 
-function M._follow_cursor()
+function M._parse_errors(bufnr)
 	local config = require("compile-mode.config.internal")
-	local compilation_bufnr = vim.fn.bufadd(config.buffer_name)
+
+	errors.error_list = {}
+	utils.clear_highlights(bufnr)
+
+	local output_highlights = {}
+	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	for linenum, line in ipairs(lines) do
+		local error = errors.parse(line, linenum)
+
+		if error then
+			errors.error_list[linenum] = error
+
+			if config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
+				local dir = find_directory_for_line(linenum)
+				utils.jump_to_error(error, dir, {})
+				error_cursor = linenum
+			end
+		else
+			local dirchange = vim.fn.matchlist(line, "\\%(Entering\\|Leavin\\(g\\)\\) directory [`']\\(.\\+\\)'$")
+			if #dirchange > 0 then
+				local leaving = dirchange[2] ~= ""
+				local dir = dirchange[3]
+
+				local latest_dir = find_directory_for_line(linenum)
+
+				if utils.is_absolute(dir) then
+					dir_changes[linenum] = vim.fn.fnamemodify(dir, leaving and ":h" or "")
+				else
+					if leaving then
+						dir_changes[linenum] = vim.fn.fnamemodify(latest_dir, ":h")
+					else
+						dir_changes[linenum] = vim.fn.resolve(latest_dir .. "/" .. dir)
+					end
+				end
+			end
+
+			if not (linenum == 1 and vim.startswith(line, "vim:")) then
+				local highlights = utils.match_command_ouput(line, linenum)
+				table.move(highlights, 1, #highlights, #output_highlights + 1, output_highlights)
+			end
+		end
+	end
+
+	errors.highlight(bufnr)
+	utils.highlight_command_outputs(bufnr, output_highlights)
+end
+
+function M._follow_cursor()
+	local compilation_buffer = vim.g.compilation_buffer
 
 	if not in_next_error_mode then
 		return
 	end
 
-	if vim.api.nvim_get_current_buf() ~= compilation_bufnr then
+	if vim.api.nvim_get_current_buf() ~= compilation_buffer then
 		return
 	end
 
@@ -631,7 +638,7 @@ function M._follow_cursor()
 			end
 
 			local winbuf = vim.api.nvim_win_get_buf(winnr)
-			if winbuf ~= compilation_bufnr then
+			if winbuf ~= compilation_buffer then
 				return true
 			end
 
@@ -641,10 +648,11 @@ function M._follow_cursor()
 	end
 
 	vim.schedule(function()
+		local dir = find_directory_for_line(cursor_row)
 		vim.api.nvim_win_call(preview_win, function()
-			utils.jump_to_error(error, vim.g.compilation_directory or vim.fn.getcwd(), {})
+			utils.jump_to_error(error, dir, {})
 		end)
-		vim.notify("Current locus from " .. config.buffer_name)
+		vim.notify("Current locus from " .. vim.fn.bufname(compilation_buffer))
 	end)
 end
 
