@@ -276,15 +276,12 @@ auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
     When `true`, compiling jumps to the first error as soon as it is
     available.
 
-<<<<<<< HEAD
-=======
 use_diagnostics                                 *compile-mode.use_diagnostics*
     When `true`, jumping to an error will cause Neovim diagnostics to show up
     for all compilation errors within the jumped-to file, instead of opening
     the compilation buffer to show the error message. These disagnostics
     will disappear when compiling again. |vim.diagnostics|
 
->>>>>>> parent of a2bf0b5 (Add `error_threshold` option)
 ask_about_save                                   *compile-mode.ask_about_save*
     When `true`, compiling asks about each unsaved buffer, checking whether to
     save it or not, before running the compilation command. Defaults to
