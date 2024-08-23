@@ -1,5 +1,7 @@
 local check = {}
 
+local compile_mode = require("compile-mode")
+
 ---@param tbl table the table to validate
 ---@see vim.validate
 ---@return boolean is_valid
@@ -7,6 +9,22 @@ local check = {}
 local function validate(tbl)
 	local ok, err = pcall(vim.validate, tbl)
 	return ok or false, "invalid config" .. (err and (": " .. err) or "")
+end
+
+local function validate_enum(value, enum, fmt)
+	return {
+		value,
+		function(val)
+			return vim.iter(pairs(enum)):any(function(_, second)
+				return second == val
+			end)
+		end,
+		("one of %s"):format(vim.iter(pairs(enum))
+			:map(function(first, _)
+				return (fmt):format(first)
+			end)
+			:join(", ")),
+	}
 end
 
 local function validate_string_list(value, or_string)
@@ -89,12 +107,14 @@ function check.validate(cfg)
 		default_command = { cfg.default_command, "string" },
 		ask_about_save = { cfg.ask_about_save, "boolean" },
 		ask_to_interrupt = { cfg.ask_to_interrupt, "boolean" },
+		use_diagnostics = { cfg.use_diagnostics, "boolean" },
 		recompile_no_fail = { cfg.recompile_no_fail, "boolean" },
 		auto_jump_to_first_error = { cfg.auto_jump_to_first_error, "boolean" },
 		environment = { cfg.environment, "table", true },
 		clear_environment = { cfg.clear_environment, "boolean" },
 		baleia_setup = { cfg.baleia_setup, { "boolean", "table" } },
 		debug = { cfg.debug, "boolean" },
+		error_threshold = validate_enum(cfg.error_threshold, compile_mode.level, "compile_mode.level.%s"),
 		error_ignore_file_list = validate_string_list(cfg.error_ignore_file_list),
 		hidden_output = validate_string_list(cfg.hidden_output, true),
 		error_regexp_table = validate_error_regexp_table(cfg.error_regexp_table),

@@ -52,7 +52,10 @@ local in_next_error_mode = false
 ---@param end_ integer
 ---@param data string[]
 local function set_lines(bufnr, start, end_, data)
+	utils.buf_set_opt(bufnr, "modifiable", true)
 	vim.api.nvim_buf_set_lines(bufnr, start, end_, false, data)
+	utils.buf_set_opt(bufnr, "modifiable", false)
+	utils.buf_set_opt(bufnr, "modified", false)
 	vim.api.nvim_buf_call(bufnr, function()
 		vim.cmd("normal G")
 	end)
@@ -242,6 +245,7 @@ local runcommand = a.void(function(command, param)
 	error_cursor = 0
 	errors.error_list = {}
 	dir_changes = {}
+	utils.clear_diagnostics()
 
 	if vim.g.compile_job_id then
 		if config.ask_to_interrupt then
@@ -258,11 +262,13 @@ local runcommand = a.void(function(command, param)
 
 	log.debug("opening compilation buffer...")
 
+	local prev_win = vim.api.nvim_get_current_win()
 	local bufnr = utils.split_unless_open(config.buffer_name, param.smods, param.count)
+	utils.wait()
+	vim.api.nvim_set_current_win(prev_win)
 	log.fmt_debug("bufnr = %d", bufnr)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
-	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
 
 	-- reset compilation buffer
@@ -316,9 +322,6 @@ local runcommand = a.void(function(command, param)
 	end
 
 	utils.wait()
-
-	utils.buf_set_opt(bufnr, "modifiable", false)
-	utils.buf_set_opt(bufnr, "modified", false)
 end)
 
 ---Create a command that takes some action on the next/previous error from the current error cursor.
@@ -336,6 +339,8 @@ end)
 local function act_from_current_error(action, direction, different_file)
 	local name = (action == "jump" and "" or "move_to_") .. direction .. "_" .. (different_file and "file" or "error")
 	return a.void(function(param)
+		local config = require("compile-mode.config.internal")
+
 		log.debug("calling " .. name .. "()")
 
 		param = param or {}
@@ -351,6 +356,9 @@ local function act_from_current_error(action, direction, different_file)
 		for i = direction == "prev" and #lines or 1, direction == "prev" and 1 or #lines, direction == "prev" and -1 or 1 do
 			local line = lines[i]
 			local error = errors.error_list[line]
+
+			local fits_threshold_constraint = error.level >= config.error_threshold
+
 			local fits_file_constraint = true
 			if different_file then
 				fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
@@ -363,7 +371,7 @@ local function act_from_current_error(action, direction, different_file)
 				fits_line_constraint = line > error_cursor and (not error_line or error_line > line)
 			end
 
-			if fits_file_constraint and fits_line_constraint then
+			if fits_threshold_constraint and fits_file_constraint and fits_line_constraint then
 				errors_found = errors_found + 1
 				if errors_found == count then
 					error_line = line
@@ -561,18 +569,6 @@ M.interrupt = a.void(function()
 	vim.fn.jobstop(vim.g.compile_job_id)
 	vim.g.compile_job_id = nil
 end)
-
----@param opts CompileModeOpts
----@deprecated set `vim.g.compile_mode` instead
-function M.setup(opts)
-	log.warn([[`setup()` is deprecated; set the `vim.g.compile_mode` object instead
-compile-mode: `setup()` will be removed in the next major version]])
-
-	vim.g.compile_mode = opts
-	local config = require("compile-mode.config.internal")
-	---@diagnostic disable-next-line: undefined-field
-	config.health_info.called_setup = true
-end
 
 ---Move to the location of the next error within the compilation buffer.
 ---Does not jump to the error's actual locus.
