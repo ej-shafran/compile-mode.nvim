@@ -105,20 +105,10 @@ end
 local function jump_to_file(filename, error, smods)
 	local config = require("compile-mode.config.internal")
 
-	local compilation_bufnr = -1
-	if config.use_diagnostics then
-		compilation_bufnr = vim.fn.bufadd(config.buffer_name)
-		vim.iter(vim.fn.win_findbuf(compilation_bufnr)):each(function(winnr)
-			vim.api.nvim_win_call(winnr, function()
-				vim.cmd("wincmd q")
-			end)
-		end)
-	else
-		compilation_bufnr = M.split_unless_open(config.buffer_name, smods, 0)
-		local compilation_winnr = vim.fn.win_findbuf(compilation_bufnr)[1]
+	local compilation_bufnr = M.split_unless_open(config.buffer_name, smods, 0)
+	local compilation_winnr = vim.fn.win_findbuf(compilation_bufnr)[1]
 
-		vim.api.nvim_win_set_cursor(compilation_winnr, { error.linenum, 0 })
-	end
+	vim.api.nvim_win_set_cursor(compilation_winnr, { error.linenum, 0 })
 
 	local row = error.row and error.row.value or 1
 	local end_row = error.end_row and error.end_row.value
@@ -170,18 +160,6 @@ local function jump_to_file(filename, error, smods)
 			vim.cmd.normal(cmd)
 		end)
 	end
-
-	if config.use_diagnostics then
-		local errors = require("compile-mode.errors")
-		local diagnostics = errors.todiagnostic(target_bufnr, errors.error_list)
-		vim.diagnostic.set(compile_mode_ns, target_bufnr, diagnostics, {})
-		M.delay(100)
-		vim.diagnostic.open_float()
-	end
-end
-
-function M.clear_diagnostics()
-	vim.diagnostic.reset(compile_mode_ns)
 end
 
 ---@type fun(error: CompileModeError, current_dir: string, smods: SMods)

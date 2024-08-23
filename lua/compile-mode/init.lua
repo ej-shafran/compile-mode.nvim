@@ -245,7 +245,6 @@ local runcommand = a.void(function(command, param)
 	error_cursor = 0
 	errors.error_list = {}
 	dir_changes = {}
-	utils.clear_diagnostics()
 
 	if vim.g.compile_job_id then
 		if config.ask_to_interrupt then

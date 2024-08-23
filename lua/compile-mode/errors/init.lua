@@ -377,63 +377,19 @@ local function parse_matcher(matcher, line, linenum)
 	}
 end
 
----@param error CompileModeError
----@return unknown
-local function map_to_qflist(error)
-	return {
-		filename = error.filename.value,
-		lnum = error.row and error.row.value,
-		end_lnum = error.end_row and error.end_row.value,
-		col = error.col and error.col.value,
-		end_col = error.end_col and error.end_col.value,
-		text = error.full_text,
-	}
-end
-
 ---@param error_list table<integer, CompileModeError> table of compilation errors, usually `errors.error_list`
 ---@return unknown[] qflist values which can be inserted into the quickfix list using `setqflist()`
 function M.toqflist(error_list)
-	return vim.tbl_values(vim.tbl_map(map_to_qflist, error_list))
-end
-
----@param bufnr integer
----@param error CompileModeError
----@return vim.Diagnostic
-local function map_to_diagnostic(bufnr, error)
-	---@type vim.diagnostic.Severity
-	local level
-	if error.level == M.level.ERROR then
-		level = vim.diagnostic.severity.ERROR
-	elseif error.level == M.level.WARNING then
-		level = vim.diagnostic.severity.ERROR
-	else
-		level = vim.diagnostic.severity.INFO
-	end
-
-	---@type vim.Diagnostic
-	return {
-		bufnr = bufnr,
-		col = error.col and error.col.value - 1 or 0,
-		lnum = error.row.value - 1,
-		message = error.full_text,
-		severity = level,
-		end_col = error.end_col and error.end_col.value - 1,
-		end_lnum = error.end_row and error.end_row.value - 1,
-	}
-end
-
----@param error_list table<integer, CompileModeError> table of compilation errors, usually `errors.error_list`
----@return vim.Diagnostic[]
-function M.todiagnostic(bufnr, error_list)
-	return vim.iter(vim.tbl_values(error_list))
-		:filter(function(error)
-			local error_buf = vim.fn.bufadd(error.filename.value)
-			return error_buf == bufnr
-		end)
-		:map(function(error)
-			return map_to_diagnostic(bufnr, error)
-		end)
-		:totable()
+	return vim.tbl_values(vim.tbl_map(function(error)
+		return {
+			filename = error.filename.value,
+			lnum = error.row and error.row.value,
+			end_lnum = error.end_row and error.end_row.value,
+			col = error.col and error.col.value,
+			end_col = error.end_col and error.end_col.value,
+			text = error.full_text,
+		}
+	end, error_list))
 end
 
 ---Parses error syntax from a given line.
