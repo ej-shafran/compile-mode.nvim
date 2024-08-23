@@ -261,10 +261,7 @@ local runcommand = a.void(function(command, param)
 
 	log.debug("opening compilation buffer...")
 
-	local prev_win = vim.api.nvim_get_current_win()
 	local bufnr = utils.split_unless_open(config.buffer_name, param.smods, param.count)
-	utils.wait()
-	vim.api.nvim_set_current_win(prev_win)
 	log.fmt_debug("bufnr = %d", bufnr)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
