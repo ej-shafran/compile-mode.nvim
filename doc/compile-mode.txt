@@ -89,9 +89,11 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
 >lua
     return {
       "ej-shafran/compile-mode.nvim",
-      branch = "latest",
-      -- or a specific version:
-      -- tag = "v4.0.0"
+      tag = "v5.*",
+      -- you can just use the latest version:
+      -- branch = "latest",
+      -- or the most up-to-date updates:
+      -- branch = "nightly",
       dependencies = {
 	  "nvim-lua/plenary.nvim",
 	  -- if you want to enable coloring of ANSI escape codes in
