@@ -52,10 +52,7 @@ local in_next_error_mode = false
 ---@param end_ integer
 ---@param data string[]
 local function set_lines(bufnr, start, end_, data)
-	utils.buf_set_opt(bufnr, "modifiable", true)
 	vim.api.nvim_buf_set_lines(bufnr, start, end_, false, data)
-	utils.buf_set_opt(bufnr, "modifiable", false)
-	utils.buf_set_opt(bufnr, "modified", false)
 	vim.api.nvim_buf_call(bufnr, function()
 		vim.cmd("normal G")
 	end)
@@ -265,6 +262,7 @@ local runcommand = a.void(function(command, param)
 	log.fmt_debug("bufnr = %d", bufnr)
 
 	utils.buf_set_opt(bufnr, "buftype", "nofile")
+	utils.buf_set_opt(bufnr, "modifiable", true)
 	utils.buf_set_opt(bufnr, "filetype", "compilation")
 
 	-- reset compilation buffer
@@ -318,6 +316,9 @@ local runcommand = a.void(function(command, param)
 	end
 
 	utils.wait()
+
+	utils.buf_set_opt(bufnr, "modifiable", false)
+	utils.buf_set_opt(bufnr, "modified", false)
 end)
 
 ---Create a command that takes some action on the next/previous error from the current error cursor.
