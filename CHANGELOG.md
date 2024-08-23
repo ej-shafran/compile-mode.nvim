@@ -17,6 +17,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - **(Breaking)** The behavior when opening a window for compilation; instead of staying in the compilation buffer's window, compiling will now remain in the window where it originally happened. (You should note this in case you have an `autocmd` that does this behavior manually - it will now have the opposite effect in some cases, so you will likely want to remove it).
 
+### Removed
+
+- **(Breaking)** The `setup` function has now been completely removed. Instead, configuration should use the `vim.g.compile_mode` object, which can be given the type `CompileModeOpts`.
+
 ## [4.2.0] - 2024-08-23
 
 ### Added

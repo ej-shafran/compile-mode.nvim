@@ -571,18 +571,6 @@ M.interrupt = a.void(function()
 	vim.g.compile_job_id = nil
 end)
 
----@param opts CompileModeOpts
----@deprecated set `vim.g.compile_mode` instead
-function M.setup(opts)
-	log.warn([[`setup()` is deprecated; set the `vim.g.compile_mode` object instead
-compile-mode: `setup()` will be removed in the next major version]])
-
-	vim.g.compile_mode = opts
-	local config = require("compile-mode.config.internal")
-	---@diagnostic disable-next-line: undefined-field
-	config.health_info.called_setup = true
-end
-
 ---Move to the location of the next error within the compilation buffer.
 ---Does not jump to the error's actual locus.
 M.move_to_next_error = act_from_current_error("move", "next", false)
