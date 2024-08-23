@@ -202,7 +202,9 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Fix issues with tab splitting
 
-* TODO Switch away from compilation window like in Emacs mode
+* DONE Switch away from compilation window like in Emacs mode
+  CLOSED: [2024-08-23 Fri 12:47]
 
-* TODO Add `NextError` and `PrevError` error threshold
+* DONE Add `NextError` and `PrevError` error threshold
+  CLOSED: [2024-08-23 Fri 12:47]
 
