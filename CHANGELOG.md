@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Issue with ANSI color sequences not being highlighted correctly by `baleia`.
+
 ## [5.0.0] - 2024-08-23
 
 ### Added

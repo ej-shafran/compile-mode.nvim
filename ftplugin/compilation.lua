@@ -1,7 +1,5 @@
 local compile_mode = require("compile-mode")
-local errors = require("compile-mode.errors")
 local config = require("compile-mode.config.internal")
-local utils = require("compile-mode.utils")
 
 local bufnr = vim.api.nvim_get_current_buf()
 
