@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.0.1] - 2024-08-24
+
 ### Fixed
 
 - Issue with ANSI color sequences not being highlighted correctly by `baleia`.
@@ -366,6 +368,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.0.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.2.0...v5.0.0
 [4.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.1.1...v4.2.0
 [4.1.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v4.1.0...v4.1.1
