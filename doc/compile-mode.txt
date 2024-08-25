@@ -196,6 +196,9 @@ information) and a table value. This table has the following keys:
     - If capture groups are provided and the first capture group is matched,
       the error is considered of type `WARNING`. If the second capture group
       matched, the error is considered to be of type `INFO`.
+- {priority} (integer) the priority for this matcher, used to determine what
+  error to use in the case where multiple different matchers are matched by
+  the same line (optional - defaults to `1`)
 
 Note: a type alias - `CompileModeRegexpMatcher` - is available for the values
 of `error_regexp_table`.
