@@ -212,3 +212,11 @@ This gets tacked on the end of the generated expressions.")
   CLOSED: [2024-08-23 Fri 16:41]
   Such that we enable editing a file with the =compilation= filetype and having the same functionality as the rest of compile-mode.
 
+* TODO Add `FirstError` command
+
+** TODO Jump to first error
+
+** TODO Jump to `count`th error
+
+* TODO Allow dynamic changing of `vim.g.compile_mode` between compilations
+
