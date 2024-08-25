@@ -8,6 +8,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Issue with completion when using `nvim-cmp`.
+
+### Changed
+
+- The order of the docs.
+
 ## [5.0.1] - 2024-08-24
 
 ### Fixed

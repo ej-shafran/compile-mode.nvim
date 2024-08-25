@@ -8,22 +8,23 @@ Table of Contents                             *compile-mode-table-of-contents*
 3. Compilation buffer                        |compile-mode-compilation-buffer|
 4. Errors                                                |compile-mode-errors|
 5. Configuration                                  |compile-mode-configuration|
-  - error_regexp_table                       |compile-mode.error_regexp_table|
   - default_command                             |compile-mode.default_command|
-  - time_format                                     |compile-mode.time_format|
-  - buffer_name                                     |compile-mode.buffer_name|
-  - debug                                                 |compile-mode.debug|
   - baleia_setup                                   |compile-mode.baleia_setup|
+  - error_regexp_table                       |compile-mode.error_regexp_table|
   - error_ignore_file_list               |compile-mode.error_ignore_file_list|
-  - hidden_output                                 |compile-mode.hidden_output|
-  - recompile_no_fail                         |compile-mode.recompile_no_fail|
-  - auto_jump_to_first_error           |compile-mode.auto_jump_to_first_error|
   - error_threshold                             |compile-mode.error_threshold|
+  - auto_jump_to_first_error           |compile-mode.auto_jump_to_first_error|
   - use_diagnostics                             |compile-mode.use_diagnostics|
+  - recompile_no_fail                         |compile-mode.recompile_no_fail|
   - ask_about_save                               |compile-mode.ask_about_save|
   - ask_to_interrupt                           |compile-mode.ask_to_interrupt|
+  - buffer_name                                     |compile-mode.buffer_name|
+  - time_format                                     |compile-mode.time_format|
+  - hidden_output                                 |compile-mode.hidden_output|
   - environment                                     |compile-mode.environment|
   - clear_environment                         |compile-mode.clear_environment|
+  - debug                                                 |compile-mode.debug|
+  - input_word_completion                 |compile-mode.input_word_completion|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -240,45 +241,22 @@ An example configuration:
 
 Valid keys and values for `vim.g.compile_mode`:
 
-error_regexp_table                            *compile-mode.error_regexp_table
-    See |compile-mode-errors|.
-
 default_command                                 *compile-mode.default_command*
     The string to show in the |compile-mode.compile()| prompt as a default.
     You can set it to `""` for an empty prompt. Defaults to: `"make -k "`.
-
-time_format                                         *compile-mode.time_format*
-    The way to format the time displayed at the top of the compilation buffer.
-    Passed into |strftime()|. Defaults to: `"%a %b %e %H:%M:%S"`.
-
-buffer_name                                         *compile-mode.buffer_name*
-    The name for the compilation buffer. Defaults to `"*compilation*"`.
-
-debug                                                     *compile-mode.debug*
-    Print additional debug information. This is printed using |print|, so you
-    can inspect it with |:messages|.
 
 baleia_setup                                       *compile-mode.baleia_setup*
     When `true`, baleia.nvim will be set up for the compilation buffer, which
     will color in ANSI escape codes in the compilation output. This option can
     also be a table of options to pass to `baleia.setup()`.
 
+error_regexp_table                            *compile-mode.error_regexp_table
+    See |compile-mode-errors|.
+
 error_ignore_file_list                   *compile-mode.error_ignore_file_list*
     A list of Vim regexes to run each error’s filename by, to check if this
     file should be ignored. Defaults to: `{ "/bin/[a-z]*sh$" }`. Passing in
     this option does not override this, but instead extends the list.
-
-hidden_output                                     *compile-mode.hidden_output*
-    A Vim regex or list of Vim regexes run on every line in the compilation
-    buffer which will be substituted with empty strings.
-
-recompile_no_fail                             *compile-mode.recompile_no_fail*
-    When `true`, running |:Recompile| without a prior command will not fail,
-    but instead simply trigger a call to |:Compile|.
-
-auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
-    When `true`, compiling jumps to the first error as soon as it is
-    available.
 
 error_threshold                                 *compile-mode.error_threshold*
     An error type (`INFO`, `WARNING`, or `ERROR`, taken from
@@ -286,11 +264,19 @@ error_threshold                                 *compile-mode.error_threshold*
     error that should be considered when jumping/moving between errors.
     Defaults to `WARNING`.
 
+auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
+    When `true`, compiling jumps to the first error as soon as it is
+    available.
+
 use_diagnostics                                 *compile-mode.use_diagnostics*
     When `true`, jumping to an error will cause Neovim diagnostics to show up
     for all compilation errors within the jumped-to file, instead of opening
     the compilation buffer to show the error message. These disagnostics
     will disappear when compiling again. |vim.diagnostics|
+
+recompile_no_fail                             *compile-mode.recompile_no_fail*
+    When `true`, running |:Recompile| without a prior command will not fail,
+    but instead simply trigger a call to |:Compile|.
 
 ask_about_save                                   *compile-mode.ask_about_save*
     When `true`, compiling asks about each unsaved buffer, checking whether to
@@ -301,6 +287,17 @@ ask_to_interrupt                               *compile-mode.ask_to_interrupt*
     When `true`, compiling when another compilation command is currently
     running will confirm whether to interrupt instead of interrupting
     automatically. Defaults to `true`.
+
+buffer_name                                         *compile-mode.buffer_name*
+    The name for the compilation buffer. Defaults to `"*compilation*"`.
+
+time_format                                         *compile-mode.time_format*
+    The way to format the time displayed at the top of the compilation buffer.
+    Passed into |strftime()|. Defaults to: `"%a %b %e %H:%M:%S"`.
+
+hidden_output                                     *compile-mode.hidden_output*
+    A Vim regex or list of Vim regexes run on every line in the compilation
+    buffer which will be substituted with empty strings.
 
 environment                                         *compile-mode.environment*
     A table of string values and string keys, defining additional environment
@@ -324,6 +321,24 @@ clear_environment                             *compile-mode.clear_environment*
     exactly, instead of merging with the current environment.
 
     Uses the `clear_env` option of |jobstart()|. |jobstart-options|
+
+debug                                                     *compile-mode.debug*
+    Print additional debug information. This is printed using |print|, so you
+    can inspect it with |:messages|.
+
+input_word_completion                     *compile-mode.input_word_completion*
+    By default, the completion provided by this plugin for the prompt which is
+    used if no arguments have been provided to |:Compile| returns its options
+    as an entire line, since this is what default Vim completion expects from
+    the completion of |input()|. However, if you're using a custom completion
+    engine (such as `nvim-cmp` with `cmp-cmdline-prompt` - see
+    <https://github.com/hrsh7th/nvim-cmp>) you may want these completions to
+    return words as options.
+
+    By default, this plugin checks if you have `cmp-cmdline-prompt` loaded,
+    and if so returns words for completion. If you're using some other
+    autocompletion solution and find issues with the completion, you may want
+    to try setting this to `true`.
 
 ==============================================================================
 6. API                                                      *compile-mode-api*
