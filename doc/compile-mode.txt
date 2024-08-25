@@ -14,6 +14,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - error_ignore_file_list               |compile-mode.error_ignore_file_list|
   - error_threshold                             |compile-mode.error_threshold|
   - auto_jump_to_first_error           |compile-mode.auto_jump_to_first_error|
+  - error_locus_highlight                 |compile-mode.error_locus_highlight|
   - use_diagnostics                             |compile-mode.use_diagnostics|
   - recompile_no_fail                         |compile-mode.recompile_no_fail|
   - ask_about_save                               |compile-mode.ask_about_save|
@@ -28,6 +29,7 @@ Table of Contents                             *compile-mode-table-of-contents*
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
+  - first_error()                                 |compile-mode.first_error()|
   - current_error()                             |compile-mode.current_error()|
   - next_error()                                   |compile-mode.next_error()|
   - prev_error()                                   |compile-mode.prev_error()|
@@ -43,6 +45,7 @@ Table of Contents                             *compile-mode-table-of-contents*
 7. Commands                                            |compile-mode-commands|
   - :Compile                                                        |:Compile|
   - :Recompile                                                    |:Recompile|
+  - :FirstError                                                  |:FirstError|
   - :CurrentError                                              |:CurrentError|
   - :NextError                                                    |:NextError|
   - :PrevError                                                    |:PrevError|
@@ -66,6 +69,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - CompileModeCheckResult                         |hl-CompileModeCheckResult|
   - CompileModeCheckTarget                               |hl-CompileModeError|
   - CompileModeDirectoryMessage               |hl-CompileModeDirectoryMessage|
+  - CompileModeErrorLocus                           |hl-CompileModeErrorLocus|
 
 ==============================================================================
 1. Introduction                                    *compile-mode-introduction*
@@ -194,6 +198,10 @@ information) and a table value. This table has the following keys:
     - If capture groups are provided and the first capture group is matched,
       the error is considered of type `WARNING`. If the second capture group
       matched, the error is considered to be of type `INFO`.
+- {priority} (integer) the priority for this matcher, used to determine what
+  error to use in the case where multiple different matchers are matched by
+  the same line; the matcher with the highest priority which matches the
+  current line will be used (optional - defaults to `1`)
 
 Note: a type alias - `CompileModeRegexpMatcher` - is available for the values
 of `error_regexp_table`.
@@ -267,6 +275,12 @@ error_threshold                                 *compile-mode.error_threshold*
 auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
     When `true`, compiling jumps to the first error as soon as it is
     available.
+
+error_locus_highlight                     *compile-mode.error_locus_highlight*
+    Configure the highlighting that occurs when jumping to an error's locus.
+    If set to `false` or `nil`, no highlighting will be done. If set to a
+    number, it determines for how many milliseconds the highlight will appear.
+    If set to `true`, the highlight will be constant. Defaults to `500`.
 
 use_diagnostics                                 *compile-mode.use_diagnostics*
     When `true`, jumping to an error will cause Neovim diagnostics to show up
@@ -360,6 +374,17 @@ recompile({param})                                  *compile-mode.recompile()*
     Parameters:
 	- {param} (table) command param (optional)
 	    - {param.smods}: a table - see |:command-modifiers| for more
+
+first_error({param})                              *compile-mode.first_error()*
+    Jumps to the Nth error within the compilation buffer, based on the count.
+    See |:FirstError|.
+
+    Parameters:
+	- {param} (table) command param (optional)
+	  - {param.count}: which error to jump to; default `1`
+	  - {param.smods}: a table - see |:command-modifiers| for more; this
+	    will affect the way windows are created when jumping to errors, if
+	    there's a need to open a new window
 
 current_error({param})                          *compile-mode.current_error()*
     Jumps to the current error within the compilation buffer. See
@@ -494,6 +519,26 @@ interrupt()                                         *compile-mode.interrupt()*
     opened window, like with |:split|.
 
     Mapped to `<C-r>` within the compilation buffer.
+
+:FirstError                                                      *:FirstError*
+:[N]FirstError
+    Jump to the Nth error in the compilation buffer, depending on the count.
+    This modifies the same cursor that |:NextError| and |:PrevError| operate
+    on.
+
+    The default count is 1, which means jump to the first error.
+
+    The following commands work when prefixed to `:FirstError`:
+
+    - |:vert|
+    - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
+    - |:silent|
+    - |:hide|
+    - |:tab|
+
+    These commands will affect the way windows are created when jumping to
+    errors, if there's a need to open a new window.
+
 
 :CurrentError                                                  *:CurrentError*
     Jump to the current error in the compilation buffer. This works using the
@@ -765,5 +810,9 @@ CompileModeDirectoryMessage                   *hl-CompileModeDirectoryMessage*
     make[1]: Entering directory '/home/user/build/directory'
                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
 <
+
+CompileModeErrorLocus                               *hl-CompileModeErrorLocus*
+    The highlighting used in the source of an error when jumping to that
+    error's locus.
 
  vim:tw=78:ts=8:noet:ft=help:norl:

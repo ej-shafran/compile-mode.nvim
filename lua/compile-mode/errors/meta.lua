@@ -11,10 +11,12 @@
 ---@field row      integer|CompileModeIntByInt|nil
 ---@field col      integer|CompileModeIntByInt|nil
 ---@field type     nil|CompileModeLevel|CompileModeIntByInt
+---@field priority nil|integer
 
 ---@class CompileModeError
 ---@field highlighted boolean
 ---@field level       CompileModeLevel
+---@field priority    integer
 ---@field full        CompileModeRange
 ---@field filename    CompileModeValueAndRange<string>
 ---@field row         CompileModeValueAndRange<integer>?

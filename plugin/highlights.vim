@@ -11,3 +11,5 @@ highlight default CompileModeDirectoryMessage guifg=#6699ff
 highlight default CompileModeOutputFile guifg=#9966cc
 highlight default CompileModeCheckResult cterm=bold gui=bold guifg=#ff9966
 highlight default CompileModeCheckTarget guifg=#ff9966
+
+highlight link CompileModeErrorLocus Visual

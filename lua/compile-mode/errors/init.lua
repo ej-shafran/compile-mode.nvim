@@ -157,12 +157,12 @@ M.error_regexp_table = {
 		col = 5,
 		type = { 1, 2 },
 	},
-	-- TODO: make this relevant with some sort of priority system
 	clang_include = {
 		regex = "^In file included from \\([^\n:]\\+\\):\\([0-9]\\+\\):$",
 		filename = 1,
 		row = 2,
 		type = M.level.INFO,
+		priority = 2,
 	},
 	gcc_include = {
 		regex = "^\\%(In file included \\|                 \\|\t\\)from \\([0-9]*[^0-9\n]\\%([^\n :]\\| [^-/\n]\\|:[^ \n]\\)\\{-}\\):\\([0-9]\\+\\)\\%(:\\([0-9]\\+\\)\\)\\?\\%(\\(:\\)\\|\\(,\\|$\\)\\)\\?",
@@ -365,6 +365,7 @@ local function parse_matcher(matcher, line, linenum)
 	return {
 		highlighted = false,
 		level = error_level,
+		priority = matcher.priority or 1,
 		full = result[1],
 		full_text = line,
 		filename = range_and_value(line, filename_range),
@@ -442,23 +443,35 @@ end
 ---@return CompileModeError|nil
 function M.parse(line, linenum)
 	local config = require("compile-mode.config.internal")
-	for group, matcher in pairs(config.error_regexp_table) do
-		local result = parse_matcher(matcher, line, linenum)
 
-		if result then
-			for _, pattern in ipairs(config.error_ignore_file_list) do
-				if vim.fn.match(result.filename.value, pattern) ~= -1 then
-					return nil
-				end
+	return vim.iter(pairs(config.error_regexp_table))
+		:map(function(group, matcher)
+			---@cast matcher CompileModeRegexpMatcher
+			local result = parse_matcher(matcher, line, linenum)
+			if not result then
+				return nil
+			end
+			result.group = group
+			return result
+		end)
+		:filter(function(error)
+			if not error then
+				return false
 			end
 
-			result.group = group
+			local ignored = vim.iter(config.error_ignore_file_list):any(function(pattern)
+				return vim.fn.match(error.filename.value, pattern) ~= -1
+			end)
 
-			return result
-		end
-	end
-
-	return nil
+			return not ignored
+		end)
+		:fold(nil, function(acc, error)
+			if not acc or error.priority > acc.priority then
+				return error
+			else
+				return acc
+			end
+		end)
 end
 
 ---Highlight a single error in the compilation buffer.

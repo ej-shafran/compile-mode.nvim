@@ -34,6 +34,8 @@ local default_config = {
 	recompile_no_fail = false,
 	---@type boolean
 	auto_jump_to_first_error = false,
+	---@type boolean|number|nil
+	error_locus_highlight = 500,
 
 	---@type table<string, string>|nil
 	environment = nil,
