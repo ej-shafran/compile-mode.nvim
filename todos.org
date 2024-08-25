@@ -223,3 +223,5 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Allow dynamic changing of `vim.g.compile_mode` between compilations
 
+* TODO Refactor error-related API to use one main function
+
