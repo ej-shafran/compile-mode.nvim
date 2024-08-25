@@ -225,3 +225,5 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Refactor error-related API to use one main function
 
+* TODO Make some logs trace-level
+
