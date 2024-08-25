@@ -52,7 +52,7 @@
 ---@field error_threshold?          CompileModeLevel
 ---
 ---For more info, run `:h compile-mode.error_locus_highlight`
----@field error_locus_highlight?          boolean|integer|nil
+---@field error_locus_highlight?    boolean|integer|nil
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode
