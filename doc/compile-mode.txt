@@ -200,7 +200,8 @@ information) and a table value. This table has the following keys:
       matched, the error is considered to be of type `INFO`.
 - {priority} (integer) the priority for this matcher, used to determine what
   error to use in the case where multiple different matchers are matched by
-  the same line (optional - defaults to `1`)
+  the same line; the matcher with the highest priority which matches the
+  current line will be used (optional - defaults to `1`)
 
 Note: a type alias - `CompileModeRegexpMatcher` - is available for the values
 of `error_regexp_table`.
