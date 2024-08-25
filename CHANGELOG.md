@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- A highlight of the error's locus when jumping to it, along with the `error_locus_highlight` option to configure if the highlight should occur, and for how long.
+
 ## [5.0.2] - 2024-08-25
 
 ### Fixed

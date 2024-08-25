@@ -4,6 +4,54 @@ local M = {}
 
 local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
 
+local highlight_ns = vim.api.nvim_create_namespace("compile-mode.nvim/highlight")
+---@type uv_timer_t | nil
+local highlight_timer
+---@type fun() | nil
+local highlight_cancel = nil
+
+---@param error CompileModeError
+local function highlight_locus_jump(bufnr, error)
+	local config = require("compile-mode.config.internal")
+
+	if highlight_timer then
+		highlight_timer:close()
+		assert(highlight_cancel)
+		highlight_cancel()
+	end
+
+	if not config.error_locus_highlight then
+		return
+	end
+
+	local start = {
+		error.row and error.row.value - 1 or 0,
+		error.col and error.col.value or 1,
+	}
+	local line = vim.api.nvim_buf_get_lines(bufnr, start[1], start[1] + 1, false)[1]
+	local end_ = {
+		error.end_row and error.end_row.value - 1 or start[1],
+		error.end_col and error.end_col.value or line:len(),
+	}
+
+	vim.highlight.range(bufnr, highlight_ns, "CompileModeErrorLocus", start, end_, {
+		inclusive = true,
+		priority = vim.highlight.priorities.diagnostics,
+		regtype = "v",
+	})
+
+	local timeout = config.error_locus_highlight
+	if type(timeout) == "number" then
+		highlight_cancel = function()
+			highlight_timer = nil
+			highlight_cancel = nil
+			pcall(vim.api.nvim_buf_clear_namespace, bufnr, highlight_ns, 0, -1)
+		end
+
+		highlight_timer = vim.defer_fn(highlight_cancel, timeout)
+	end
+end
+
 ---@param bufnr integer
 ---@param hlname string
 ---@param linenum integer
@@ -131,7 +179,6 @@ local function jump_to_file(filename, error, smods)
 	end
 
 	local row = error.row and error.row.value or 1
-	local end_row = error.end_row and error.end_row.value
 
 	local col = (error.col and error.col.value or 1) - 1
 	if col < 0 then
@@ -159,27 +206,7 @@ local function jump_to_file(filename, error, smods)
 		row = last_row
 	end
 	vim.api.nvim_win_set_cursor(target_winnr, { row, col })
-
-	if end_row or end_col then
-		local cmd = ""
-		if not error.col and not error.end_col then
-			cmd = cmd .. "V"
-		else
-			cmd = cmd .. "v"
-		end
-
-		if end_row then
-			cmd = cmd .. tostring(end_row - row) .. "j"
-		end
-
-		if end_col then
-			cmd = cmd .. tostring(end_col - col) .. "l"
-		end
-
-		vim.api.nvim_buf_call(target_bufnr, function()
-			vim.cmd.normal(cmd)
-		end)
-	end
+	highlight_locus_jump(target_bufnr, error)
 
 	if config.use_diagnostics then
 		local errors = require("compile-mode.errors")
