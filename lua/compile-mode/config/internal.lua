@@ -42,6 +42,8 @@ local default_config = {
 
 	---@type table | boolean
 	baleia_setup = false,
+	---@type boolean
+	input_word_completion = false,
 
 	---@type boolean
 	debug = false,

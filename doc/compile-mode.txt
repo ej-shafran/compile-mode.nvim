@@ -24,6 +24,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - ask_to_interrupt                           |compile-mode.ask_to_interrupt|
   - environment                                     |compile-mode.environment|
   - clear_environment                         |compile-mode.clear_environment|
+  - input_word_completion                 |compile-mode.input_word_completion|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -324,6 +325,20 @@ clear_environment                             *compile-mode.clear_environment*
     exactly, instead of merging with the current environment.
 
     Uses the `clear_env` option of |jobstart()|. |jobstart-options|
+
+input_word_completion                     *compile-mode.input_word_completion*
+    By default, the completion provided by this plugin for the prompt which is
+    used if no arguments have been provided to |:Compile| returns its options
+    as an entire line, since this is what default Vim completion expects from
+    the completion of |input()|. However, if you're using a custom completion
+    engine (such as `nvim-cmp` with `cmp-cmdline-prompt` - see
+    <https://github.com/hrsh7th/nvim-cmp>) you may want these completions to
+    return words as options.
+
+    By default, this plugin checks if you have `cmp-cmdline-prompt` loaded,
+    and if so returns words for completion. If you're using some other
+    autocompletion solution and find issues with the completion, you may want
+    to try setting this to `true`.
 
 ==============================================================================
 6. API                                                      *compile-mode-api*

@@ -379,12 +379,19 @@ M.compile = a.void(function(param)
 	log.debug("calling compile()")
 
 	param = param or {}
-	local command = param.args ~= "" and param.args
-		or utils.input({
+	local command = param.args
+	if not command or command then
+		local input_completion_func = "CompileInputComplete"
+		if package.loaded["cmp_cmdline_prompt"] or config.input_word_completion then
+			input_completion_func = "CompileInputCompleteWord"
+		end
+
+		command = utils.input({
 			prompt = "Compile command: ",
 			default = vim.g.compile_command or config.default_command,
-			completion = "customlist,CompileInputComplete",
+			completion = ("customlist,%s"):format(input_completion_func),
 		})
+	end
 
 	if command == nil then
 		return
