@@ -12,6 +12,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - A highlight of the error's locus when jumping to it, along with the `error_locus_highlight` option to configure if the highlight should occur, and for how long.
 - The `priority` key for error matchers, and a default priority for the default `clang_include` matcher.
+- The `:FirstError` command, which jumps to the Nth error based on the count (defaulting to 1).
 
 ## [5.0.2] - 2024-08-25
 

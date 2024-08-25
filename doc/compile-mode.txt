@@ -29,6 +29,7 @@ Table of Contents                             *compile-mode-table-of-contents*
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
+  - first_error()                                 |compile-mode.first_error()|
   - current_error()                             |compile-mode.current_error()|
   - next_error()                                   |compile-mode.next_error()|
   - prev_error()                                   |compile-mode.prev_error()|
@@ -44,6 +45,7 @@ Table of Contents                             *compile-mode-table-of-contents*
 7. Commands                                            |compile-mode-commands|
   - :Compile                                                        |:Compile|
   - :Recompile                                                    |:Recompile|
+  - :FirstError                                                  |:FirstError|
   - :CurrentError                                              |:CurrentError|
   - :NextError                                                    |:NextError|
   - :PrevError                                                    |:PrevError|
@@ -372,6 +374,17 @@ recompile({param})                                  *compile-mode.recompile()*
 	- {param} (table) command param (optional)
 	    - {param.smods}: a table - see |:command-modifiers| for more
 
+first_error({param})                              *compile-mode.first_error()*
+    Jumps to the Nth error within the compilation buffer, based on the count.
+    See |:FirstError|.
+
+    Parameters:
+	- {param} (table) command param (optional)
+	  - {param.count}: which error to jump to; default `1`
+	  - {param.smods}: a table - see |:command-modifiers| for more; this
+	    will affect the way windows are created when jumping to errors, if
+	    there's a need to open a new window
+
 current_error({param})                          *compile-mode.current_error()*
     Jumps to the current error within the compilation buffer. See
     |:CurrentError|.
@@ -505,6 +518,26 @@ interrupt()                                         *compile-mode.interrupt()*
     opened window, like with |:split|.
 
     Mapped to `<C-r>` within the compilation buffer.
+
+:FirstError                                                      *:FirstError*
+:[N]FirstError
+    Jump to the Nth error in the compilation buffer, depending on the count.
+    This modifies the same cursor that |:NextError| and |:PrevError| operate
+    on.
+
+    The default count is 1, which means jump to the first error.
+
+    The following commands work when prefixed to `:FirstError`:
+
+    - |:vert|
+    - |:aboveleft|, |:belowright|, |:topleft| and |:botright|
+    - |:silent|
+    - |:hide|
+    - |:tab|
+
+    These commands will affect the way windows are created when jumping to
+    errors, if there's a need to open a new window.
+
 
 :CurrentError                                                  *:CurrentError*
     Jump to the current error in the compilation buffer. This works using the

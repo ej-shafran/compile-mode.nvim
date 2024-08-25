@@ -424,6 +424,46 @@ M.recompile = a.void(function(param)
 	end
 end)
 
+---Jump to the Nth error in the error list, based on the count
+---
+---@type fun(param: CommandParam?)
+M.first_error = a.void(function(param)
+	local config = require("compile-mode.config.internal")
+
+	log.debug("calling first_error()")
+
+	param = param or {}
+	local count = param.count or 1
+	log.fmt_debug("count = %d", count)
+
+	local lines = vim.iter(pairs(errors.error_list))
+		:filter(function(_, error)
+			return error.level >= config.error_threshold
+		end)
+		:map(function(line, _)
+			return line
+		end)
+		:totable()
+
+	if count < 1 then
+		vim.notify("Moved back before first error")
+		return
+	end
+
+	if count > #lines then
+		vim.notify("Moved past last error")
+		return
+	end
+
+	table.sort(lines)
+
+	error_cursor = assert(lines[count])
+	local error = assert(errors.error_list[error_cursor])
+
+	local dir = find_directory_for_line(error_cursor)
+	utils.jump_to_error(error, dir, param.smods or {})
+end)
+
 ---Jump to the current error in the error list
 ---
 ---@type fun(param: CommandParam?)
@@ -553,6 +593,8 @@ M.move_to_prev_error = act_from_current_error("move", "prev", false)
 ---Move to the location of the previous error within the compilation buffer that has a different file to the current one.
 ---Does not jump to the error's actual locus.
 M.move_to_prev_file = act_from_current_error("move", "prev", true)
+
+-- OUTWARD-FACING UTILITIES
 
 M._gf = goto_file(false)
 
