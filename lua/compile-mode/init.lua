@@ -380,7 +380,7 @@ M.compile = a.void(function(param)
 
 	param = param or {}
 	local command = param.args
-	if not command or command then
+	if not command or command == "" then
 		local input_completion_func = "CompileInputComplete"
 		if package.loaded["cmp_cmdline_prompt"] or config.input_word_completion then
 			input_completion_func = "CompileInputCompleteWord"
