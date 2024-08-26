@@ -286,6 +286,15 @@ local runcommand = a.void(function(command, param)
 		vim.notify(compilation_message)
 	end
 
+	vim.api.nvim_exec_autocmds("User", {
+		pattern = "CompilationFinished",
+		data = {
+			command = command,
+			code = code,
+			bufnr = bufnr,
+		},
+	})
+
 	utils.wait()
 end)
 
