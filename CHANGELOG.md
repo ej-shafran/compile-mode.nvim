@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.2.0] - 2024-08-27
+
 ### Added
 
 - The `CompilationFinished` autocmd (a pattern of `User`) which triggers when the compilation is finished.
@@ -390,6 +392,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.0.2...v5.1.0
 [5.0.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.0.1...v5.0.2
 [5.0.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.0.0...v5.0.1
