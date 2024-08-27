@@ -70,6 +70,8 @@ Table of Contents                             *compile-mode-table-of-contents*
   - CompileModeCheckTarget                               |hl-CompileModeError|
   - CompileModeDirectoryMessage               |hl-CompileModeDirectoryMessage|
   - CompileModeErrorLocus                           |hl-CompileModeErrorLocus|
+9. Autocmd                                              |compile-mode-autocmd|
+  - CompilationFinished                                  |CompilationFinished|
 
 ==============================================================================
 1. Introduction                                    *compile-mode-introduction*
@@ -814,5 +816,22 @@ CompileModeDirectoryMessage                   *hl-CompileModeDirectoryMessage*
 CompileModeErrorLocus                               *hl-CompileModeErrorLocus*
     The highlighting used in the source of an error when jumping to that
     error's locus.
+
+
+==============================================================================
+9. Autocmd                                              *compile-mode-autocmd*
+
+You can create custom autocommands (see |:autocmd|) for certain compile-mode
+events by defining autocommands for the |User| event with the following
+patterns:
+
+CompilationFinished                                      *CompilationFinished*
+    Invoked when the compilation is finished. The |event-data| is a table with
+    the following keys:
+
+	- {command} (string) the compilation command that finished executing
+	- {code} (integer) the exit code of the executed command
+	- {bufnr} (integer) the buffer ID for the compilation buffer with the
+	  output of the command
 
  vim:tw=78:ts=8:noet:ft=help:norl:

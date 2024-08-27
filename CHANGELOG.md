@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `CompilationFinished` autocmd (a pattern of `User`) which triggers when the compilation is finished.
+
 ## [5.1.0] - 2024-08-25
 
 ### Added
