@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.3.0] - 2024-10-13
+
+### Changed
+
+- The behavior of the `q` mapping within the compilation buffer; instead of running `<CMD>q<CR>` and possibly quitting Neovim, it now runs `<CMD>bdelete<CR>`, which won't close out the entire editor.
+- No longer outputs additional lines created by the process once interrupted/exited.
+
 ## [5.2.0] - 2024-08-27
 
 ### Added
@@ -392,6 +399,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.3.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.2.0...v5.3.0
 [5.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.0.2...v5.1.0
 [5.0.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.0.1...v5.0.2
