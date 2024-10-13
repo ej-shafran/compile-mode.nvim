@@ -50,7 +50,11 @@ end)
 
 describe("`clear_environment` option", function()
 	it("should override existing environment variables", function()
-		helpers.setup_tests({ clear_environment = true })
+		helpers.setup_tests({
+			clear_environment = true,
+			-- NOTE: this is required or tests fail on macOS, because Homebrew needs $HOME to be set
+			environment = { HOME = "/" },
+		})
 
 		local cmd = env_variable("OTHER")
 		vim.env.OTHER = "some value"
