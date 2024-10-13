@@ -227,3 +227,5 @@ This gets tacked on the end of the generated expressions.")
 
 * TODO Make some logs trace-level
 
+* TODO Add ability to customize entering-leaving regex
+

@@ -80,7 +80,7 @@ command("CompileNextFile", compile_mode.move_to_next_file, { count = 1 })
 command("CompilePrevError", compile_mode.move_to_prev_error, { count = 1 })
 command("CompilePrevFile", compile_mode.move_to_prev_file, { count = 1 })
 
-set("n", "q", "<cmd>q<cr>")
+set("n", "q", "<cmd>bdelete<cr>")
 set("n", "<cr>", "<cmd>CompileGotoError<cr>")
 set("n", "<C-c>", "<cmd>CompileInterrupt<cr>")
 set("n", "<C-q>", "<cmd>QuickfixErrors<cr>")
@@ -102,7 +102,7 @@ autocmd("CursorMoved", {
 autocmd({ "TextChanged", "TextChangedI" }, {
 	desc = "Error Parsing",
 	buffer = bufnr,
-	callback = function ()
+	callback = function()
 		compile_mode._parse_errors(bufnr)
 	end,
 })
