@@ -118,10 +118,9 @@ local runjob = a.wrap(function(cmd, bufnr, param, callback)
 
 	local count = 0
 	local partial_line = ""
-	local is_exited = false
 
 	local on_either = a.void(function(_, data)
-		if is_exited or not data or #data < 1 or (#data == 1 and data[1] == "") then
+		if not data or #data < 1 or (#data == 1 and data[1] == "") then
 			return
 		end
 
@@ -149,7 +148,6 @@ local runjob = a.wrap(function(cmd, bufnr, param, callback)
 		on_stdout = on_either,
 		on_stderr = on_either,
 		on_exit = function(id, code)
-			is_exited = true
 			callback(count, code, id)
 		end,
 		env = config.environment,
