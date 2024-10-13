@@ -8,6 +8,13 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.3.0] - 2024-10-13
+
+### Changed
+
+- The behavior of the `q` mapping within the compilation buffer; instead of running `<CMD>q<CR>` and possibly quitting Neovim, it now runs `<CMD>bdelete<CR>`, which won't close out the entire editor.
+- No longer outputs additional lines created by the process once interrupted/exited.
+
 ## [5.2.0] - 2024-08-27
 
 ### Added
