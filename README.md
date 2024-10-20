@@ -15,6 +15,10 @@ rerun that command over and over again as much as you need.
 Use your favorite plugin manager. `compile-mode.nvim` depends on
 [plenary.nvim](https://github.com/nvim-lua/plenary.nvim).
 
+> [!WARNING]
+>
+> `compile-mode.nvim` only supports Neovim versions v0.10.0 and higher, and isn't expected to work for earlier versions.
+
 Here's an example of a [Lazy](https://github.com/folke/lazy.nvim) config for
 `compile-mode.nvim`:
 

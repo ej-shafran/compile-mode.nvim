@@ -18,11 +18,10 @@ jobs:
           - ubuntu-latest
           - macos-latest
           - windows-latest
+        nvim_version:
+          - 0.10.0
 
     runs-on: ${{ matrix.os }}
-
-    env:
-      NVIM_VERSION: 0.10.0
 
     steps:
       - name: Checkout Code
@@ -39,12 +38,12 @@ jobs:
       - name: Install Neovim
         uses: MunifTanjim/setup-neovim-action@v1
         with:
-          tag: v${{ env.NVIM_VERSION }}
+          tag: v${{ matrix.nvim_version }}
         if: matrix.os != 'windows-latest'
 
       - name: Install Neovim (Windows)
         run: |
-          choco install neovim --version=${{ env.NVIM_VERSION }}
+          choco install neovim --version=${{ matrix.nvim_version }}
           echo 'C:\tools\neovim\nvim-win64\bin' | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         if: matrix.os == 'windows-latest'
 
