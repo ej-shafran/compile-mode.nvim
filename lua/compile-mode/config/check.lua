@@ -2,6 +2,18 @@ local check = {}
 
 local compile_mode = require("compile-mode")
 
+---@param lst unknown[]
+---@param value unknown
+---@return boolean
+local function list_contains(lst, value)
+	for _, item in ipairs(lst) do
+		if item == value then
+			return true
+		end
+	end
+	return false
+end
+
 ---@param tbl table the table to validate
 ---@see vim.validate
 ---@return boolean is_valid
@@ -143,12 +155,12 @@ function check.unrecognized_keys(tbl, default_tbl)
 
 	local keys = {}
 	for k, _ in pairs(tbl) do
-		if not vim.list_contains(skipped_keys, k) then
+		if not list_contains(skipped_keys, k) then
 			keys[k] = true
 		end
 	end
 	for k, _ in pairs(default_tbl) do
-		if not vim.list_contains(skipped_keys, k) then
+		if not list_contains(skipped_keys, k) then
 			keys[k] = false
 		end
 	end
