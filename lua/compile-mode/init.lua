@@ -145,7 +145,9 @@ local runjob = a.wrap(function(cmd, bufnr, param, callback)
 	log.debug("starting job...")
 	local job_id = vim.fn.jobstart(cmd, {
 		cwd = vim.g.compilation_directory,
+		stdout_buffered = true,
 		on_stdout = on_either,
+		stderr_buffered = true,
 		on_stderr = on_either,
 		on_exit = function(id, code)
 			callback(count, code, id)
