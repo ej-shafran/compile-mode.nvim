@@ -2,6 +2,10 @@
 
 Thank you for wanting to contribute to `compile-mode.nvim`! Generally, I want to keep this plugin pretty close to the features of Emacs' Compilation Mode, with better quality of life where possible, so I'd recommend you have some familiarity with it if you want to contribute. Bug fixes are always welcome, of course, but new features should either be things that exist in the Emacs mode or things that unambiguously make the plugin nicer to use.
 
+> [!NOTE]
+>
+> As specified in the README, `compile-mode.nvim` only officially supports Neovim versions v0.10.0 and higher. However, if you'd like to contribute some code that makes the plugin work for earlier versions (and isn't too much of a hassle to maintain) I'll be glad to merge it.
+
 ## The development process
 
 ### Cloning the repository

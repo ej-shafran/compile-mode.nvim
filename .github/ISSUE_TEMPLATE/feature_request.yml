@@ -1,7 +1,8 @@
 name: Feature Request
 description: Request a feature you would like to see
 title: "[FEAT] <title>"
-labels: enhancement
+labels:
+  - enhancement
 assignees: ej-shafran
 body:
   - type: checkboxes

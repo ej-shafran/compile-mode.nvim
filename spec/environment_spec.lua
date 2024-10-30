@@ -3,7 +3,7 @@ local helpers = require("spec.test_helpers")
 local function env_variable(var)
 	if vim.o.shell:match("cmd.exe$") then
 		return "echo %" .. var .. "%"
-	elseif vim.o.shell:match("pwdh$") or vim.o.shell:match("powershell$") then
+	elseif vim.o.shell:match("pwsh$") or vim.o.shell:match("powershell$") then
 		return "echo $Env:" .. var
 	else
 		return "echo $" .. var
@@ -50,7 +50,11 @@ end)
 
 describe("`clear_environment` option", function()
 	it("should override existing environment variables", function()
-		helpers.setup_tests({ clear_environment = true })
+		helpers.setup_tests({
+			clear_environment = true,
+			-- NOTE: this is required or tests fail on macOS, because Homebrew needs $HOME to be set
+			environment = { HOME = "/" },
+		})
 
 		local cmd = env_variable("OTHER")
 		vim.env.OTHER = "some value"
