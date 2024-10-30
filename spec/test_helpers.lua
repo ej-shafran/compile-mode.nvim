@@ -135,7 +135,7 @@ end
 
 function M.sleep_command(seconds)
 	if vim.o.shell:match("cmd.exe$") then
-		return ("timeout /T %d"):format(seconds)
+		return ("timeout %d"):format(seconds)
 	else
 		return ("sleep %d"):format(seconds)
 	end
