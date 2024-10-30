@@ -26,5 +26,5 @@ jobs:
       - name: Pull from tag
         run: |
           git fetch origin
-          git merge v${GITHUB_REF#refs/tags/v} --ff-only -m 'Update to latest tag'
+          git merge $GITHUB_REF --ff-only -m 'Update to latest tag'
           git push origin latest
