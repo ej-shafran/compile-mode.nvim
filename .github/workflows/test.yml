@@ -23,6 +23,7 @@ jobs:
           - windows-latest
         nvim_version:
           - 0.10.0
+          - 0.10.1
 
     runs-on: ${{ matrix.os }}
 
