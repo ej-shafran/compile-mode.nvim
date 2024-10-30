@@ -67,7 +67,7 @@ function M.get_output(start_line, end_line)
 	local bufnr = M.get_compilation_bufnr()
 	local result = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line, false)
 	return vim.tbl_map(function(line)
-		local replaced = line:gsub("\r", "")
+		local replaced = line:gsub("%s*\r", "")
 		return replaced
 	end, result)
 end
