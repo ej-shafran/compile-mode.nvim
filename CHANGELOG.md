@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Documentation for minimum supported version of Neovim.
+
 ## [5.3.0] - 2024-10-13
 
 ### Changed
