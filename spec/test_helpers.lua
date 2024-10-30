@@ -134,15 +134,17 @@ function M.compile_multiple_errors(error_strings)
 end
 
 function M.multi_step_command(first_step, second_step, wait_seconds)
-	local fmt
 	if vim.o.shell:match("cmd.exe$") then
-		fmt = 'echo "%s" && timeout /t %d && echo "%s"'
+		return ("echo %s && ping 127.0.0.1 -n %d > nul && echo %s"):format(first_step, wait_seconds + 1, second_step)
 	elseif vim.o.shell:match("pwsh$") or vim.o.shell:match("powershell$") then
-		fmt = "Write-Output '%s'; Start-Sleep -Seconds %d; Write-Output '%s'"
+		return ("Write-Output '%s'; Start-Sleep -Seconds %d; Write-Output '%s'"):format(
+			first_step,
+			wait_seconds,
+			second_step
+		)
 	else
-		fmt = "echo '%s' && sleep %d && echo '%s'"
+		return ("echo '%s' && sleep %d && echo '%s'"):format(first_step, wait_seconds, second_step)
 	end
-	return fmt:format(first_step, wait_seconds, second_step)
 end
 
 ---@param expected CreateError
