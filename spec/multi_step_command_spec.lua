@@ -4,7 +4,7 @@ local assert = require("luassert")
 local first_step_output = "hello"
 local wait_seconds = 1
 local second_step_output = "goodbye"
-local cmd = ("echo %s && %s && echo %s"):format(
+local cmd = ("echo %s&& %s && echo %s"):format(
 	first_step_output,
 	helpers.sleep_command(wait_seconds),
 	second_step_output
