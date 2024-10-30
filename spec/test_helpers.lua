@@ -133,12 +133,16 @@ function M.compile_multiple_errors(error_strings)
 	M.compile({ args = "printf '" .. printf_fmt .. "' " .. printf_args })
 end
 
-function M.sleep_command(seconds)
+function M.multi_step_command(first_step, second_step, wait_seconds)
+	local fmt
 	if vim.o.shell:match("cmd.exe$") then
-		return ("timeout %d"):format(seconds)
+		fmt = 'echo "%s" && timeout /t %d && echo "%s"'
+	elseif vim.o.shell:match("pwsh$") or vim.o.shell:match("powershell$") then
+		fmt = "Write-Output '%s'; Start-Sleep -Seconds %d; Write-Output '%s'"
 	else
-		return ("sleep %d"):format(seconds)
+		fmt = "echo '%s' && sleep %d && echo '%s'"
 	end
+	return fmt:format(first_step, wait_seconds, second_step)
 end
 
 ---@param expected CreateError
