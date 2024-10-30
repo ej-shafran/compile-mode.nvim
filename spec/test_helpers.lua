@@ -60,9 +60,12 @@ function M.get_compilation_bufnr()
 	return vim.fn.bufadd(config.buffer_name)
 end
 
-function M.get_output()
+function M.get_output(start_line, end_line)
+	start_line = start_line or 3
+	end_line = end_line or -4
+
 	local bufnr = M.get_compilation_bufnr()
-	local result = vim.api.nvim_buf_get_lines(bufnr, 3, -4, false)
+	local result = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line, false)
 	return vim.tbl_map(function(line)
 		local replaced = line:gsub("\r", "")
 		return replaced
@@ -76,11 +79,12 @@ function M.setup_tests(opts)
 	package.loaded["compile-mode.config.internal"] = nil
 end
 
-function M.wait()
+function M.wait(ms)
+	ms = ms or 100
 	local co = coroutine.running()
 	vim.defer_fn(function()
 		coroutine.resume(co)
-	end, 100)
+	end, ms)
 	coroutine.yield(co)
 end
 
@@ -127,6 +131,14 @@ function M.compile_multiple_errors(error_strings)
 	local printf_fmt = vim.fn.join(format_strings, "\\n")
 
 	M.compile({ args = "printf '" .. printf_fmt .. "' " .. printf_args })
+end
+
+function M.sleep_command(seconds)
+	if vim.o.shell:match("cmd.exe$") then
+		return ("timeout /T %d"):format(seconds)
+	else
+		return ("sleep %d"):format(seconds)
+	end
 end
 
 ---@param expected CreateError
