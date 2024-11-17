@@ -534,7 +534,7 @@ end
 
 --- COMPILATION BUFFER COMMANDS
 
----Go to the error on the current line
+---Go to the error on the current line.
 ---
 ---@type fun(param: CommandParam?)
 M.goto_error = a.void(function(param)
@@ -558,6 +558,22 @@ M.goto_error = a.void(function(param)
 
 	error_cursor = linenum
 	utils.jump_to_error(error, dir, param or {})
+end)
+
+---Print information about the error on the current line.
+---
+---@type fun()
+M.debug_error = a.void(function()
+	log.debug("calling debug_error()")
+
+	local linenum = unpack(vim.api.nvim_win_get_cursor(0))
+	local error = errors.error_list[linenum]
+	if not error then
+		vim.notify("No error here")
+		return
+	end
+
+	print(("error = %s"):format(vim.inspect(error)))
 end)
 
 ---Interrupt the currently running compilation command.

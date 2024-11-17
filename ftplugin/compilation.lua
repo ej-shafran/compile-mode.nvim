@@ -74,6 +74,7 @@ matchadd(
 matchadd("CompileModeDirectoryMessage", "\\(Entering\\|Leaving\\) directory [`']\\zs.\\+\\ze'$")
 
 command("CompileGotoError", compile_mode.goto_error)
+command("CompileDebugError", compile_mode.debug_error)
 command("CompileInterrupt", compile_mode.interrupt)
 command("CompileNextError", compile_mode.move_to_next_error, { count = 1 })
 command("CompileNextFile", compile_mode.move_to_next_file, { count = 1 })
@@ -82,6 +83,7 @@ command("CompilePrevFile", compile_mode.move_to_prev_file, { count = 1 })
 
 set("n", "q", "<cmd>bdelete<cr>")
 set("n", "<cr>", "<cmd>CompileGotoError<cr>")
+set("n", "<C-/>", "<cmd>CompileDebugError<cr>")
 set("n", "<C-c>", "<cmd>CompileInterrupt<cr>")
 set("n", "<C-q>", "<cmd>QuickfixErrors<cr>")
 set("n", "<C-r>", "<cmd>Recompile<cr>")
