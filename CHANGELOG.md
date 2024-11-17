@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `CompileDebugError` command, which prints debug information about the error under the current line (along with a matching API function).
+
 ## [5.3.1] - 2024-10-30
 
 ### Added

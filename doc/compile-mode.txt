@@ -37,6 +37,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - add_to_qflist()                             |compile-mode.add_to_qflist()|
   - next_error_follow()                     |compile-mode.next_error_follow()|
   - goto_error()                                   |compile-mode.goto_error()|
+  - debug_error()                                 |compile-mode.debug_error()|
   - move_to_next_error()                                |move_to_next_error()|
   - move_to_next_file()                                  |move_to_next_file()|
   - move_to_prev_error()                                |move_to_prev_error()|
@@ -52,6 +53,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :QuickfixErrors                                          |:QuickfixErrors|
   - :NextErrorFollow                                        |:NextErrorFollow|
   - :CompileGotoError                                      |:CompileGotoError|
+  - :CompileDebugError                                    |:CompileDebugError|
   - :CompileNextError                                      |:CompileNextError|
   - :CompileNextFile                                        |:CompileNextFile|
   - :CompilePrevError                                      |:CompilePrevError|
@@ -152,6 +154,7 @@ The compilation buffer has a few local commands and keymaps. The local
 commands (and their keymaps, if mentioned) are:
 
 - |:CompileGotoError| - mapped to `<CR>`
+- |:CompileDebugError| - mapped to `<C-/>`
 - |:CompileInterrupt| - mapped to `<C-c>`
 - |:CompileNextError| - mapped to `<C-g>n`
 - |:CompileNextFile| - mapped to `<C-g>]`
@@ -441,6 +444,10 @@ goto_error({param})                                *compile-mode.goto_error()*
 	      will affect the way windows are created when jumping to errors,
 	      if there's a need to open a new window
 
+debug_error({param})                              *compile-mode.debug_error()*
+    Prints debug information about the error under the cursor. See
+    |:CompileDebugError|.
+
 move_to_next_error({param})                *compile-mode.move_to_next_error()*
     Move to the line of the next error within the compilation buffer. See
     |:CompileNextError|.
@@ -637,6 +644,14 @@ interrupt()                                         *compile-mode.interrupt()*
     errors, if there's a need to open a new window.
 
     Mapped to `<CR>` within the compilation buffer.
+
+:CompileDebugError                                        *:CompileDebugError*
+    Only available within the compilation buffer itself.
+
+    Print debug information about the error present in the line under the
+    cursor. If no such error exists, the command reports on this fact.
+
+    Mapped to `<C-/>` within the compilation buffer.
 
 :CompileNextError                                          *:CompileNextError*
 :[N]CompileNextError
