@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.3.2] - 2024-11-17
+
 ### Added
 
 - The `CompileDebugError` command, which prints debug information about the error under the current line (along with a matching API function).
@@ -409,6 +411,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.3.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.1...v5.3.2
 [5.3.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.0...v5.3.1
 [5.3.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.2.0...v5.3.0
 [5.2.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.1.0...v5.2.0
