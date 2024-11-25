@@ -8,6 +8,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.4.0] - 2024-11-25
+
+### Fixed
+
+- Issue with calling the API functions without some optional fields crashing.
+
 ## [5.3.2] - 2024-11-17
 
 ### Added
@@ -411,6 +417,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.4.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.2...v5.4.0
 [5.3.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.1...v5.3.2
 [5.3.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.0...v5.3.1
 [5.3.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.2.0...v5.3.0
