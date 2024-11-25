@@ -39,6 +39,12 @@ jobs:
           repository: nvim-lua/plenary.nvim
           path: plenary.nvim
 
+      # workaround for https://github.com/actions/runner-images/issues/10984
+      - name: Fix Homebrew Issue
+        run: |
+          brew uninstall --ignore-dependencies --force pkg-config@0.29.2
+        if: matrix.os == 'macos-latest'
+
       - name: Install Neovim
         uses: MunifTanjim/setup-neovim-action@v1
         with:
