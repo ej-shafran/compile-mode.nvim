@@ -423,9 +423,10 @@ M.compile = a.void(
 		end
 
 		vim.g.compile_command = command
-		compilation_directory = vim.fn.getcwd()
+		compilation_directory = vim.g.compilation_directory or vim.fn.getcwd()
 
 		runcommand(command, param)
+		vim.g.compilation_directory = nil
 	end
 )
 
