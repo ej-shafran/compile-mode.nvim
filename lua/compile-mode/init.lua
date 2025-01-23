@@ -267,7 +267,7 @@ local runcommand = a.void(
 		utils.wait()
 		errors.highlight(bufnr)
 
-		log.fmt_debug("running command: `%s`", string.gsub(command, "\\`", "\\`"))
+		log.fmt_debug("running command: %s", command)
 		local line_count, code, job_id = runjob(command, bufnr, param)
 		if job_id ~= vim.g.compile_job_id then
 			return
@@ -570,7 +570,7 @@ M.goto_error = a.void(
 
 		local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 		local error = errors.error_list[linenum]
-		log.fmt_debug("error = %s", vim.inspect(error))
+		log.fmt_debug("error = %s", error)
 
 		if not error then
 			if not param.smods or not param.smods.silent then

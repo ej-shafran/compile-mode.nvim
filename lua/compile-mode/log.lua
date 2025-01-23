@@ -96,19 +96,23 @@ log.new = function(config, standalone)
 
 		-- Output to console
 		if config.use_console then
-			local console_string = string.format("[%-6s%s] %s: %s", nameupper, os.date("%H:%M:%S"), lineinfo, msg)
+			local is_headless = #vim.api.nvim_list_uis() == 0
 
-			if config.highlights and level_config.hl then
-				vim.cmd(string.format("echohl %s", level_config.hl))
-			end
+			local console_string = string.format("[%-6s%s] %s: %s", nameupper, os.date("%H:%M:%S"), lineinfo, msg)
 
 			local split_console = vim.split(console_string, "\n")
 			for _, v in ipairs(split_console) do
-				vim.cmd(string.format([[echom "[%s] %s"]], config.plugin, vim.fn.escape(v, '"')))
-			end
-
-			if config.highlights and level_config.hl then
-				vim.cmd("echohl NONE")
+				local message = string.format("[%s] %s", config.plugin, v)
+				-- Use Lua print in headless mode, so STDERR is not mangled
+				if is_headless then
+					print(message)
+				else
+					local chunk = { message }
+					if config.highlights and level_config.hl then
+						table.insert(chunk, level_config.hl)
+					end
+					vim.api.nvim_echo({ chunk }, true, {})
+				end
 			end
 		end
 
