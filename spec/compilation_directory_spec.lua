@@ -18,6 +18,21 @@ describe(":Compile", function()
 		helpers.compile({ args = pwd })
 		assert.are.same({ pwd, cwd }, helpers.get_output())
 	end)
+
+	it("should use vim.g.compilation_directory if set", function()
+		local dir = "/"
+		vim.g.compilation_directory = dir
+
+		helpers.compile({ args = pwd })
+		assert.are.same({ pwd, dir }, helpers.get_output())
+	end)
+
+	it("should unset vim.g.compilation_directory", function()
+		vim.g.compilation_directory = "/"
+
+		helpers.compile({ args = pwd })
+		assert.is_nil(vim.g.compilation_directory)
+	end)
 end)
 
 describe(":Recompile", function()
@@ -28,11 +43,16 @@ describe(":Recompile", function()
 		helpers.compile({ args = pwd })
 		assert.are.same({ pwd, old_cwd }, helpers.get_output())
 
+		-- Over the current working directory
 		helpers.change_vim_directory("..")
-
 		helpers.recompile({ args = pwd })
 		assert.are.same({ pwd, old_cwd }, helpers.get_output())
-
 		helpers.change_vim_directory(old_cwd)
+
+		-- Over vim.g.compilation_directory
+		vim.g.compilation_directory = "/"
+		helpers.recompile({ args = pwd })
+		assert.are.same({ pwd, old_cwd }, helpers.get_output())
+		vim.g.compilation_directory = nil
 	end)
 end)
