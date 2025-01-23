@@ -24,7 +24,7 @@ describe(":Compile", function()
 		vim.g.compilation_directory = dir
 
 		helpers.compile({ args = pwd })
-		assert.are.same({ pwd, dir }, helpers.get_output())
+		assert.are.same({ pwd, vim.fn.simplify(dir) }, helpers.get_output())
 	end)
 
 	it("should unset vim.g.compilation_directory", function()
