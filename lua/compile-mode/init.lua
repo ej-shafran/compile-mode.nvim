@@ -35,7 +35,7 @@ local error_cursor = 0
 
 ---The previous directory used for compilation.
 ---@type string|nil
-vim.g.compilation_directory = nil
+local compilation_directory = nil
 
 ---A table which keeps track of the changes in directory for the compilation buffer,
 ---based on "Entering directory" and "Leaving directory" messages.
@@ -69,7 +69,7 @@ end
 ---@return string
 local function find_directory_for_line(linenum)
 	local latest_linenum = nil
-	local dir = vim.g.compilation_directory or vim.fn.getcwd()
+	local dir = compilation_directory or vim.fn.getcwd()
 	for old_linenum, old_dir in pairs(dir_changes) do
 		if old_linenum < linenum and (not latest_linenum or latest_linenum <= old_linenum) then
 			latest_linenum = old_linenum
@@ -150,7 +150,7 @@ local runjob = a.wrap(
 
 		log.debug("starting job...")
 		local job_id = vim.fn.jobstart(cmd, {
-			cwd = vim.g.compilation_directory,
+			cwd = compilation_directory,
 			on_stdout = on_either,
 			on_stderr = on_either,
 			on_exit = function(id, code)
@@ -423,13 +423,9 @@ M.compile = a.void(
 		end
 
 		vim.g.compile_command = command
-		if not vim.g.compilation_directory then
-			vim.g.compilation_directory = vim.fn.getcwd()
-		end
+		compilation_directory = vim.fn.getcwd()
 
 		runcommand(command, param)
-
-		vim.g.compilation_directory = nil
 	end
 )
 
