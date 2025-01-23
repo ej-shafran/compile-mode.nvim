@@ -28,13 +28,11 @@ describe(":Recompile", function()
 		helpers.compile({ args = pwd })
 		assert.are.same({ pwd, old_cwd }, helpers.get_output())
 
-		vim.cmd("cd ..")
-		helpers.wait()
+		helpers.change_vim_directory("..")
 
 		helpers.recompile({ args = pwd })
 		assert.are.same({ pwd, old_cwd }, helpers.get_output())
 
-		vim.cmd("cd " .. old_cwd)
-		helpers.wait()
+		helpers.change_vim_directory(old_cwd)
 	end)
 end)
