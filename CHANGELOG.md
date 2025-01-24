@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.5.0] - 2025-01-24
+
 ### Fixed
 
 - The behavior of the compilation directory. The existing behavior was misleading and did not match the documentation or the Emacs plugin behavior. `:Compile` now uses the current working directory (`vim.fn.getcwd()`), unless the `vim.g.compilation_directory` global variable is set (in which case, `:Compile` unsets it once it's finished compiling); `:Recompile` now always uses the directory used by the last `:Compile`.
@@ -421,6 +423,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.5.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.4.0...v5.5.0
 [5.4.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.2...v5.4.0
 [5.3.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.1...v5.3.2
 [5.3.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.0...v5.3.1
