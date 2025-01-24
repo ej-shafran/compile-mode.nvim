@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The behavior of the compilation directory. The existing behavior was misleading and did not match the documentation or the Emacs plugin behavior. `:Compile` now uses the current working directory (`vim.fn.getcwd()`), unless the `vim.g.compilation_directory` global variable is set (in which case, `:Compile` unsets it once it's finished compiling); `:Recompile` now always uses the directory used by the last `:Compile`.
+
 ## [5.4.0] - 2024-11-25
 
 ### Fixed
@@ -19,10 +23,6 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - The `CompileDebugError` command, which prints debug information about the error under the current line (along with a matching API function).
-
-### Fixed
-
-- The behavior of the compilation directory. The existing behavior was misleading and did not match the documentation or the Emacs plugin behavior. `:Compile` now uses the current working directory (`vim.fn.getcwd()`), unless the `vim.g.compilation_directory` global variable is set (in which case, `:Compile` unsets it once it's finished compiling); `:Recompile` now always uses the directory used by the last `:Compile`.
 
 ## [5.3.1] - 2024-10-30
 
