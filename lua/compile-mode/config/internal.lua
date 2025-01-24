@@ -72,7 +72,7 @@ if not ok then
 end
 
 if #config.health_info.unrecognized_keys > 0 then
-	log.warn("found unrecognized options: " .. vim.fn.join(config.health_info.unrecognized_keys, ", "))
+	log.fmt_warn("found unrecognized options: %s", config.health_info.unrecognized_keys)
 end
 
 if config.health_info.no_user_config then

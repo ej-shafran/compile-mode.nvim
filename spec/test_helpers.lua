@@ -79,6 +79,13 @@ function M.setup_tests(opts)
 	package.loaded["compile-mode.config.internal"] = nil
 end
 
+---@param directory string
+function M.change_vim_directory(directory)
+	vim.cmd(("cd %s"):format(directory))
+	M.wait()
+end
+
+---@param ms integer?
 function M.wait(ms)
 	ms = ms or 100
 	local co = coroutine.running()

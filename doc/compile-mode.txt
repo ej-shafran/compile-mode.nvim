@@ -45,6 +45,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - interrupt()                                     |compile-mode.interrupt()|
 7. Commands                                            |compile-mode-commands|
   - :Compile                                                        |:Compile|
+    - vim.g.compilation_directory                |vim.g.compilation_directory|
   - :Recompile                                                    |:Recompile|
   - :FirstError                                                  |:FirstError|
   - :CurrentError                                              |:CurrentError|
@@ -489,7 +490,8 @@ interrupt()                                         *compile-mode.interrupt()*
 
 :Compile[!]                                                         *:Compile*
     Runs a command and places its output in the compilation buffer. The
-    command is run from the current working directory. The compilation buffer
+    command is run from the current working directory, unless the
+    |vim.g.compilation_directory| variable is set. The compilation buffer
     is opened in a new split if it isn’t already opened. If an argument is
     present, it is used as the command. Otherwise, the user is prompted using
     |vim.ui.input()|.
@@ -508,6 +510,12 @@ interrupt()                                         *compile-mode.interrupt()*
 
     Additionally, you can run the command with a |count| to set the size of
     the opened window, like with |:split|.
+
+                 *compile-compilation-directory* *vim.g.compilation_directory*
+    If the `vim.g.compilation_directory` global variable is set to anything
+    but Lua `nil`, it is used instead of the current working directory when
+    compiling. After `:Compile` is finished, `vim.g.compilation_directory` is
+    set to `nil`.
 
 :Recompile[!]                                                     *:Recompile*
     Reruns the last compiled command. If there isn’t one, the error is
