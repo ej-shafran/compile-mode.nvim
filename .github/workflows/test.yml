@@ -24,6 +24,7 @@ jobs:
         nvim_version:
           - 0.10.0
           - 0.10.1
+          - 0.10.4
 
     runs-on: ${{ matrix.os }}
 
