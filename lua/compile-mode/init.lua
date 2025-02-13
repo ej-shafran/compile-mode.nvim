@@ -628,8 +628,16 @@ M.interrupt = a.void(function()
 	})
 	utils.wait()
 
-	vim.fn.jobstop(vim.g.compile_job_id)
+	local job_id = vim.g.compile_job_id
+	vim.fn.jobstop(job_id)
 	vim.g.compile_job_id = nil
+	vim.api.nvim_exec_autocmds("User", {
+		pattern = "CompilationInterrupted",
+		data = {
+			job_id = job_id,
+			bufnr = bufnr,
+		},
+	})
 end)
 
 ---Move to the location of the next error within the compilation buffer.

@@ -75,6 +75,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - CompileModeErrorLocus                           |hl-CompileModeErrorLocus|
 9. Autocmd                                              |compile-mode-autocmd|
   - CompilationFinished                                  |CompilationFinished|
+  - CompilationInterrupted                            |CompilationInterrupted|
 
 ==============================================================================
 1. Introduction                                    *compile-mode-introduction*
@@ -857,6 +858,15 @@ CompilationFinished                                      *CompilationFinished*
 
 	- {command} (string) the compilation command that finished executing
 	- {code} (integer) the exit code of the executed command
+	- {bufnr} (integer) the buffer ID for the compilation buffer with the
+	  output of the command
+
+CompilationInterrupted                                *CompilationInterrupted*
+    Invoked when the compilation is interrupted (when another job is started
+    or by a call to |:CompileInterrupt|). The |event-data| is a table with the
+    following keys:
+
+	- {job_id} (integer) the job ID of the job which was interrupted
 	- {bufnr} (integer) the buffer ID for the compilation buffer with the
 	  output of the command
 
