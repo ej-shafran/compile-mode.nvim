@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `CompilationInterrupted` autocmd (a pattern of `User`) which triggers when the compilation is interrupted.
+
 ## [5.5.0] - 2025-01-24
 
 ### Fixed
