@@ -422,6 +422,10 @@ M.compile = a.void(
 			return
 		end
 
+		-- Replace '%' with the absolute path of the current buffer's file
+		local current_file_path = vim.fn.expand("%:p")
+		command = command:gsub("%%", current_file_path)
+
 		vim.g.compile_command = command
 		compilation_directory = vim.g.compilation_directory or vim.fn.getcwd()
 
