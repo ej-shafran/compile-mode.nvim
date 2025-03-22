@@ -399,9 +399,7 @@ M.compile = a.void(
 	---@param param CommandParam?
 	function(param)
 		local config = require("compile-mode.config.internal")
-
 		log.debug("calling compile()")
-
 		param = param or {}
 
 		local command = param.args
@@ -422,13 +420,20 @@ M.compile = a.void(
 			return
 		end
 
-		-- Replace '%' with the absolute path of the current buffer's file
 		local current_file_path = vim.fn.expand("%:p")
-		command = command:gsub("%%", current_file_path)
+		-- Replace standalone '%' with the current file path, but leave tokens like %s, %d untouched.
+		command = command:gsub("%%(.)", function(ch)
+			if ch:match("[%a%d]") then
+				return "%" .. ch -- leave placeholders like %s, %d, etc. intact
+			else
+				return current_file_path .. ch
+			end
+		end)
+		-- Also handle case where '%' is at the end of the string.
+		command = command:gsub("%%$", current_file_path)
 
 		vim.g.compile_command = command
 		compilation_directory = vim.g.compilation_directory or vim.fn.getcwd()
-
 		runcommand(command, param)
 		vim.g.compilation_directory = nil
 	end
