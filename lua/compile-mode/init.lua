@@ -248,6 +248,10 @@ local runcommand = a.void(
 		utils.buf_set_opt(bufnr, "buftype", "nofile")
 		utils.buf_set_opt(bufnr, "filetype", "compilation")
 
+		if not config.hidden_buffer then
+			utils.buf_set_opt(bufnr, "buflisted", true)
+		end
+
 		-- reset compilation buffer
 		set_lines(bufnr, 0, -1, {})
 		utils.wait()

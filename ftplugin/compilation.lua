@@ -82,6 +82,9 @@ command("CompilePrevError", compile_mode.move_to_prev_error, { count = 1 })
 command("CompilePrevFile", compile_mode.move_to_prev_file, { count = 1 })
 
 set("n", "q", "<cmd>bdelete<cr>")
+if not config.hidden_buffer then
+	set("n", "c", require("compile-mode.utils").close_compilation)
+end
 set("n", "<cr>", "<cmd>CompileGotoError<cr>")
 set("n", "<C-/>", "<cmd>CompileDebugError<cr>")
 set("n", "<C-c>", "<cmd>CompileInterrupt<cr>")

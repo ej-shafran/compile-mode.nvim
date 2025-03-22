@@ -363,6 +363,16 @@ input_word_completion                     *compile-mode.input_word_completion*
     autocompletion solution and find issues with the completion, you may want
     to try setting this to `true`.
 
+hidden_buffer                                     *compile-mode.hidden_buffer*
+    By default, `hidden_buffer` is set to `false` which means that the
+    compilation buffer has *buflisted* set to `false` hiding it from the
+    buffer list.
+
+    When `true`, *buflisted* is set to `true` and the new keybinding 'c'
+    simply closes the window to the compilation buffer so that it may be
+    opened again with, .e.g., `:buffer *compilation*`.
+
+
 ==============================================================================
 6. API                                                      *compile-mode-api*
 

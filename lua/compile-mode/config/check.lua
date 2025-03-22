@@ -130,6 +130,7 @@ function check.validate(cfg)
 		error_ignore_file_list = validate_string_list(cfg.error_ignore_file_list),
 		hidden_output = validate_string_list(cfg.hidden_output, true),
 		error_regexp_table = validate_error_regexp_table(cfg.error_regexp_table),
+		hidden_buffer = { cfg.hidden_buffer, "boolean" }
 	})
 end
 
