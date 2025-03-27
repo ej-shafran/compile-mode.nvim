@@ -59,6 +59,7 @@ local function set_lines(bufnr, start, end_, data)
 		utils.buf_set_opt(bufnr, "modified", false)
 	end)
 	vim.api.nvim_buf_call(bufnr, function()
+		vim.cmd("redraw!")
 		vim.cmd("normal G")
 	end)
 end
