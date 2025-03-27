@@ -272,8 +272,6 @@ local runcommand = a.void(
 			return
 		end
 
-		M._parse_errors(bufnr)
-
 		vim.g.compile_job_id = nil
 
 		if line_count == 0 then
@@ -283,6 +281,7 @@ local runcommand = a.void(
 		local compilation_message
 		if code == exit_code.SUCCESS then
 			compilation_message = "Compilation finished"
+			M._parse_errors(bufnr)
 		elseif code == exit_code.SIGSEGV then
 			compilation_message = "Compilation segmentation fault (core dumped)"
 		elseif code == exit_code.SIGTERM then
