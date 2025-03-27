@@ -79,13 +79,13 @@ local function validate_error_regexp_table(value)
 
 			---@type string|nil
 			local err_msg = nil
-			local ok = vim.iter(regexp_table):all(function(group, matcher)
+			local ok = vim.iter(regexp_table):all(function(matcher)
 				if matcher == false then
 					return true
 				end
 
 				if type(matcher) ~= "table" then
-					err_msg = group .. " expected table or false, got " .. type(matcher)
+					err_msg = matcher.group .. " expected table or false, got " .. type(matcher)
 					return false
 				end
 
@@ -97,7 +97,7 @@ local function validate_error_regexp_table(value)
 					type = { matcher.type, { "number", "table" }, true },
 				})
 				if not ok then
-					err_msg = group .. "." .. err
+					err_msg = matcher.group .. "." .. err
 				end
 				return ok
 			end)

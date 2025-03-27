@@ -107,6 +107,7 @@ end
 
 ---@type CompileModeRegexpMatcher
 M.typescript_regexp_matcher = {
+	group = "typescript",
 	regex = "^\\(.\\+\\)(\\([1-9][0-9]*\\),\\([1-9][0-9]*\\)): error TS[1-9][0-9]*:",
 	filename = 1,
 	row = 2,

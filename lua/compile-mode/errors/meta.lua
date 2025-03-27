@@ -6,6 +6,7 @@
 ---@field end_  integer
 
 ---@class CompileModeRegexpMatcher
+---@field group    string
 ---@field regex    string
 ---@field filename integer
 ---@field row      integer|CompileModeIntByInt|nil
@@ -24,5 +25,6 @@
 ---@field col         CompileModeValueAndRange<integer>?
 ---@field end_col     CompileModeValueAndRange<integer>?
 ---@field group       string?
+---@field matcher     CompileModeRegexpMatcher
 ---@field full_text   string
 ---@field linenum     integer

@@ -137,8 +137,8 @@ local runjob = a.wrap(
 			table.move(data, 2, #data, #new_lines + 1, new_lines)
 			partial_line = new_lines[#new_lines]
 
-			for i, line in ipairs(new_lines) do
-				for _, re in ipairs(config.hidden_output) do
+			for _, re in ipairs(config.hidden_output) do
+				for i, line in ipairs(new_lines) do
 					line = vim.fn.substitute(line, re, "", "")
 					new_lines[i] = line
 				end
@@ -665,10 +665,12 @@ function M._parse_errors(bufnr)
 
 	local output_highlights = {}
 	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	local matcher = nil
 	for linenum, line in ipairs(lines) do
-		local error = errors.parse(line, linenum)
+		local error = errors.parse(line, linenum, matcher)
 
 		if error then
+			matcher = error.matcher
 			errors.error_list[linenum] = error
 
 			if config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
