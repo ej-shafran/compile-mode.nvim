@@ -144,8 +144,6 @@ local runjob = a.wrap(
 			end
 
 			set_lines(bufnr, -2, -1, new_lines)
-			utils.wait()
-			M._parse_errors(bufnr)
 		end)
 
 		log.debug("starting job...")
@@ -272,6 +270,9 @@ local runcommand = a.void(
 		if job_id ~= vim.g.compile_job_id then
 			return
 		end
+
+		M._parse_errors(bufnr)
+
 		vim.g.compile_job_id = nil
 
 		if line_count == 0 then
