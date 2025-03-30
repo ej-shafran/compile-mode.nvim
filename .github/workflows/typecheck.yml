@@ -24,19 +24,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: nvim-lua/plenary.nvim
-          path: "$GITHUB_WORKSPACE/plenary.nvim"
+          path: "${{ github.workspace }}/plenary.nvim"
 
       - name: Setup Neovim Runtime
         uses: actions/checkout@v4
         with:
           repository: neovim/neovim
-          path: "$GITHUB_WORKSPACE/neovim"
+          path: "${{ github.workspace }}/neovim"
 
       - name: Typecheck
         uses: mrcjkb/lua-typecheck-action@v1
         env:
-          VIMRUNTIME: "$GITHUB_WORKSPACE/neovim/runtime"
-          PLENARY_PATH: "$GITHUB_WORKSPACE/plenary.nvim"
+          VIMRUNTIME: "${{ github.workspace }}/neovim/runtime"
+          PLENARY_PATH: "${{ github.workspace }}/plenary.nvim"
         with:
           directories: |
             compile-mode.nvim
