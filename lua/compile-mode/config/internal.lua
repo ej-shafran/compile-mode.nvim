@@ -51,7 +51,7 @@ local default_config = {
 	debug = false,
 
 	--- @type boolean
-	hidden_buffer = true
+	hidden_buffer = false
 }
 
 local user_config = type(vim.g.compile_mode) == "function" and vim.g.compile_mode() or vim.g.compile_mode
