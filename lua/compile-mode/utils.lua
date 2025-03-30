@@ -5,7 +5,7 @@ local M = {}
 local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
 
 local highlight_ns = vim.api.nvim_create_namespace("compile-mode.nvim/highlight")
----@type uv_timer_t | nil
+---@type table | nil
 local highlight_timer
 ---@type fun() | nil
 local highlight_cancel = nil
@@ -199,10 +199,6 @@ local function jump_to_file(filename, error, smods)
 	local col = (error.col and error.col.value or 1) - 1
 	if col < 0 then
 		col = 0
-	end
-	local end_col = error.end_col and error.end_col.value - 1
-	if end_col and end_col < 0 then
-		end_col = 0
 	end
 
 	if vim.api.nvim_get_current_buf() ~= compilation_buffer then

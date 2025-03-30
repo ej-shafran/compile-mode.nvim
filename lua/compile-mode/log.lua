@@ -40,19 +40,10 @@ local default_config = {
 -- {{{ NO NEED TO CHANGE
 local log = {}
 
-local unpack = unpack or table.unpack
-
 log.new = function(config, standalone)
 	config = vim.tbl_deep_extend("force", default_config, config)
 
 	local outfile = string.format("%s/%s.log", vim.api.nvim_call_function("stdpath", { "data" }), config.plugin)
-
-	local obj
-	if standalone then
-		obj = log
-	else
-		obj = {}
-	end
 
 	local levels = {}
 	for i, v in ipairs(config.modes) do
@@ -127,6 +118,13 @@ log.new = function(config, standalone)
 		end
 	end
 
+	local obj
+	if standalone then
+		obj = log
+	else
+		obj = {}
+	end
+
 	for i, x in ipairs(config.modes) do
 		obj[x.name] = function(...)
 			return log_at_level(i, x, make_string, ...)
@@ -144,6 +142,8 @@ log.new = function(config, standalone)
 			end)
 		end
 	end
+
+	return obj
 end
 
 log.new(default_config, true)

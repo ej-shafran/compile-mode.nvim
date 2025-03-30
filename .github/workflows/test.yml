@@ -24,6 +24,7 @@ jobs:
         nvim_version:
           - 0.10.0
           - 0.10.1
+          - 0.10.4
 
     runs-on: ${{ matrix.os }}
 
@@ -46,7 +47,7 @@ jobs:
         if: matrix.os == 'macos-latest'
 
       - name: Install Neovim
-        uses: MunifTanjim/setup-neovim-action@v1
+        uses: ej-shafran/setup-neovim-action@v1
         with:
           tag: v${{ matrix.nvim_version }}
         if: matrix.os != 'windows-latest'

@@ -10,7 +10,8 @@ describe("interrupting a compilation", function()
 	end)
 
 	it("should show an interruption message", function()
-		helpers.compile({ args = "sleep 10" })
+		helpers.compile({ args = "sleep 10" }, true)
+		helpers.wait_ms(100)
 
 		helpers.interrupt()
 
@@ -21,7 +22,8 @@ describe("interrupting a compilation", function()
 	end)
 
 	it("should make the job stop running", function()
-		helpers.compile({ args = "sleep 10" })
+		helpers.compile({ args = "sleep 10" }, true)
+		helpers.wait_ms(100)
 
 		local id = vim.g.compile_job_id
 
