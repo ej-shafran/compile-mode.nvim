@@ -1,5 +1,3 @@
-local config = {}
-
 local compile_mode = require("compile-mode")
 local check = require("compile-mode.config.check")
 local log = require("compile-mode.log")
@@ -60,7 +58,7 @@ local health_info = {
 	},
 }
 
-config = vim.tbl_extend("force", health_info, default_config, user_config or {})
+local config = vim.tbl_extend("force", health_info, default_config, user_config or {})
 config.error_regexp_table =
 	vim.tbl_extend("force", require("compile-mode.errors").error_regexp_table, config.error_regexp_table)
 config.error_ignore_file_list = vim.list_extend({ "/bin/[a-z]*sh$" }, config.error_ignore_file_list)
