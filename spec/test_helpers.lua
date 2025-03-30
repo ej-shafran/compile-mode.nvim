@@ -13,13 +13,16 @@ local M = {}
 ---COMMANDS
 
 ---@param param CommandParam?
-function M.compile(param)
+---@param disable_wait boolean?
+function M.compile(param, disable_wait)
 	param = param or {}
 
 	compile_mode.compile(vim.tbl_extend("force", param, {
 		smods = vim.tbl_extend("force", param.smods or {}, { silent = true }),
 	}))
-	M.wait()
+	if not disable_wait then
+		M.wait_for_compilation()
+	end
 end
 
 ---@param param CommandParam?
@@ -29,28 +32,28 @@ function M.recompile(param)
 	compile_mode.recompile(vim.tbl_extend("force", param, {
 		smods = vim.tbl_extend("force", param.smods or {}, { silent = true }),
 	}))
-	M.wait()
+	M.wait_for_compilation()
 end
 
 function M.interrupt()
 	compile_mode.interrupt()
-	M.wait()
+	M.wait_for_interruption()
 end
 
 ---@param param CommandParam?
 function M.next_error(param)
 	compile_mode.next_error(param)
-	M.wait()
+	M.wait_ms(100)
 end
 
 function M.move_to_next_error()
 	compile_mode.move_to_next_error()
-	M.wait()
+	M.wait_ms(100)
 end
 
 function M.move_to_next_file()
 	compile_mode.move_to_next_file()
-	M.wait()
+	M.wait_ms(100)
 end
 
 ---UTILS
@@ -82,12 +85,36 @@ end
 ---@param directory string
 function M.change_vim_directory(directory)
 	vim.cmd(("cd %s"):format(directory))
-	M.wait()
+	M.wait_ms(100)
 end
 
----@param ms integer?
-function M.wait(ms)
-	ms = ms or 100
+function M.wait_for_compilation()
+	local co = coroutine.running()
+	vim.api.nvim_create_autocmd("User", {
+		once = true,
+		pattern = "CompilationFinished",
+		callback = function()
+			coroutine.resume(co)
+		end,
+	})
+	coroutine.yield(co)
+end
+
+function M.wait_for_interruption()
+	local co = coroutine.running()
+	vim.api.nvim_create_autocmd("User", {
+		once = true,
+		pattern = "CompilationInterrupted",
+		callback = function()
+			print("here")
+			coroutine.resume(co)
+		end,
+	})
+	coroutine.yield(co)
+end
+
+---@param ms integer
+function M.wait_ms(ms)
 	local co = coroutine.running()
 	vim.defer_fn(function()
 		coroutine.resume(co)

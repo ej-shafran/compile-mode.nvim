@@ -133,7 +133,9 @@ local runjob = a.wrap(
 			count = count + #data
 
 			local new_lines = { partial_line .. data[1] }
-			table.move(data, 2, #data, #new_lines + 1, new_lines)
+			for i = 2, #data do
+				table.insert(new_lines, data[i])
+			end
 			partial_line = new_lines[#new_lines]
 
 			for i, line in ipairs(new_lines) do
@@ -351,7 +353,7 @@ local function act_from_current_error(action, direction, different_file)
 				fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
 			end
 
-			local fits_line_constraint = true
+			local fits_line_constraint
 			if direction == "prev" then
 				fits_line_constraint = line < error_cursor and (not error_line or error_line < line)
 			else
@@ -628,8 +630,16 @@ M.interrupt = a.void(function()
 	})
 	utils.wait()
 
-	vim.fn.jobstop(vim.g.compile_job_id)
+	local job_id = vim.g.compile_job_id
+	vim.fn.jobstop(job_id)
 	vim.g.compile_job_id = nil
+	vim.api.nvim_exec_autocmds("User", {
+		pattern = "CompilationInterrupted",
+		data = {
+			job_id = job_id,
+			bufnr = bufnr,
+		},
+	})
 end)
 
 ---Move to the location of the next error within the compilation buffer.
@@ -695,7 +705,9 @@ function M._parse_errors(bufnr)
 
 			if not (linenum == 1 and vim.startswith(line, "vim:")) then
 				local highlights = utils.match_command_ouput(line, linenum)
-				table.move(highlights, 1, #highlights, #output_highlights + 1, output_highlights)
+				for _, value in ipairs(highlights) do
+					table.insert(output_highlights, value)
+				end
 			end
 		end
 	end
@@ -721,7 +733,7 @@ function M._follow_cursor()
 		return
 	end
 
-	local preview_win = nil
+	local preview_win
 	local winnrs = vim.api.nvim_list_wins()
 	if #winnrs == 1 then
 		-- If there are no other windows, split a new one for the preview
