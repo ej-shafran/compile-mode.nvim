@@ -351,7 +351,7 @@ local function act_from_current_error(action, direction, different_file)
 				fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
 			end
 
-			local fits_line_constraint = true
+			local fits_line_constraint
 			if direction == "prev" then
 				fits_line_constraint = line < error_cursor and (not error_line or error_line < line)
 			else
@@ -729,7 +729,7 @@ function M._follow_cursor()
 		return
 	end
 
-	local preview_win = nil
+	local preview_win
 	local winnrs = vim.api.nvim_list_wins()
 	if #winnrs == 1 then
 		-- If there are no other windows, split a new one for the preview

@@ -184,10 +184,6 @@ local function jump_to_file(filename, error, smods)
 	if col < 0 then
 		col = 0
 	end
-	local end_col = error.end_col and error.end_col.value - 1
-	if end_col and end_col < 0 then
-		end_col = 0
-	end
 
 	if vim.api.nvim_get_current_buf() ~= compilation_buffer then
 		vim.cmd.e(filename)

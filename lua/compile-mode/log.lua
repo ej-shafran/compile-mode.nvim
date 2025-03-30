@@ -47,13 +47,6 @@ log.new = function(config, standalone)
 
 	local outfile = string.format("%s/%s.log", vim.api.nvim_call_function("stdpath", { "data" }), config.plugin)
 
-	local obj
-	if standalone then
-		obj = log
-	else
-		obj = {}
-	end
-
 	local levels = {}
 	for i, v in ipairs(config.modes) do
 		levels[v.name] = i
@@ -127,6 +120,13 @@ log.new = function(config, standalone)
 		end
 	end
 
+	local obj
+	if standalone then
+		obj = log
+	else
+		obj = {}
+	end
+
 	for i, x in ipairs(config.modes) do
 		obj[x.name] = function(...)
 			return log_at_level(i, x, make_string, ...)
@@ -144,6 +144,8 @@ log.new = function(config, standalone)
 			end)
 		end
 	end
+
+	return obj
 end
 
 log.new(default_config, true)
