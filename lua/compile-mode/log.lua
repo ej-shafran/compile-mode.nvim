@@ -40,8 +40,6 @@ local default_config = {
 -- {{{ NO NEED TO CHANGE
 local log = {}
 
-local unpack = unpack or table.unpack
-
 log.new = function(config, standalone)
 	config = vim.tbl_deep_extend("force", default_config, config)
 

@@ -133,7 +133,9 @@ local runjob = a.wrap(
 			count = count + #data
 
 			local new_lines = { partial_line .. data[1] }
-			table.move(data, 2, #data, #new_lines + 1, new_lines)
+			for i = 2, #data do
+				table.insert(new_lines, data[i])
+			end
 			partial_line = new_lines[#new_lines]
 
 			for i, line in ipairs(new_lines) do
@@ -703,7 +705,9 @@ function M._parse_errors(bufnr)
 
 			if not (linenum == 1 and vim.startswith(line, "vim:")) then
 				local highlights = utils.match_command_ouput(line, linenum)
-				table.move(highlights, 1, #highlights, #output_highlights + 1, output_highlights)
+				for _, value in ipairs(highlights) do
+					table.insert(output_highlights, value)
+				end
 			end
 		end
 	end

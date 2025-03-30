@@ -5,7 +5,7 @@ local M = {}
 local compile_mode_ns = vim.api.nvim_create_namespace("compile-mode.nvim")
 
 local highlight_ns = vim.api.nvim_create_namespace("compile-mode.nvim/highlight")
----@type uv_timer_t | nil
+---@type table | nil
 local highlight_timer
 ---@type fun() | nil
 local highlight_cancel = nil

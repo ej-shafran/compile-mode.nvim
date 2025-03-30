@@ -17,6 +17,27 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+        with:
+          path: compile-mode.nvim
+
+      - name: Setup `plenary.nvim`
+        uses: actions/checkout@v4
+        with:
+          repository: nvim-lua/plenary.nvim
+          path: plenary.nvim
+
+      - name: Setup Neovim Runtime
+        uses: actions/checkout@v4
+        with:
+          repository: neovim/neovim
+          path: neovim
 
       - name: Typecheck
         uses: mrcjkb/lua-typecheck-action@v1
+        env:
+          VIMRUNTIME: neovim/runtime
+          PLENARY_PATH: plenary.nvim
+        with:
+          directories: |
+            compile-mode.nvim
+          configpath: compile-mode.nvim/.luarc-ci.json
