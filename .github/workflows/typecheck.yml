@@ -24,19 +24,19 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: nvim-lua/plenary.nvim
-          path: plenary.nvim
+          path: /deps/plenary.nvim
 
       - name: Setup Neovim Runtime
         uses: actions/checkout@v4
         with:
           repository: neovim/neovim
-          path: neovim
+          path: /deps/neovim
 
       - name: Typecheck
         uses: mrcjkb/lua-typecheck-action@v1
         env:
-          VIMRUNTIME: neovim/runtime
-          PLENARY_PATH: plenary.nvim
+          VIMRUNTIME: /deps/neovim/runtime
+          PLENARY_PATH: /deps/plenary.nvim
         with:
           directories: |
             compile-mode.nvim
