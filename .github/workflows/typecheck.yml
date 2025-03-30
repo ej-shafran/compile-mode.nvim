@@ -12,6 +12,13 @@ jobs:
   typecheck:
     name: Typecheck Code
 
+    strategy:
+      matrix:
+        nvim_version:
+          - 0.10.0
+          - 0.10.1
+          - 0.10.4
+
     runs-on: ubuntu-latest
 
     steps:
@@ -29,6 +36,7 @@ jobs:
       - name: Setup Neovim Runtime
         uses: actions/checkout@v4
         with:
+          ref: "v${{ matrix.nvim_version }}"
           repository: neovim/neovim
           path: "${{ github.workspace }}/neovim"
 
