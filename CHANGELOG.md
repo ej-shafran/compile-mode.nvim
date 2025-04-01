@@ -11,6 +11,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - The `CompilationInterrupted` autocmd (a pattern of `User`) which triggers when the compilation is interrupted.
+- The `hidden_buffer` option, which applies the old behavior where the compilation buffer is not listed.
+- The `CompileCloseBuffer` command in the compilation buffer, which closes the buffer's window.
+
+### Changed
+
+- The behavior of the `q` keymap in the compilation buffer - it now triggers `:CompileCloseBuffer`.
+
+### Fixed
+
+- The default behavior for the compilation buffer's `buflisted` setting. This is possibly a breaking change for some users, for whom the `hidden_buffer` option is made available, but since this is more in line with the Emacs plugin's behavior and resolves several errors, it is marked as a fix and not a change.
 
 ## [5.5.0] - 2025-01-24
 

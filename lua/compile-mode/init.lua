@@ -649,14 +649,7 @@ end)
 
 ---Close the compilation buffer.
 function M.close_buffer()
-	local config = require("compile-mode.config.internal")
-
 	local bufnr = vim.g.compilation_buffer
-
-	if config.hidden_buffer then
-		vim.cmd.bdelete(bufnr)
-		return
-	end
 
 	local winnrs = vim.fn.win_findbuf(bufnr)
 

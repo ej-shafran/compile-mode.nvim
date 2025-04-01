@@ -738,7 +738,7 @@ close_buffer()                                   *compile-mode.close_buffer()*
 :CompileCloseBuffer                                      *:CompileCloseBuffer*
     Only available within the compilation buffer itself.
 
-    Close the comiplation buffer.
+    Close the compilation buffer's window.
 
     Mapped to `q` within the compilation buffer.
 
