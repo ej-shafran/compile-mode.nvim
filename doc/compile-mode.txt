@@ -26,6 +26,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - clear_environment                         |compile-mode.clear_environment|
   - debug                                                 |compile-mode.debug|
   - input_word_completion                 |compile-mode.input_word_completion|
+  - hidden_buffer                                 |compile-mode.hidden_buffer|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -43,6 +44,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - move_to_prev_error()                                |move_to_prev_error()|
   - move_to_prev_file()                                  |move_to_prev_file()|
   - interrupt()                                     |compile-mode.interrupt()|
+  - close_buffer()                               |compile-mode.close_buffer()|
 7. Commands                                            |compile-mode-commands|
   - :Compile                                                        |:Compile|
     - vim.g.compilation_directory                |vim.g.compilation_directory|
@@ -60,6 +62,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :CompilePrevError                                      |:CompilePrevError|
   - :CompilePrevFile                                        |:CompilePrevFile|
   - :CompileInterrupt                                      |:CompileInterrupt|
+  - :CompileCloseBuffer                                  |:CompileCloseBuffer|
 8. Highlights                                        |compile-mode-highlights|
   - CompileModeError                                     |hl-CompileModeError|
   - CompileModeInfo                                       |hl-CompileModeInfo|
@@ -158,6 +161,7 @@ commands (and their keymaps, if mentioned) are:
 - |:CompileGotoError| - mapped to `<CR>`
 - |:CompileDebugError| - mapped to `<C-/>`
 - |:CompileInterrupt| - mapped to `<C-c>`
+- |:CompileCloseBuffer| - mapped to `<q>`
 - |:CompileNextError| - mapped to `<C-g>n`
 - |:CompileNextFile| - mapped to `<C-g>]`
 - |:CompilePrevError| - mapped to `<C-g>p`
@@ -165,7 +169,6 @@ commands (and their keymaps, if mentioned) are:
 
 Additional keymaps within the compilation buffer are:
 
-- `q` is mapped to `<CMD>q<CR>` for easy closing of the compilation buffer.
 - `<C-r>` is mapped to `<CMD>Recompile<CR>` for quick recompilation.
 - `<C-g>f` is mapped to `<CMD>NextErrorFollow<CR>` to preview the error under
   the cursor.
@@ -364,6 +367,10 @@ input_word_completion                     *compile-mode.input_word_completion*
     autocompletion solution and find issues with the completion, you may want
     to try setting this to `true`.
 
+hidden_buffer                                     *compile-mode.hidden_buffer*
+    When `true`, the compilation buffer will be hidden, meaning *'buflisted'*
+    will be `false` for it.
+
 ==============================================================================
 6. API                                                      *compile-mode-api*
 
@@ -484,6 +491,9 @@ move_to_prev_file({param})                  *compile-mode.move_to_prev_file()*
 
 interrupt()                                         *compile-mode.interrupt()*
     Interrupts the currently running compilation. See |:CompileInterrupt|.
+
+close_buffer()                                   *compile-mode.close_buffer()*
+    Closes the compilation buffer. See |:CompileCloseBuffer|.
 
 ==============================================================================
 7. Commands                                            *compile-mode-commands*
@@ -724,6 +734,13 @@ interrupt()                                         *compile-mode.interrupt()*
     the compilation buffer.
 
     Mapped to `<C-c>` within the compilation buffer.
+
+:CompileCloseBuffer                                      *:CompileCloseBuffer*
+    Only available within the compilation buffer itself.
+
+    Close the comiplation buffer.
+
+    Mapped to `q` within the compilation buffer.
 
 ==============================================================================
 8. Highlights                                        *compile-mode-highlights*

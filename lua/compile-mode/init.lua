@@ -52,6 +52,10 @@ local in_next_error_mode = false
 ---@param end_ integer
 ---@param data string[]
 local function set_lines(bufnr, start, end_, data)
+	if vim.fn.bufexists(bufnr) == 0 then
+		return
+	end
+
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	vim.api.nvim_buf_set_lines(bufnr, start, end_, false, data)
 	vim.schedule(function()
@@ -249,6 +253,7 @@ local runcommand = a.void(
 
 		utils.buf_set_opt(bufnr, "buftype", "nofile")
 		utils.buf_set_opt(bufnr, "filetype", "compilation")
+		utils.buf_set_opt(bufnr, "buflisted", not config.hidden_buffer)
 
 		-- reset compilation buffer
 		set_lines(bufnr, 0, -1, {})
@@ -641,6 +646,30 @@ M.interrupt = a.void(function()
 		},
 	})
 end)
+
+---Close the compilation buffer.
+function M.close_buffer()
+	local config = require("compile-mode.config.internal")
+
+	local bufnr = vim.g.compilation_buffer
+
+	if config.hidden_buffer then
+		vim.cmd.bdelete(bufnr)
+		return
+	end
+
+	local winnrs = vim.fn.win_findbuf(bufnr)
+
+	if #vim.api.nvim_list_wins() > 1 then
+		vim.iter(winnrs):each(function(winnr)
+			vim.api.nvim_win_close(winnr, true)
+		end)
+	elseif vim.fn.bufexists("#") ~= 0 then
+		vim.cmd.buffer("#")
+	else
+		vim.cmd.bnext()
+	end
+end
 
 ---Move to the location of the next error within the compilation buffer.
 ---Does not jump to the error's actual locus.

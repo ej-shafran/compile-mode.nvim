@@ -8,8 +8,6 @@ on:
     types:
       - opened
       - synchronize
-    branches:
-      - main
 
 jobs:
   test:
