@@ -125,6 +125,7 @@ function check.validate(cfg)
 		environment = { cfg.environment, "table", true },
 		clear_environment = { cfg.clear_environment, "boolean" },
 		baleia_setup = { cfg.baleia_setup, { "boolean", "table" } },
+		bang_expansion = { cfg.bang_expansion, "boolean" },
 		debug = { cfg.debug, "boolean" },
 		error_threshold = validate_enum(cfg.error_threshold, compile_mode.level, "compile_mode.level.%s"),
 		error_ignore_file_list = validate_string_list(cfg.error_ignore_file_list),

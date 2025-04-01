@@ -42,6 +42,9 @@
 ---For more info, run `:h compile-mode.baleia_setup`
 ---@field baleia_setup?             boolean|table
 ---
+---For more info, run `:h compile-mode.bang_expansion`
+---@field bang_expansion?           boolean
+---
 ---For more info, run `:h compile-mode.input_word_completion`
 ---@field input_word_completion?    boolean
 ---

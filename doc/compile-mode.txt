@@ -10,6 +10,7 @@ Table of Contents                             *compile-mode-table-of-contents*
 5. Configuration                                  |compile-mode-configuration|
   - default_command                             |compile-mode.default_command|
   - baleia_setup                                   |compile-mode.baleia_setup|
+  - bang_expansion                               |compile-mode.bang_expansion|
   - error_regexp_table                       |compile-mode.error_regexp_table|
   - error_ignore_file_list               |compile-mode.error_ignore_file_list|
   - error_threshold                             |compile-mode.error_threshold|
@@ -122,6 +123,10 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
 	  vim.g.compile_mode = {
 	      -- to add ANSI escape code support, add:
 	      -- baleia_setup = true,
+
+	      -- to make `:Compile` replace special characters (e.g. `%`) in
+	      -- the command (and behave more like `:!`), add:
+	      -- bang_expansion = true,
 	  }
       end
     }
@@ -270,6 +275,15 @@ baleia_setup                                       *compile-mode.baleia_setup*
     When `true`, baleia.nvim will be set up for the compilation buffer, which
     will color in ANSI escape codes in the compilation output. This option can
     also be a table of options to pass to `baleia.setup()`.
+
+bang_expansion                                   *compile-mode.bang_expansion*
+    When `true`, commands will be run through |expandcmd()| before being
+    executed, which will make them behave more like the |:!| command.
+
+    This enables things like `:Compile echo %`, which will print the current
+    file's name. Note that you will have to escape characters like `%` in the
+    command if you have this setting enabled; this means using `printf \%s`
+    instead of `printf %s`, as the latter will be expanded.
 
 error_regexp_table                            *compile-mode.error_regexp_table
     See |compile-mode-errors|.
