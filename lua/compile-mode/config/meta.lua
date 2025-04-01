@@ -53,6 +53,9 @@
 ---
 ---For more info, run `:h compile-mode.error_locus_highlight`
 ---@field error_locus_highlight?    boolean|integer|nil
+---
+---For more info, run `:h compile-mode.hidden_buffer`
+---@field hidden_buffer?            boolean
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode
