@@ -251,7 +251,7 @@ local runcommand = a.void(
 		utils.buf_set_opt(bufnr, "filetype", "compilation")
 		utils.buf_set_opt(bufnr, "buflisted", true)
 		if config.hidden_buffer then
-		    utils.buf_set_opt(bufnr, "buflisted", false)
+			utils.buf_set_opt(bufnr, "buflisted", false)
 		end
 
 		-- reset compilation buffer
@@ -645,6 +645,30 @@ M.interrupt = a.void(function()
 		},
 	})
 end)
+
+---Close the compilation buffer.
+function M.close_buffer()
+	local config = require("compile-mode.config.internal")
+
+	local bufnr = vim.g.compilation_buffer
+
+	if config.hidden_buffer then
+		vim.cmd.bdelete(bufnr)
+		return
+	end
+
+	local winnrs = vim.fn.win_findbuf(bufnr)
+
+	if #vim.api.nvim_list_wins() > 1 then
+		vim.iter(winnrs):each(function(winnr)
+			vim.api.nvim_win_close(winnr, true)
+		end)
+	elseif vim.fn.bufexists("#") ~= 0 then
+		vim.cmd.buffer("#")
+	else
+		vim.cmd.bnext()
+	end
+end
 
 ---Move to the location of the next error within the compilation buffer.
 ---Does not jump to the error's actual locus.
