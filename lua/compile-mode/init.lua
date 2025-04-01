@@ -52,6 +52,10 @@ local in_next_error_mode = false
 ---@param end_ integer
 ---@param data string[]
 local function set_lines(bufnr, start, end_, data)
+	if vim.fn.bufexists(bufnr) == 0 then
+		return
+	end
+
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	vim.api.nvim_buf_set_lines(bufnr, start, end_, false, data)
 	vim.schedule(function()
@@ -249,10 +253,7 @@ local runcommand = a.void(
 
 		utils.buf_set_opt(bufnr, "buftype", "nofile")
 		utils.buf_set_opt(bufnr, "filetype", "compilation")
-		utils.buf_set_opt(bufnr, "buflisted", true)
-		if config.hidden_buffer then
-			utils.buf_set_opt(bufnr, "buflisted", false)
-		end
+		utils.buf_set_opt(bufnr, "buflisted", not config.hidden_buffer)
 
 		-- reset compilation buffer
 		set_lines(bufnr, 0, -1, {})
