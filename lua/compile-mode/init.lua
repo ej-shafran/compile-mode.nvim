@@ -259,6 +259,10 @@ local runcommand = a.void(
 		set_lines(bufnr, 0, -1, {})
 		utils.wait()
 
+		if config.bang_expansion then
+			command = vim.fn.expandcmd(command)
+		end
+
 		local error = errors.parse(command, 4)
 		if error then
 			errors.error_list[4] = error

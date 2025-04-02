@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- The `bang_expansion` offer, which runs commands through `expandcmd()` and makes the `:Compile` command behave more like `:!`.
 - The `CompilationInterrupted` autocmd (a pattern of `User`) which triggers when the compilation is interrupted.
 - The `hidden_buffer` option, which applies the old behavior where the compilation buffer is not listed.
 - The `CompileCloseBuffer` command in the compilation buffer, which closes the buffer's window.
