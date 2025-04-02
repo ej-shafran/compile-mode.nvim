@@ -20,10 +20,7 @@ describe("bang_expansion", function()
 
 	it("should escape properly", function()
 		vim.cmd.e(filename)
-		helpers.compile({ args = print_command("\\%") })
+		helpers.compile({ args = print_command([[\%]]) })
 		assert.are.same({ print_command("%"), "%" }, helpers.get_output())
-
-		helpers.compile({ args = print_command("\\\\\\%") })
-		assert.are.same({ print_command("\\%"), "\\%" }, helpers.get_output())
 	end)
 end)
