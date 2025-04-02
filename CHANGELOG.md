@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.6.0] - 2025-04-02
+
 ### Added
 
 - The `bang_expansion` offer, which runs commands through `expandcmd()` and makes the `:Compile` command behave more like `:!`.
@@ -438,6 +440,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.6.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.5.0...v5.6.0
 [5.5.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.4.0...v5.5.0
 [5.4.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.2...v5.4.0
 [5.3.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.3.1...v5.3.2
