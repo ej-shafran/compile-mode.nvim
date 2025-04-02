@@ -63,6 +63,7 @@ local function set_lines(bufnr, start, end_, data)
 		utils.buf_set_opt(bufnr, "modified", false)
 	end)
 	vim.api.nvim_buf_call(bufnr, function()
+		vim.cmd("redraw!")
 		vim.cmd("normal G")
 	end)
 end
@@ -142,16 +143,14 @@ local runjob = a.wrap(
 			end
 			partial_line = new_lines[#new_lines]
 
-			for i, line in ipairs(new_lines) do
-				for _, re in ipairs(config.hidden_output) do
+			for _, re in ipairs(config.hidden_output) do
+				for i, line in ipairs(new_lines) do
 					line = vim.fn.substitute(line, re, "", "")
 					new_lines[i] = line
 				end
 			end
 
 			set_lines(bufnr, -2, -1, new_lines)
-			utils.wait()
-			M._parse_errors(bufnr)
 		end)
 
 		log.debug("starting job...")
@@ -283,6 +282,7 @@ local runcommand = a.void(
 		if job_id ~= vim.g.compile_job_id then
 			return
 		end
+
 		vim.g.compile_job_id = nil
 
 		if line_count == 0 then
@@ -292,6 +292,7 @@ local runcommand = a.void(
 		local compilation_message
 		if code == exit_code.SUCCESS then
 			compilation_message = "Compilation finished"
+			M._parse_errors(bufnr)
 		elseif code == exit_code.SIGSEGV then
 			compilation_message = "Compilation segmentation fault (core dumped)"
 		elseif code == exit_code.SIGTERM then
@@ -699,10 +700,12 @@ function M._parse_errors(bufnr)
 
 	local output_highlights = {}
 	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+	local matcher = nil
 	for linenum, line in ipairs(lines) do
-		local error = errors.parse(line, linenum)
+		local error = errors.parse(line, linenum, matcher)
 
 		if error then
+			matcher = error.matcher
 			errors.error_list[linenum] = error
 
 			if config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
