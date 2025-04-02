@@ -42,6 +42,9 @@
 ---For more info, run `:h compile-mode.baleia_setup`
 ---@field baleia_setup?             boolean|table
 ---
+---For more info, run `:h compile-mode.bang_expansion`
+---@field bang_expansion?           boolean
+---
 ---For more info, run `:h compile-mode.input_word_completion`
 ---@field input_word_completion?    boolean
 ---
@@ -53,6 +56,9 @@
 ---
 ---For more info, run `:h compile-mode.error_locus_highlight`
 ---@field error_locus_highlight?    boolean|integer|nil
+---
+---For more info, run `:h compile-mode.hidden_buffer`
+---@field hidden_buffer?            boolean
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode

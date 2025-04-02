@@ -166,11 +166,13 @@ local function jump_to_file(filename, error, smods)
 	local compilation_buffer = vim.g.compilation_buffer
 	if config.use_diagnostics then
 		compilation_buffer = compilation_buffer or vim.fn.bufadd(config.buffer_name)
-		vim.iter(vim.fn.win_findbuf(compilation_buffer)):each(function(winnr)
-			vim.api.nvim_win_call(winnr, function()
-				vim.cmd("wincmd q")
+		local winnrs = vim.fn.win_findbuf(compilation_buffer)
+
+		if #vim.api.nvim_list_wins() > 1 then
+			vim.iter(winnrs):each(function(winnr)
+				vim.api.nvim_win_close(winnr, true)
 			end)
-		end)
+		end
 	else
 		compilation_buffer = M.split_unless_open({ bufnr = compilation_buffer, fname = config.buffer_name }, smods, 0)
 		local compilation_winnr = vim.fn.win_findbuf(compilation_buffer)[1]
