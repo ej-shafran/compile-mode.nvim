@@ -150,7 +150,11 @@ function M.split_unless_open(opts, smods, count)
 		vim.cmd(cmd)
 
 		if count ~= 0 and count ~= nil then
-			vim.cmd("resize" .. count)
+			local resize_cmd = "resize" .. count
+			if smods.vertical then
+				resize_cmd = "vert " .. resize_cmd
+			end
+			vim.cmd(resize_cmd)
 		end
 	end
 
