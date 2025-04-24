@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- The number prefix which resizes the compilation buffer when compiling with `:vert`.
+
 ## [5.6.0] - 2025-04-02
 
 ### Added
