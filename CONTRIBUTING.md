@@ -10,7 +10,7 @@ Thank you for wanting to contribute to `compile-mode.nvim`! Generally, I want to
 
 ### Cloning the repository
 
-Fork the repository and clone it.
+Fork the repository and clone it. It's better if you work from the `nightly` branch, so make sure you fork the repo with all its branches and not just `main`.
 
 ### Makefile
 
