@@ -15,6 +15,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - error_ignore_file_list               |compile-mode.error_ignore_file_list|
   - error_threshold                             |compile-mode.error_threshold|
   - auto_jump_to_first_error           |compile-mode.auto_jump_to_first_error|
+  - jump_to_previous_buffer             |compile-mode.jump_to_previous_buffer|
   - error_locus_highlight                 |compile-mode.error_locus_highlight|
   - use_diagnostics                             |compile-mode.use_diagnostics|
   - recompile_no_fail                         |compile-mode.recompile_no_fail|
@@ -302,6 +303,10 @@ error_threshold                                 *compile-mode.error_threshold*
 auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
     When `true`, compiling jumps to the first error as soon as it is
     available.
+
+jump_to_previous_buffer                 *compile-mode.jump_to_previous_buffer*
+    When `true`, compiling jumps to the last active buffer before compilations
+    command was called
 
 error_locus_highlight                     *compile-mode.error_locus_highlight*
     Configure the highlighting that occurs when jumping to an error's locus.

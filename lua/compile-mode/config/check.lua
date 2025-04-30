@@ -122,6 +122,7 @@ function check.validate(cfg)
 		recompile_no_fail = { cfg.recompile_no_fail, "boolean" },
 		error_locus_highlight = { cfg.error_locus_highlight, { "number", "boolean" }, true },
 		auto_jump_to_first_error = { cfg.auto_jump_to_first_error, "boolean" },
+		jump_to_previous_buffer = { cfg.jump_to_previous_buffer, "boolean" },
 		environment = { cfg.environment, "table", true },
 		clear_environment = { cfg.clear_environment, "boolean" },
 		baleia_setup = { cfg.baleia_setup, { "boolean", "table" } },

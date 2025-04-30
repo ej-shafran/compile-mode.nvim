@@ -27,6 +27,9 @@
 ---For more info, run `:h compile-mode.auto_jump_to_first_error`
 ---@field auto_jump_to_first_error? boolean
 ---
+---For more info, run `:h compile-mode.jump_to_previous_buffer`
+---@field jump_to_previous_buffer? boolean
+---
 ---For more info, run `:h compile-mode.ask_about_save`
 ---@field ask_about_save?           boolean
 ---

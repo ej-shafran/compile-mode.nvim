@@ -32,6 +32,8 @@ local default_config = {
 	recompile_no_fail = false,
 	---@type boolean
 	auto_jump_to_first_error = false,
+	---@type boolean
+	jump_to_previous_buffer = true,
 	---@type boolean|number|nil
 	error_locus_highlight = 500,
 
