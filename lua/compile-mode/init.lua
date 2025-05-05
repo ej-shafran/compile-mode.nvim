@@ -249,9 +249,8 @@ local runcommand = a.void(
 		local bufnr = utils.split_unless_open({ fname = config.buffer_name }, param.smods or {}, param.count)
 		utils.wait()
 
-		if not config.follow_output_window then
-			vim.api.nvim_set_current_win(prev_win)
-		end
+		local output_win = vim.api.nvim_get_current_win()
+		vim.api.nvim_set_current_win(prev_win)
 
 		log.fmt_debug("bufnr = %d", bufnr)
 
@@ -321,6 +320,9 @@ local runcommand = a.void(
 				bufnr = bufnr,
 			},
 		})
+		if config.follow_output_window then
+			vim.api.nvim_set_current_win(output_win)
+		end
 
 		utils.wait()
 	end
