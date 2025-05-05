@@ -52,6 +52,9 @@ local default_config = {
 
 	--- @type boolean
 	hidden_buffer = false,
+
+	--- @type boolean
+	follow_output_window = false,
 }
 
 local user_config = type(vim.g.compile_mode) == "function" and vim.g.compile_mode() or vim.g.compile_mode
