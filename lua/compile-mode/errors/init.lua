@@ -232,6 +232,12 @@ M.error_regexp_table = {
 		filename = 2,
 		row = 3,
 	},
+	rust = {
+		regex = "^.*\\( -->\\|panicked at\\) \\(.*\\):\\([0-9]\\+\\):\\([0-9]\\+\\)",
+		filename = 2,
+		row = 3,
+		col = 4,
+	},
 	-- TODO: support multi-line errors
 	rxp = {
 		regex = "^\\%(Error\\|Warnin\\(g\\)\\):.*\n.* line \\([0-9]\\+\\) char \\([0-9]\\+\\) of file://\\(.\\+\\)",
