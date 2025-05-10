@@ -28,6 +28,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - debug                                                 |compile-mode.debug|
   - input_word_completion                 |compile-mode.input_word_completion|
   - hidden_buffer                                 |compile-mode.hidden_buffer|
+  - follow_output_window                   |compile-mode.follow_output_window|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -384,6 +385,11 @@ input_word_completion                     *compile-mode.input_word_completion*
 hidden_buffer                                     *compile-mode.hidden_buffer*
     When `true`, the compilation buffer will be hidden, meaning *'buflisted'*
     will be `false` for it.
+
+follow_output_window                       *compile-mode.follow_output_window*
+    When `true`, after the compilation, compilation window will be set as the 
+    current window, meaning your cursor will jump to the compilation window.
+
 
 ==============================================================================
 6. API                                                      *compile-mode-api*
