@@ -321,7 +321,10 @@ local runcommand = a.void(
 			},
 		})
 		if config.follow_output_window then
-			vim.api.nvim_set_current_win(output_win)
+			local output_window_list = vim.fn.win_findbuf(bufnr)
+			if #output_window_list >= 1 then
+				vim.api.nvim_set_current_win(output_window_list[1])
+			end
 		end
 
 		utils.wait()
