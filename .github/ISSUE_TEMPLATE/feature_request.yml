@@ -19,6 +19,5 @@ body:
     attributes:
       label: Feature Suggestion
       description: What feature would you like to see?
-      render: markdown
     validations:
       required: true
