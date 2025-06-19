@@ -147,6 +147,10 @@ local runjob = a.wrap(
 					line = vim.fn.substitute(line, re, "", "")
 					new_lines[i] = line
 				end
+
+				if new_lines[i]:sub(-1) == "\r" then
+					new_lines[i] = new_lines[i]:sub(1, -2)
+				end
 			end
 
 			set_lines(bufnr, -2, -1, new_lines)
