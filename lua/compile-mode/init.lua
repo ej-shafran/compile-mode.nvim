@@ -145,7 +145,11 @@ local runjob = a.wrap(
 			for i, line in ipairs(new_lines) do
 				for _, re in ipairs(config.hidden_output) do
 					line = vim.fn.substitute(line, re, "", "")
-					new_lines[i] = line:gsub("\r", "")
+					new_lines[i] = line
+				end
+
+				if new_lines[i]:sub(-1) == "\r" then
+					new_lines[i] = new_lines[i]:sub(1, -2):match("^(.-)%s*$")
 				end
 			end
 
