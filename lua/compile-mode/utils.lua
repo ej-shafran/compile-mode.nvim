@@ -223,6 +223,9 @@ function M.clear_diagnostics()
 	vim.diagnostic.reset(compile_mode_ns)
 end
 
+--- @type string|nil
+local last_corrected_dir = nil
+
 ---@type fun(error: CompileModeError, current_dir: string, smods: SMods)
 M.jump_to_error = a.void(function(error, current_dir, smods)
 	current_dir = string.gsub(current_dir or "", "/$", "")
@@ -233,6 +236,17 @@ M.jump_to_error = a.void(function(error, current_dir, smods)
 	end
 
 	local file_exists = vim.fn.filereadable(filename) ~= 0
+	if not file_exists and last_corrected_dir ~= nil then
+		local maybe_filename = vim.fs.normalize(last_corrected_dir .. "/" .. error.filename.value)
+
+		if vim.fn.filereadable(maybe_filename) ~= 0 then
+			jump_to_file(maybe_filename, error, smods)
+
+			return
+		else
+			last_corrected_dir = nil
+		end
+	end
 
 	if file_exists then
 		jump_to_file(filename, error, smods)
@@ -266,6 +280,7 @@ M.jump_to_error = a.void(function(error, current_dir, smods)
 		return
 	end
 
+	last_corrected_dir = dir
 	jump_to_file(nested_filename, error, smods)
 end)
 
