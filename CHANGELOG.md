@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Keeping the last response to the directory prompt when a file cannot be found and reusing it when the next file cannot be found.
+
 ## [5.6.1] - 2025-04-24
 
 ### Fixed
