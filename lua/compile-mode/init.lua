@@ -248,7 +248,10 @@ local runcommand = a.void(
 		local prev_win = vim.api.nvim_get_current_win()
 		local bufnr = utils.split_unless_open({ fname = config.buffer_name }, param.smods or {}, param.count)
 		utils.wait()
+
+		local output_win = vim.api.nvim_get_current_win()
 		vim.api.nvim_set_current_win(prev_win)
+
 		log.fmt_debug("bufnr = %d", bufnr)
 
 		utils.buf_set_opt(bufnr, "buftype", "nofile")
@@ -317,6 +320,12 @@ local runcommand = a.void(
 				bufnr = bufnr,
 			},
 		})
+		if config.follow_output_window then
+			local output_window_list = vim.fn.win_findbuf(bufnr)
+			if #output_window_list >= 1 then
+				vim.api.nvim_set_current_win(output_window_list[1])
+			end
+		end
 
 		utils.wait()
 	end
