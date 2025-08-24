@@ -134,7 +134,7 @@ function M.split_unless_open(opts, smods, count)
 	local winnrs = vim.fn.win_findbuf(bufnr)
 
 	if #winnrs == 0 then
-		local cmd = "sbuffer " .. bufnr
+		local cmd = "sbuffer"
 		if smods.vertical then
 			cmd = "vert " .. cmd
 		end
@@ -147,7 +147,7 @@ function M.split_unless_open(opts, smods, count)
 			cmd = tostring(smods.tab) .. "tab " .. cmd
 		end
 
-		vim.cmd(cmd)
+		vim.cmd({ cmd = cmd, args = { bufnr }, mods = smods })
 
 		if count ~= 0 and count ~= nil then
 			local resize_cmd = "resize" .. count
