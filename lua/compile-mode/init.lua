@@ -7,11 +7,12 @@
 
 ---@class SMods
 ---
----@field vertical? boolean
----@field silent?   boolean
----@field hide?     boolean
----@field tab?      integer
----@field split?    SplitModifier
+---@field vertical?   boolean
+---@field silent?     boolean
+---@field hide?       boolean
+---@field tab?        integer
+---@field split?      SplitModifier
+---@field noswapfile? boolean
 
 ---@class CommandParam
 ---
