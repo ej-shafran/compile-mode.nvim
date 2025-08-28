@@ -247,8 +247,7 @@ local runcommand = a.void(
 		log.debug("opening compilation buffer...")
 
 		local prev_win = vim.api.nvim_get_current_win()
-		param.smods.noswapfile = true
-		local bufnr = utils.split_unless_open({ fname = config.buffer_name }, param.smods or {}, param.count)
+		local bufnr = utils.split_unless_open({ fname = config.buffer_name }, vim.tbl_extend("force", param.smods or {}, { noswapfile = true }), param.count)
 		utils.wait()
 		vim.api.nvim_set_current_win(prev_win)
 		log.fmt_debug("bufnr = %d", bufnr)
