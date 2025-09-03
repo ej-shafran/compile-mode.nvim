@@ -113,7 +113,7 @@ function M.buf_set_opt(bufnr, opt, value)
 end
 
 ---If `fname` has a window open, do nothing.
----Otherwise, split a new window (and possibly buffer) open for that file, respecting `config.split_vertically`.
+---Otherwise, split a new window (and possibly buffer) open for that file, respecting split mods.
 ---
 ---@param opts { fname: string } | { bufnr: integer }
 ---@param smods SMods
@@ -134,27 +134,10 @@ function M.split_unless_open(opts, smods, count)
 	local winnrs = vim.fn.win_findbuf(bufnr)
 
 	if #winnrs == 0 then
-		local cmd = "sbuffer " .. bufnr
-		if smods.vertical then
-			cmd = "vert " .. cmd
-		end
-
-		if smods.split and smods.split ~= "" then
-			cmd = smods.split .. " " .. cmd
-		end
-
-		if smods.tab and smods.tab ~= -1 then
-			cmd = tostring(smods.tab) .. "tab " .. cmd
-		end
-
-		vim.cmd(cmd)
+		vim.cmd({ cmd = "sbuffer", args = { bufnr }, mods = smods })
 
 		if count ~= 0 and count ~= nil then
-			local resize_cmd = "resize" .. count
-			if smods.vertical then
-				resize_cmd = "vert " .. resize_cmd
-			end
-			vim.cmd(resize_cmd)
+			vim.cmd({ cmd = "resize", args = { count }, mods = smods })
 		end
 	end
 
@@ -223,6 +206,9 @@ function M.clear_diagnostics()
 	vim.diagnostic.reset(compile_mode_ns)
 end
 
+--- @type string|nil
+local last_corrected_dir = nil
+
 ---@type fun(error: CompileModeError, current_dir: string, smods: SMods)
 M.jump_to_error = a.void(function(error, current_dir, smods)
 	current_dir = string.gsub(current_dir or "", "/$", "")
@@ -233,6 +219,17 @@ M.jump_to_error = a.void(function(error, current_dir, smods)
 	end
 
 	local file_exists = vim.fn.filereadable(filename) ~= 0
+	if not file_exists and last_corrected_dir ~= nil then
+		local maybe_filename = vim.fs.normalize(last_corrected_dir .. "/" .. error.filename.value)
+
+		if vim.fn.filereadable(maybe_filename) ~= 0 then
+			jump_to_file(maybe_filename, error, smods)
+
+			return
+		else
+			last_corrected_dir = nil
+		end
+	end
 
 	if file_exists then
 		jump_to_file(filename, error, smods)
@@ -266,6 +263,7 @@ M.jump_to_error = a.void(function(error, current_dir, smods)
 		return
 	end
 
+	last_corrected_dir = dir
 	jump_to_file(nested_filename, error, smods)
 end)
 

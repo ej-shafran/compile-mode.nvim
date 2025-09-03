@@ -8,6 +8,16 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Disable swapfile for compilation buffer - fixes [#41](https://github.com/ej-shafran/compile-mode.nvim/issues/41), by [@PrescientSentinel](https://github.com/PrescientSentinel)
+
+## [5.7.0] - 2025-07-08
+
+### Added
+
+- Keeping the last response to the directory prompt when a file cannot be found and reusing it when the next file cannot be found.
+
 ## [5.6.1] - 2025-04-24
 
 ### Fixed
@@ -446,6 +456,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.7.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.6.1...v5.7.0
 [5.6.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.6.0...v5.6.1
 [5.6.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.5.0...v5.6.0
 [5.5.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.4.0...v5.5.0
