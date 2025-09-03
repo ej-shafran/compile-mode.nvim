@@ -23,6 +23,10 @@ jobs:
           - 0.10.0
           - 0.10.1
           - 0.10.4
+        exclude:
+          # There's an issue building Vim syntax files from source for this version on macOS, specifically...
+          - os: macos-latest
+            nvim_version: 0.10.0
 
     runs-on: ${{ matrix.os }}
 
