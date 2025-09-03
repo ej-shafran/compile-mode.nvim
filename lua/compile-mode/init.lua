@@ -149,7 +149,7 @@ local runjob = a.wrap(
 				end
 
 				if new_lines[i]:sub(-1) == "\r" then
-					new_lines[i] = new_lines[i]:sub(1, -2):match("^(.-)%s*$")
+					new_lines[i] = new_lines[i]:sub(1, -2)
 				end
 			end
 
