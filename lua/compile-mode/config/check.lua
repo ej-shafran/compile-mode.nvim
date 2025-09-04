@@ -141,7 +141,7 @@ end
 ---@param default_tbl table
 ---@return string[]
 function check.unrecognized_keys(tbl, default_tbl)
-	local skipped_keys = { "error_regexp_table", "environment" }
+	local skipped_keys = { "error_regexp_table", "environment", "error_ignore_file_list", "hidden_output" }
 
 	local keys = {}
 	for k, _ in pairs(tbl) do

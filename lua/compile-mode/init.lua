@@ -7,11 +7,12 @@
 
 ---@class SMods
 ---
----@field vertical? boolean
----@field silent?   boolean
----@field hide?     boolean
----@field tab?      integer
----@field split?    SplitModifier
+---@field vertical?   boolean
+---@field silent?     boolean
+---@field hide?       boolean
+---@field tab?        integer
+---@field split?      SplitModifier
+---@field noswapfile? boolean
 
 ---@class CommandParam
 ---
@@ -147,6 +148,10 @@ local runjob = a.wrap(
 					line = vim.fn.substitute(line, re, "", "")
 					new_lines[i] = line
 				end
+
+				if new_lines[i]:sub(-1) == "\r" then
+					new_lines[i] = new_lines[i]:sub(1, -2)
+				end
 			end
 
 			set_lines(bufnr, -2, -1, new_lines)
@@ -246,7 +251,7 @@ local runcommand = a.void(
 		log.debug("opening compilation buffer...")
 
 		local prev_win = vim.api.nvim_get_current_win()
-		local bufnr = utils.split_unless_open({ fname = config.buffer_name }, param.smods or {}, param.count)
+		local bufnr = utils.split_unless_open({ fname = config.buffer_name }, vim.tbl_extend("force", param.smods or {}, { noswapfile = true }), param.count)
 		utils.wait()
 		vim.api.nvim_set_current_win(prev_win)
 		log.fmt_debug("bufnr = %d", bufnr)
