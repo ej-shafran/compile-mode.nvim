@@ -11,6 +11,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 
 - Disable swapfile for compilation buffer - fixes [#41](https://github.com/ej-shafran/compile-mode.nvim/issues/41), by [@PrescientSentinel](https://github.com/PrescientSentinel)
+- Strip carriage returns from the end of lines - fixes [#72](https://github.com/ej-shafran/compile-mode.nvim/issues/72), by [@StillTree](https://github.com/StillTree)
 
 ## [5.7.0] - 2025-07-08
 
