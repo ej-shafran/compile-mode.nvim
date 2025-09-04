@@ -253,7 +253,11 @@ local runcommand = a.void(
 		local prev_win = vim.api.nvim_get_current_win()
 		local bufnr = utils.split_unless_open({ fname = config.buffer_name }, vim.tbl_extend("force", param.smods or {}, { noswapfile = true }), param.count)
 		utils.wait()
-		vim.api.nvim_set_current_win(prev_win)
+
+		if not config.focus_compilation_buffer then
+			vim.api.nvim_set_current_win(prev_win)
+		end
+
 		log.fmt_debug("bufnr = %d", bufnr)
 
 		utils.buf_set_opt(bufnr, "buftype", "nofile")
