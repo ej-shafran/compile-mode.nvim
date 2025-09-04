@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.8.0] - 2025-09-04
+
 ### Added
 
 - The `focus_compilation_buffer` option, which keeps focus on the compilation buffer when compiling - solves [#69](https://github.com/ej-shafran/compile-mode.nvim/issues/69), by [@arnevm123](https://github.com/arnevm123)
@@ -464,6 +466,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.8.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.7.1...v5.8.0
 [5.7.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.7.0...v5.7.1
 [5.7.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.6.1...v5.7.0
 [5.6.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.6.0...v5.6.1
