@@ -169,7 +169,7 @@ end
 
 function M.multi_step_command(first_step, second_step, wait_seconds)
 	if vim.o.shell:match("cmd.exe$") then
-		return ("echo %s && ping 127.0.0.1 -n %d > nul && echo %s"):format(first_step, wait_seconds + 1, second_step)
+		return ("echo %s&& ping 127.0.0.1 -n %d > nul && echo %s"):format(first_step, wait_seconds + 1, second_step)
 	elseif vim.o.shell:match("pwsh$") or vim.o.shell:match("powershell$") then
 		return ("Write-Output '%s'; Start-Sleep -Seconds %d; Write-Output '%s'"):format(
 			first_step,
