@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.7.1] - 2025-09-04
+
 ### Fixed
 
 - Disable swapfile for compilation buffer - fixes [#41](https://github.com/ej-shafran/compile-mode.nvim/issues/41), by [@PrescientSentinel](https://github.com/PrescientSentinel)
@@ -458,6 +460,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.7.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.7.0...v5.7.1
 [5.7.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.6.1...v5.7.0
 [5.6.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.6.0...v5.6.1
 [5.6.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.5.0...v5.6.0
