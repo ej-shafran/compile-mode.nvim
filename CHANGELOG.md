@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `focus_compilation_buffer` option, which keeps focus on the compilation buffer when compiling - solves [#69](https://github.com/ej-shafran/compile-mode.nvim/issues/69), by [@arnevm123](https://github.com/arnevm123)
+
 ## [5.7.1] - 2025-09-04
 
 ### Fixed
