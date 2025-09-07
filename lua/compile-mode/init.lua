@@ -261,12 +261,13 @@ local runcommand = a.void(
 		log.fmt_debug("bufnr = %d", bufnr)
 
 		utils.buf_set_opt(bufnr, "buftype", "nofile")
-		utils.buf_set_opt(bufnr, "filetype", "compilation")
 		utils.buf_set_opt(bufnr, "buflisted", not config.hidden_buffer)
 
 		-- reset compilation buffer
 		set_lines(bufnr, 0, -1, {})
 		utils.wait()
+
+		utils.buf_set_opt(bufnr, "filetype", "compilation")
 
 		if config.bang_expansion then
 			command = vim.fn.expandcmd(command)
