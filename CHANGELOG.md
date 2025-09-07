@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Moved when the `filetype` is set for the compilation buffer, which should hopefully improve performance - by [@Sheol27](https://github.com/Sheol27)
+
 ## [5.8.0] - 2025-09-04
 
 ### Added
