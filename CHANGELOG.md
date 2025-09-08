@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.8.1] - 2025-09-08
+
 ### Fixed
 
 - Moved when the `filetype` is set for the compilation buffer, which should hopefully improve performance - by [@Sheol27](https://github.com/Sheol27)
@@ -470,6 +472,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.8.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.8.0...v5.8.1
 [5.8.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.7.1...v5.8.0
 [5.7.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.7.0...v5.7.1
 [5.7.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.6.1...v5.7.0
