@@ -4,7 +4,7 @@ describe("error parsing", function()
 	before_each(function()
 		helpers.setup_tests({
 			error_regexp_table = {
-				typescript = helpers.typescript_regexp_matcher,
+				helpers.typescript_regexp_matcher,
 			},
 		})
 	end)
