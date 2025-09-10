@@ -251,7 +251,11 @@ local runcommand = a.void(
 		log.debug("opening compilation buffer...")
 
 		local prev_win = vim.api.nvim_get_current_win()
-		local bufnr = utils.split_unless_open({ fname = config.buffer_name }, vim.tbl_extend("force", param.smods or {}, { noswapfile = true }), param.count)
+		local bufnr = utils.split_unless_open(
+			{ fname = config.buffer_name },
+			vim.tbl_extend("force", param.smods or {}, { noswapfile = true }),
+			param.count
+		)
 		utils.wait()
 
 		if not config.focus_compilation_buffer then

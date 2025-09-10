@@ -346,8 +346,6 @@ local function parse_matcher(matcher, line, linenum)
 	local row_range, end_row_range = parse_matcher_group(result, matcher.row)
 	local col_range, end_col_range = parse_matcher_group(result, matcher.col)
 
-
-
 	---@type CompileModeLevel
 	local error_level
 	local matcher_type = matcher.type
@@ -443,11 +441,11 @@ end
 
 local _cached_config = nil
 local function get_config()
-  if _cached_config then
-    return _cached_config
-  end
-  _cached_config = require("compile-mode.config.internal")
-  return _cached_config
+	if _cached_config then
+		return _cached_config
+	end
+	_cached_config = require("compile-mode.config.internal")
+	return _cached_config
 end
 
 local _ordered = nil
@@ -458,53 +456,51 @@ local function get_ordered()
 
 	local config = get_config()
 	_ordered = {}
-   for group, matcher in pairs(config.error_regexp_table) do
-    ---@cast matcher CompileModeRegexpMatcher
-    table.insert(_ordered, { group = group, matcher = matcher })
-  end
+	for group, matcher in pairs(config.error_regexp_table) do
+		---@cast matcher CompileModeRegexpMatcher
+		table.insert(_ordered, { group = group, matcher = matcher })
+	end
 
-  table.sort(_ordered, function(a, b)
-    local pa = a.matcher.priority or 0
-    local pb = b.matcher.priority or 0
-    if pa ~= pb then
-      return pa > pb 
-    end
-    return tostring(a.group) < tostring(b.group) 
-  end)
+	table.sort(_ordered, function(a, b)
+		local pa = a.matcher.priority or 0
+		local pb = b.matcher.priority or 0
+		if pa ~= pb then
+			return pa > pb
+		end
+		return tostring(a.group) < tostring(b.group)
+	end)
 
 	return _ordered
 end
-
-
 
 ---Parses error syntax from a given line.
 ---@param line string the line to parse
 ---@param linenum integer the line number of the parsed line
 ---@return CompileModeError|nil
 function M.parse(line, linenum)
-  local config = get_config()
+	local config = get_config()
 
-  local ordered = get_ordered()
-  for _, item in ipairs(ordered) do
-    local result = parse_matcher(item.matcher, line, linenum)
-    if result then
-      result.group = item.group
+	local ordered = get_ordered()
+	for _, item in ipairs(ordered) do
+		local result = parse_matcher(item.matcher, line, linenum)
+		if result then
+			result.group = item.group
 
-      local ignored = false
-      for _, pattern in ipairs(config.error_ignore_file_list or {}) do
-        if vim.fn.match(result.filename.value, pattern) ~= -1 then
-          ignored = true
-          break
-        end
-      end
+			local ignored = false
+			for _, pattern in ipairs(config.error_ignore_file_list or {}) do
+				if vim.fn.match(result.filename.value, pattern) ~= -1 then
+					ignored = true
+					break
+				end
+			end
 
-      if not ignored then
-        return result
-      end
-    end
-  end
+			if not ignored then
+				return result
+			end
+		end
+	end
 
-  return nil
+	return nil
 end
 
 ---Highlight a single error in the compilation buffer.
