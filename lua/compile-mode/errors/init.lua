@@ -330,8 +330,10 @@ local function parse_matcher(matcher, line, linenum)
 		return nil
 	end
 
+	matcher._rx = matcher._rx or vim.regex(matcher.regex)
+
 	local regex = matcher.regex
-	local result = utils.matchlistpos(line, regex)
+	local result = utils.matchlistpos(line, matcher.regex, matcher._rx)
 	if not result then
 		return nil
 	end
@@ -343,6 +345,8 @@ local function parse_matcher(matcher, line, linenum)
 
 	local row_range, end_row_range = parse_matcher_group(result, matcher.row)
 	local col_range, end_col_range = parse_matcher_group(result, matcher.col)
+
+
 
 	---@type CompileModeLevel
 	local error_level

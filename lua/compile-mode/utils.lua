@@ -67,31 +67,48 @@ end
 
 ---@param input string
 ---@param pattern string
+---@param compiled_rx vim.regex|nil
 ---@return (CompileModeRange|nil)[]
-function M.matchlistpos(input, pattern)
-	local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
+function M.matchlistpos(input, pattern, compiled_rx)
+  local rx = compiled_rx or vim.regex(pattern)
+  local s0, e0 = rx:match_str(input)
+  if not s0 then
+    return nil
+  end
 
-	---@type (CompileModeIntByInt|nil)[]
-	local result = {}
+  local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
+  if not list or #list == 0 then
+    return nil
+  end
 
-	local latest_index = vim.fn.match(input, pattern)
-	for i, capture in ipairs(list) do
-		if capture == "" then
-			result[i] = nil
-		else
-			local start, end_ = string.find(input, capture, latest_index, true)
-			assert(start and end_)
-			if i ~= 1 then
-				latest_index = end_ + 1
-			end
-			result[i] = {
-				start = start,
-				end_ = end_,
-			}
-		end
-	end
+  local seg_start = s0 + 1
+  local seg = string.sub(input, seg_start, e0)
 
-	return result
+  local result = {} ---@type (CompileModeIntByInt|nil)[]
+  local cursor = 1
+
+  for i, capture in ipairs(list) do
+    if capture ~= "" then
+      local s, e = string.find(seg, capture, cursor, true)
+      if not s then
+        s, e = string.find(seg, capture, 1, true)
+      end
+      if s and e then
+        local abs_s = seg_start + s - 1
+        local abs_e = seg_start + e - 1
+        result[i] = { start = abs_s, end_ = abs_e }
+        if i ~= 1 then
+          cursor = e + 1
+        end
+      else
+        result[i] = nil
+      end
+    else
+      result[i] = nil
+    end
+  end
+
+  return result
 end
 
 ---@type fun(opts: table): string
