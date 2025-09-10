@@ -70,21 +70,21 @@ end
 ---@param compiled_rx vim.regex|nil
 ---@return (CompileModeRange|nil)[]
 function M.matchlistpos(input, pattern, compiled_rx)
+	local result = {} ---@type (CompileModeIntByInt|nil)[]
 	local rx = compiled_rx or vim.regex(pattern)
 	local s0, e0 = rx:match_str(input)
 	if not s0 then
-		return [nil]
+		return result
 	end
 
 	local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
 	if not list or #list == 0 then
-		return [nil]
+		return result
 	end
 
 	local seg_start = s0 + 1
 	local seg = string.sub(input, seg_start, e0)
 
-	local result = {} ---@type (CompileModeIntByInt|nil)[]
 	local cursor = 1
 
 	for i, capture in ipairs(list) do
