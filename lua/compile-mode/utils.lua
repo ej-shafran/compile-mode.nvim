@@ -73,12 +73,12 @@ function M.matchlistpos(input, pattern, compiled_rx)
 	local rx = compiled_rx or vim.regex(pattern)
 	local s0, e0 = rx:match_str(input)
 	if not s0 then
-		return nil
+		return [nil]
 	end
 
 	local list = vim.fn.matchlist(input, pattern) --[[@as string[] ]]
 	if not list or #list == 0 then
-		return nil
+		return [nil]
 	end
 
 	local seg_start = s0 + 1
