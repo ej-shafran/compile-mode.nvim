@@ -330,8 +330,10 @@ local function parse_matcher(matcher, line, linenum)
 		return nil
 	end
 
+	matcher._rx = matcher._rx or vim.regex(matcher.regex)
+
 	local regex = matcher.regex
-	local result = utils.matchlistpos(line, regex)
+	local result = utils.matchlistpos(line, matcher.regex, matcher._rx)
 	if not result then
 		return nil
 	end
@@ -437,41 +439,68 @@ function M.todiagnostic(bufnr, error_list)
 		:totable()
 end
 
+local _cached_config = nil
+local function get_config()
+	if _cached_config then
+		return _cached_config
+	end
+	_cached_config = require("compile-mode.config.internal")
+	return _cached_config
+end
+
+local _ordered = nil
+local function get_ordered()
+	if _ordered then
+		return _ordered
+	end
+
+	local config = get_config()
+	_ordered = {}
+	for group, matcher in pairs(config.error_regexp_table) do
+		---@cast matcher CompileModeRegexpMatcher
+		table.insert(_ordered, { group = group, matcher = matcher })
+	end
+
+	table.sort(_ordered, function(a, b)
+		local pa = a.matcher.priority or 0
+		local pb = b.matcher.priority or 0
+		if pa ~= pb then
+			return pa > pb
+		end
+		return tostring(a.group) < tostring(b.group)
+	end)
+
+	return _ordered
+end
+
 ---Parses error syntax from a given line.
 ---@param line string the line to parse
 ---@param linenum integer the line number of the parsed line
 ---@return CompileModeError|nil
 function M.parse(line, linenum)
-	local config = require("compile-mode.config.internal")
+	local config = get_config()
 
-	return vim.iter(pairs(config.error_regexp_table))
-		:map(function(group, matcher)
-			---@cast matcher CompileModeRegexpMatcher
-			local result = parse_matcher(matcher, line, linenum)
-			if not result then
-				return nil
-			end
-			result.group = group
-			return result
-		end)
-		:filter(function(error)
-			if not error then
-				return false
+	local ordered = get_ordered()
+	for _, item in ipairs(ordered) do
+		local result = parse_matcher(item.matcher, line, linenum)
+		if result then
+			result.group = item.group
+
+			local ignored = false
+			for _, pattern in ipairs(config.error_ignore_file_list or {}) do
+				if vim.fn.match(result.filename.value, pattern) ~= -1 then
+					ignored = true
+					break
+				end
 			end
 
-			local ignored = vim.iter(config.error_ignore_file_list):any(function(pattern)
-				return vim.fn.match(error.filename.value, pattern) ~= -1
-			end)
-
-			return not ignored
-		end)
-		:fold(nil, function(acc, error)
-			if not acc or error.priority > acc.priority then
-				return error
-			else
-				return acc
+			if not ignored then
+				return result
 			end
-		end)
+		end
+	end
+
+	return nil
 end
 
 ---Highlight a single error in the compilation buffer.
