@@ -7,6 +7,7 @@
 
 ---@class CompileModeRegexpMatcher
 ---@field regex    string
+---@field _rx	   vim.regex|nil
 ---@field filename integer
 ---@field row      integer|CompileModeIntByInt|nil
 ---@field col      integer|CompileModeIntByInt|nil
