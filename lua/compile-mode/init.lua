@@ -203,7 +203,7 @@ end
 
 ---Get the default directory, formatted.
 local function default_dir()
-	local cwd = compilation_directory
+	local cwd = compilation_directory or vim.gn.getcwd() --[[@as string]]
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
 
