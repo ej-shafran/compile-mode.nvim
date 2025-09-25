@@ -258,7 +258,9 @@ local runcommand = a.void(
 		)
 		utils.wait()
 
-		if not config.focus_compilation_buffer then
+		if config.focus_compilation_buffer then
+			vim.api.nvim_set_current_win(vim.fn.win_findbuf(bufnr)[1])
+		else
 			vim.api.nvim_set_current_win(prev_win)
 		end
 

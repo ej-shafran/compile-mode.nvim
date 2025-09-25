@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Follow the compilation window when `focus_compilation_buffer` is set, even if the compilation buffer was already open and just not focused - by [@mdnrz](https://github.com/mdnrz)
+- Performance improvements - by [@Sheol27](https://github.com/Sheol27)
+
 ## [5.8.1] - 2025-09-08
 
 ### Fixed
