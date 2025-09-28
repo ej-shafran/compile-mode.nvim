@@ -203,7 +203,7 @@ end
 
 ---Get the default directory, formatted.
 local function default_dir()
-	local cwd = vim.fn.getcwd() --[[@as string]]
+	local cwd = compilation_directory or vim.fn.getcwd() --[[@as string]]
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
 
@@ -295,7 +295,13 @@ local runcommand = a.void(
 		errors.highlight(bufnr)
 
 		log.fmt_debug("running command: %s", command)
+
+		local start_time = vim.loop.hrtime()
+
 		local line_count, code, job_id = runjob(command, bufnr, param)
+
+		local elapsed = (vim.loop.hrtime() - start_time) / 1e9
+
 		if job_id ~= vim.g.compile_job_id then
 			return
 		end
@@ -316,8 +322,10 @@ local runcommand = a.void(
 			compilation_message = "Compilation exited abnormally with code " .. tostring(code)
 		end
 
+		local fmt_elapsed = string.format(", duration %.2f s", elapsed)
+
 		set_lines(bufnr, -1, -1, {
-			compilation_message .. " at " .. time(),
+			compilation_message .. " at " .. time() ..  fmt_elapsed,
 			"",
 		})
 
