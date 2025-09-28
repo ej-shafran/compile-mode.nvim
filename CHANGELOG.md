@@ -8,6 +8,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Duration information in the "compilation finished" messages - by [@Sheol27](https://github.com/Sheol27)
+
+### Fixed
+
+- Display the correct path when using `vim.g.compilation_directory` - by [@Sheol27](https://github.com/Sheol27)
+
 ## [5.8.2] - 2025-09-13
 
 ### Fixed
