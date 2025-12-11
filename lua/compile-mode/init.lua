@@ -389,7 +389,7 @@ local function act_from_current_error(action, direction, different_file)
 
 		local error_line = nil
 		local errors_found = 0
-		local past_cursor = false
+		local past_cursor = error_cursor == 0
 
 		for _, line in ipairs(lines) do
 			if line == error_cursor then
