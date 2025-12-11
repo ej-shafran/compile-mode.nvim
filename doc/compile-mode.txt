@@ -398,7 +398,7 @@ focus_compilation_buffer                 *compile-mode.focus_compilation_buffer*
 use_circular_error_navigation     *compile-mode.use_circular_error_navigation*
     When `true`, |:NextError| and |:PrevError| (and their related functions)
     will wrap around when reaching the end or beginning of the error list.
-    For example, calling |:NextError| on the last error will jump to the first
+    This means calling |:NextError| on the last error will jump to the first
     error, and calling |:PrevError| on the first error will jump to the last.
 
     Default: `false`
