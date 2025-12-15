@@ -112,7 +112,6 @@ function M.wait_for_interruption()
 		once = true,
 		pattern = "CompilationInterrupted",
 		callback = function()
-			print("here")
 			coroutine.resume(co)
 		end,
 	})
