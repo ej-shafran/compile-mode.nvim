@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `use_circular_error_navigation` option, which allows `NextError` and `PrevError` to cycle through errors even at the start or end - by [@brunobmello25](https://github.com/brunobmello25)
+
 ## [5.9.0] - 2025-09-28
 
 ### Added
