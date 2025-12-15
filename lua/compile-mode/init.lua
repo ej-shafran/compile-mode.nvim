@@ -325,7 +325,7 @@ local runcommand = a.void(
 		local fmt_elapsed = string.format(", duration %.2f s", elapsed)
 
 		set_lines(bufnr, -1, -1, {
-			compilation_message .. " at " .. time() ..  fmt_elapsed,
+			compilation_message .. " at " .. time() .. fmt_elapsed,
 			"",
 		})
 
