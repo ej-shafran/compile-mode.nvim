@@ -23,6 +23,7 @@ jobs:
           - 0.10.0
           - 0.10.1
           - 0.10.4
+          - 0.11.5
         exclude:
           # There's an issue building Vim syntax files from source for this version on macOS, specifically...
           - os: macos-latest
