@@ -321,7 +321,9 @@ end
 function M.ask_to_save(smods)
 	local buffers = vim.api.nvim_list_bufs()
 	local buffers_with_changes = vim.tbl_filter(function(bufnr)
-		return vim.api.nvim_buf_is_loaded(bufnr) and vim.api.nvim_get_option_value("modified", { buf = bufnr })
+		return vim.api.nvim_buf_is_loaded(bufnr)
+			and vim.api.nvim_get_option_value("buflisted", { buf = bufnr })
+			and vim.api.nvim_get_option_value("modified", { buf = bufnr })
 	end, buffers)
 
 	for _, bufnr in ipairs(buffers_with_changes) do
