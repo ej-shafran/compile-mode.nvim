@@ -2,6 +2,10 @@ fmt:
 	@echo "===> Format"
 	stylua lua/
 
+fmt-check:
+	@echo "===> Check Formatting"
+	stylua --check lua/
+
 test:
 	@echo "===> Test"
 	nvim --headless --clean \
