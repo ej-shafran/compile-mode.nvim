@@ -132,6 +132,7 @@ function check.validate(cfg)
 		hidden_output = validate_string_list(cfg.hidden_output, true),
 		error_regexp_table = validate_error_regexp_table(cfg.error_regexp_table),
 		hidden_buffer = { cfg.hidden_buffer, "boolean" },
+		use_circular_error_navigation = { cfg.use_circular_error_navigation, "boolean" },
 	})
 end
 
