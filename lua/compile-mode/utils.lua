@@ -57,7 +57,13 @@ end
 ---@param linenum integer
 ---@param range CompileModeRange
 function M.add_highlight(bufnr, hlname, linenum, range)
-	vim.hl.range(bufnr, compile_mode_ns, hlname, { linenum, range.start }, { linenum, range.end_ })
+	vim.api.nvim_buf_set_extmark(
+		bufnr,
+		compile_mode_ns,
+		linenum - 1,
+		range.start - 1,
+		{ end_col = range.end_, hl_group = hlname }
+	)
 end
 
 ---@param bufnr integer
