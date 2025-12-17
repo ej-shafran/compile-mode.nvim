@@ -206,9 +206,9 @@ local function jump_to_file(filename, error, smods)
 		if current_bufnr ~= compilation_buffer then
 			vim.api.nvim_set_current_buf(target_bufnr)
 		elseif #vim.api.nvim_list_wins() > 1 then
-			local prev_winnr = vim.fn.winnr("#")
-			vim.api.nvim_win_set_buf(prev_winnr, target_bufnr)
-			vim.api.nvim_set_current_win(prev_winnr)
+			local prev_win_id = vim.fn.win_getid(vim.fn.winnr("#"))
+			vim.api.nvim_win_set_buf(prev_win_id, target_bufnr)
+			vim.api.nvim_set_current_win(prev_win_id)
 		else
 			M.split_unless_open({ bufnr = target_bufnr }, smods, 0)
 		end
