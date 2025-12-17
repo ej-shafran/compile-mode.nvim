@@ -84,7 +84,9 @@ end
 ---@param opts CompileModeOpts|nil
 function M.setup_tests(opts)
 	require("plugin.command")
-	vim.g.compile_mode = vim.tbl_extend("force", { debug = true }, opts or {})
+	vim.g.compile_mode = vim.tbl_extend("force", {
+		debug = vim.env.TEST_DEBUG ~= nil or vim.env.ACTIONS_STEP_DEBUG ~= nil,
+	}, opts or {})
 	package.loaded["compile-mode.config.internal"] = nil
 end
 
