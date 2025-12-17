@@ -692,11 +692,11 @@ end)
 function M.close_buffer()
 	local bufnr = vim.g.compilation_buffer
 
-	local winnrs = vim.fn.win_findbuf(bufnr)
+	local win_ids = vim.fn.win_findbuf(bufnr)
 
 	if #vim.api.nvim_list_wins() > 1 then
-		vim.iter(winnrs):each(function(winnr)
-			vim.api.nvim_win_close(winnr, true)
+		vim.iter(win_ids):each(function(win_id)
+			vim.api.nvim_win_close(win_id, true)
 		end)
 	elseif vim.fn.bufexists("#") ~= 0 then
 		vim.cmd.buffer("#")
@@ -797,15 +797,15 @@ function M._follow_cursor()
 	end
 
 	local preview_win
-	local winnrs = vim.api.nvim_list_wins()
-	if #winnrs == 1 then
+	local win_ids = vim.api.nvim_list_wins()
+	if #win_ids == 1 then
 		-- If there are no other windows, split a new one for the preview
 		preview_win = vim.api.nvim_open_win(vim.api.nvim_create_buf(true, true), false, { split = "below" })
 	else
 		-- If there is already a window for this file, use it
-		preview_win = vim.iter(winnrs):find(function(winnr)
+		preview_win = vim.iter(win_ids):find(function(win_id)
 			local fbuf = vim.fn.bufadd(error.filename.value)
-			local winbuf = vim.api.nvim_win_get_buf(winnr)
+			local winbuf = vim.api.nvim_win_get_buf(win_id)
 			return fbuf == winbuf
 		end)
 	end
@@ -813,12 +813,12 @@ function M._follow_cursor()
 	-- use the first existing window that isn't the first compilation window
 	if not preview_win then
 		local past_first_window = false
-		preview_win = vim.iter(winnrs):find(function(winnr)
+		preview_win = vim.iter(win_ids):find(function(win_id)
 			if past_first_window then
 				return true
 			end
 
-			local winbuf = vim.api.nvim_win_get_buf(winnr)
+			local winbuf = vim.api.nvim_win_get_buf(win_id)
 			if winbuf ~= compilation_buffer then
 				return true
 			end

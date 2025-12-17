@@ -154,9 +154,9 @@ function M.split_unless_open(opts, smods, count)
 		return bufnr
 	end
 
-	local winnrs = vim.fn.win_findbuf(bufnr)
+	local win_ids = vim.fn.win_findbuf(bufnr)
 
-	if #winnrs == 0 then
+	if #win_ids == 0 then
 		vim.cmd({ cmd = "split", mods = smods })
 
 		if count ~= 0 and count ~= nil then
@@ -178,18 +178,18 @@ local function jump_to_file(filename, error, smods)
 	local compilation_buffer = vim.g.compilation_buffer
 	if config.use_diagnostics then
 		compilation_buffer = compilation_buffer or vim.fn.bufadd(config.buffer_name)
-		local winnrs = vim.fn.win_findbuf(compilation_buffer)
+		local win_ids = vim.fn.win_findbuf(compilation_buffer)
 
 		if #vim.api.nvim_list_wins() > 1 then
-			vim.iter(winnrs):each(function(winnr)
-				vim.api.nvim_win_close(winnr, true)
+			vim.iter(win_ids):each(function(win_id)
+				vim.api.nvim_win_close(win_id, true)
 			end)
 		end
 	else
 		compilation_buffer = M.split_unless_open({ bufnr = compilation_buffer, fname = config.buffer_name }, smods, 0)
-		local compilation_winnr = vim.fn.win_findbuf(compilation_buffer)[1]
+		local compilation_win_id = vim.fn.win_findbuf(compilation_buffer)[1]
 
-		vim.api.nvim_win_set_cursor(compilation_winnr, { error.linenum, 0 })
+		vim.api.nvim_win_set_cursor(compilation_win_id, { error.linenum, 0 })
 	end
 
 	local row = error.row and error.row.value or 1
@@ -214,13 +214,13 @@ local function jump_to_file(filename, error, smods)
 		end
 	end
 
-	local target_winnr = vim.fn.win_findbuf(target_bufnr)[1]
+	local target_win_id = vim.fn.win_findbuf(target_bufnr)[1]
 
 	local last_row = vim.api.nvim_buf_line_count(target_bufnr)
 	if row > last_row then
 		row = last_row
 	end
-	vim.api.nvim_win_set_cursor(target_winnr, { row, col })
+	vim.api.nvim_win_set_cursor(target_win_id, { row, col })
 	highlight_locus_jump(target_bufnr, error)
 
 	if config.use_diagnostics then
