@@ -1,4 +1,4 @@
-name: Test
+name: Continuous Integration
 
 on:
   push:
@@ -9,9 +9,13 @@ on:
       - opened
       - synchronize
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
-    name: Plenary Busted Tests
+    name: Tests
 
     strategy:
       matrix:
@@ -23,6 +27,7 @@ jobs:
           - 0.10.0
           - 0.10.1
           - 0.10.4
+          - 0.11.5
         exclude:
           # There's an issue building Vim syntax files from source for this version on macOS, specifically...
           - os: macos-latest
@@ -65,3 +70,61 @@ jobs:
           cd compile-mode.nvim
           make setup-ci
           make test
+
+  typecheck:
+    name: Typecheck
+
+    strategy:
+      matrix:
+        nvim_version:
+          - 0.10.0
+          - 0.10.1
+          - 0.10.4
+          - 0.11.5
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          path: compile-mode.nvim
+
+      - name: Setup `plenary.nvim`
+        uses: actions/checkout@v4
+        with:
+          repository: nvim-lua/plenary.nvim
+          path: "${{ github.workspace }}/plenary.nvim"
+
+      - name: Setup Neovim Runtime
+        uses: actions/checkout@v4
+        with:
+          ref: "v${{ matrix.nvim_version }}"
+          repository: neovim/neovim
+          path: "${{ github.workspace }}/neovim"
+
+      - name: Typecheck
+        uses: mrcjkb/lua-typecheck-action@v1
+        env:
+          VIMRUNTIME: "${{ github.workspace }}/neovim/runtime"
+          PLENARY_PATH: "${{ github.workspace }}/plenary.nvim"
+        with:
+          directories: |
+            compile-mode.nvim
+          configpath: compile-mode.nvim/.luarc-ci.json
+
+  fmt-check:
+    name: Check Formatting
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Stylua
+        uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: 2.0.2
+          args: --check lua

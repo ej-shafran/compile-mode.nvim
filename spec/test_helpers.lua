@@ -46,6 +46,12 @@ function M.next_error(param)
 	M.wait_ms(100)
 end
 
+---@param param CommandParam?
+function M.prev_error(param)
+	compile_mode.prev_error(param)
+	M.wait_ms(100)
+end
+
 function M.move_to_next_error()
 	compile_mode.move_to_next_error()
 	M.wait_ms(100)
@@ -106,7 +112,6 @@ function M.wait_for_interruption()
 		once = true,
 		pattern = "CompilationInterrupted",
 		callback = function()
-			print("here")
 			coroutine.resume(co)
 		end,
 	})

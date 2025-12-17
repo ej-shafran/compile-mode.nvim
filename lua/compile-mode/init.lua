@@ -325,7 +325,7 @@ local runcommand = a.void(
 		local fmt_elapsed = string.format(", duration %.2f s", elapsed)
 
 		set_lines(bufnr, -1, -1, {
-			compilation_message .. " at " .. time() ..  fmt_elapsed,
+			compilation_message .. " at " .. time() .. fmt_elapsed,
 			"",
 		})
 
@@ -372,32 +372,46 @@ local function act_from_current_error(action, direction, different_file)
 
 		local lines = vim.tbl_keys(errors.error_list)
 		table.sort(lines)
+		if direction == "prev" then
+			lines = vim.fn.reverse(lines)
+		end
+
+		local function fits_constraints(line)
+			local error = errors.error_list[line]
+			if error.level < config.error_threshold then
+				return false
+			end
+			if different_file and current_error and error.filename.value == current_error.filename.value then
+				return false
+			end
+			return true
+		end
 
 		local error_line = nil
 		local errors_found = 0
-		for i = direction == "prev" and #lines or 1, direction == "prev" and 1 or #lines, direction == "prev" and -1 or 1 do
-			local line = lines[i]
-			local error = errors.error_list[line]
+		local past_cursor = error_cursor == 0
 
-			local fits_threshold_constraint = error.level >= config.error_threshold
-
-			local fits_file_constraint = true
-			if different_file then
-				fits_file_constraint = not current_error or error.filename.value ~= current_error.filename.value
-			end
-
-			local fits_line_constraint
-			if direction == "prev" then
-				fits_line_constraint = line < error_cursor and (not error_line or error_line < line)
-			else
-				fits_line_constraint = line > error_cursor and (not error_line or error_line > line)
-			end
-
-			if fits_threshold_constraint and fits_file_constraint and fits_line_constraint then
+		for _, line in ipairs(lines) do
+			if line == error_cursor then
+				past_cursor = true
+			elseif past_cursor and fits_constraints(line) then
 				errors_found = errors_found + 1
 				if errors_found == count then
 					error_line = line
 					break
+				end
+			end
+		end
+
+		if not error_line and config.use_circular_error_navigation then
+			local remaining_count = count - errors_found
+			for _, line in ipairs(lines) do
+				if fits_constraints(line) then
+					remaining_count = remaining_count - 1
+					if remaining_count == 0 then
+						error_line = line
+						break
+					end
 				end
 			end
 		end
@@ -407,7 +421,6 @@ local function act_from_current_error(action, direction, different_file)
 				local message = direction == "next" and "past last" or "back before first"
 				vim.notify("Moved " .. message .. " error")
 			end
-
 			return
 		end
 

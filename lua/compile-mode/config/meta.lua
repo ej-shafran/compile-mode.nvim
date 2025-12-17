@@ -59,6 +59,9 @@
 ---
 ---For more info, run `:h compile-mode.hidden_buffer`
 ---@field hidden_buffer?            boolean
+---
+---For more info, run `:h compile-mode.use_circular_error_navigation`
+---@field use_circular_error_navigation? boolean
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode

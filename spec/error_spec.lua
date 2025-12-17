@@ -77,6 +77,70 @@ describe("jumping to errors", function()
 	end)
 end)
 
+describe("circular error navigation", function()
+	before_each(function()
+		helpers.setup_tests({
+			use_circular_error_navigation = true,
+		})
+	end)
+
+	it("should wrap from last to first error with NextError", function()
+		local first = { filename = "README.md", row = 1, col = 1 }
+		local second = { filename = "todos.org", row = 1, col = 1 }
+		local errors = {
+			helpers.sun_ada_error(first),
+			helpers.sun_ada_error(second),
+		}
+
+		helpers.compile_multiple_errors(errors)
+
+		helpers.next_error()
+		helpers.assert_at_error_locus(first)
+
+		helpers.next_error()
+		helpers.assert_at_error_locus(second)
+
+		helpers.next_error()
+		helpers.assert_at_error_locus(first)
+	end)
+
+	it("should wrap from first to last error with PrevError", function()
+		local first = { filename = "README.md", row = 1, col = 1 }
+		local second = { filename = "todos.org", row = 1, col = 1 }
+		local errors = {
+			helpers.sun_ada_error(first),
+			helpers.sun_ada_error(second),
+		}
+
+		helpers.compile_multiple_errors(errors)
+
+		helpers.next_error()
+		helpers.assert_at_error_locus(first)
+
+		helpers.prev_error()
+		helpers.assert_at_error_locus(second)
+	end)
+
+	it("should respect count when wrapping", function()
+		local first = { filename = "README.md", row = 1, col = 1 }
+		local second = { filename = "todos.org", row = 1, col = 1 }
+		local third = { filename = "LICENSE", row = 1, col = 1 }
+		local errors = {
+			helpers.sun_ada_error(first),
+			helpers.sun_ada_error(second),
+			helpers.sun_ada_error(third),
+		}
+
+		helpers.compile_multiple_errors(errors)
+
+		helpers.next_error()
+		helpers.assert_at_error_locus(first)
+
+		helpers.next_error({ count = 4 })
+		helpers.assert_at_error_locus(second)
+	end)
+end)
+
 describe("moving to errors", function()
 	before_each(helpers.setup_tests)
 
