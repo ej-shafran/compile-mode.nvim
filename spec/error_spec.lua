@@ -154,8 +154,10 @@ describe("moving to errors", function()
 		local error_string = helpers.sun_ada_error(expected)
 
 		helpers.compile_error(error_string)
-		helpers.move_to_next_error()
 
+		vim.api.nvim_set_current_buf(helpers.get_compilation_bufnr())
+
+		helpers.move_to_next_error()
 		helpers.assert_cursor_at_error(error_string)
 	end)
 
@@ -170,6 +172,8 @@ describe("moving to errors", function()
 		}
 
 		helpers.compile_multiple_errors(errors)
+
+		vim.api.nvim_set_current_buf(helpers.get_compilation_bufnr())
 
 		helpers.move_to_next_error()
 		helpers.assert_cursor_at_error(errors[1])
