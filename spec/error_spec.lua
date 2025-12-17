@@ -56,6 +56,29 @@ describe("jumping to errors", function()
 		helpers.assert_at_error_locus(expected)
 	end)
 
+	it("should not error when in the unsaved file being jumped to", function()
+		---@type CreateError
+		local expected = {
+			filename = "README.md",
+			row = 1,
+			col = 1,
+		}
+		local errors = {
+			helpers.sun_ada_error(expected),
+			helpers.sun_ada_error(expected),
+		}
+
+		helpers.compile_multiple_errors(errors)
+
+		helpers.next_error()
+
+		vim.bo.modified = true
+
+		helpers.next_error()
+
+		helpers.assert_at_error_locus(expected)
+	end)
+
 	it("should skip ahead by a count", function()
 		---@type CreateError
 		local expected = {
