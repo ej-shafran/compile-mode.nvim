@@ -157,11 +157,13 @@ function M.split_unless_open(opts, smods, count)
 	local winnrs = vim.fn.win_findbuf(bufnr)
 
 	if #winnrs == 0 then
-		vim.cmd({ cmd = "sbuffer", args = { bufnr }, mods = smods })
+		vim.cmd({ cmd = "split", mods = smods })
 
 		if count ~= 0 and count ~= nil then
 			vim.cmd({ cmd = "resize", args = { count }, mods = smods })
 		end
+
+		vim.api.nvim_set_current_buf(bufnr)
 	end
 
 	return bufnr
@@ -197,16 +199,21 @@ local function jump_to_file(filename, error, smods)
 		col = 0
 	end
 
-	if vim.api.nvim_get_current_buf() ~= compilation_buffer then
-		vim.cmd.e(filename)
-	elseif #vim.api.nvim_list_wins() > 1 then
-		vim.cmd("wincmd p")
-		vim.cmd.e(filename)
-	else
-		M.split_unless_open({ fname = filename }, smods, 0)
+	local target_bufnr = vim.fn.bufadd(filename)
+	local current_bufnr = vim.api.nvim_get_current_buf()
+
+	if current_bufnr ~= target_bufnr then
+		if current_bufnr ~= compilation_buffer then
+			vim.api.nvim_set_current_buf(target_bufnr)
+		elseif #vim.api.nvim_list_wins() > 1 then
+			local prev_winnr = vim.fn.winnr("#")
+			vim.api.nvim_win_set_buf(prev_winnr, target_bufnr)
+			vim.api.nvim_set_current_win(prev_winnr)
+		else
+			M.split_unless_open({ bufnr = target_bufnr }, smods, 0)
+		end
 	end
 
-	local target_bufnr = vim.fn.bufadd(filename)
 	local target_winnr = vim.fn.win_findbuf(target_bufnr)[1]
 
 	local last_row = vim.api.nvim_buf_line_count(target_bufnr)
