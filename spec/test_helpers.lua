@@ -88,6 +88,7 @@ function M.setup_tests(opts)
 		debug = vim.env.TEST_DEBUG ~= nil or vim.env.ACTIONS_STEP_DEBUG ~= nil,
 	}, opts or {})
 	package.loaded["compile-mode.config.internal"] = nil
+	vim.cmd("silent %bdelete!")
 end
 
 ---@param directory string
