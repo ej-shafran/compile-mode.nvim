@@ -56,6 +56,67 @@ describe("jumping to errors", function()
 		helpers.assert_at_error_locus(expected)
 	end)
 
+	it("should use the current window if it's not the compilation buffer", function()
+		local error_string = helpers.sun_ada_error({
+			filename = "README.md",
+			row = 1,
+			col = 1,
+		})
+
+		helpers.compile_error(error_string)
+
+		local original_win_id = vim.api.nvim_get_current_win()
+
+		helpers.next_error()
+
+		assert.are_same(original_win_id, vim.api.nvim_get_current_win())
+	end)
+
+	it("should reuse a window for the error's buffer if it exists", function()
+		---@type CreateError
+		local expected = {
+			filename = "README.md",
+			row = 1,
+			col = 1,
+		}
+		local error_string = helpers.sun_ada_error(expected)
+
+		vim.cmd.edit(expected.filename)
+
+		helpers.compile_error(error_string)
+
+		local original_win_id = vim.api.nvim_get_current_win()
+
+		local compilation_bufnr = helpers.get_compilation_bufnr()
+		assert.are.not_same(compilation_bufnr, vim.api.nvim_get_current_buf())
+		vim.cmd("wincmd w")
+
+		helpers.next_error()
+
+		assert.are_same(original_win_id, vim.api.nvim_get_current_win())
+	end)
+
+	it("should split if the error's buffer has no window", function()
+		local error_string = helpers.sun_ada_error({
+			filename = "README.md",
+			row = 1,
+			col = 1,
+		})
+
+		helpers.compile_error(error_string)
+
+		local compilation_bufnr = helpers.get_compilation_bufnr()
+		assert.are.not_same(compilation_bufnr, vim.api.nvim_get_current_buf())
+		vim.cmd("wincmd w")
+		vim.cmd("wincmd o")
+
+		local original_win_id = vim.api.nvim_get_current_win()
+
+		helpers.next_error()
+
+		assert.are.not_same(original_win_id, vim.api.nvim_get_current_win())
+	end)
+
 	it("should not error when in the unsaved file being jumped to", function()
 		---@type CreateError
 		local expected = {
