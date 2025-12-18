@@ -157,13 +157,11 @@ function M.split_unless_open(opts, smods, count)
 	local win_ids = vim.fn.win_findbuf(bufnr)
 
 	if #win_ids == 0 then
-		vim.cmd({ cmd = "split", mods = smods })
+		vim.cmd({ cmd = "sbuffer", args = { bufnr }, mods = smods })
 
 		if count ~= 0 and count ~= nil then
 			vim.cmd({ cmd = "resize", args = { count }, mods = smods })
 		end
-
-		vim.api.nvim_set_current_buf(bufnr)
 	end
 
 	return bufnr
