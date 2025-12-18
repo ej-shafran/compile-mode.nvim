@@ -58,6 +58,9 @@ local default_config = {
 
 	---@type boolean
 	use_circular_error_navigation = false,
+
+	---@type integer
+	compilation_buffer_max_size = 12,
 }
 
 local user_config = type(vim.g.compile_mode) == "function" and vim.g.compile_mode() or vim.g.compile_mode

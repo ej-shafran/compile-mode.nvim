@@ -254,7 +254,7 @@ local runcommand = a.void(
 		local bufnr = utils.split_unless_open(
 			{ fname = config.buffer_name },
 			vim.tbl_extend("force", param.smods or {}, { noswapfile = true }),
-			param.count
+			config.compilation_buffer_max_size or param.count
 		)
 		utils.wait()
 
