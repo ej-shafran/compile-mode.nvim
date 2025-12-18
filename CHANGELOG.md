@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Error when jumping to an error in a buffer with unsaved changes
+
 ## [5.10.0] - 2025-12-17
 
 ### Added
