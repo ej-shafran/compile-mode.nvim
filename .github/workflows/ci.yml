@@ -70,6 +70,8 @@ jobs:
           cd compile-mode.nvim
           make setup-ci
           make test
+        env:
+          ACTIONS_STEP_DEBUG: ${{ secrets.ACTIONS_STEP_DEBUG }}
 
   typecheck:
     name: Typecheck
