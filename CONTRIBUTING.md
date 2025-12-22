@@ -12,18 +12,30 @@ Thank you for wanting to contribute to `compile-mode.nvim`! Generally, I want to
 
 Fork the repository and clone it. It's better if you work from the `nightly` branch, so make sure you fork the repo with all its branches and not just `main`.
 
-### Makefile
-
-The Makefile has commands for `test` and `fmt`. These commands do exactly what you would expect.
-
 ### Using your local changes in Neovim
 
-If you're using Lazy, use the `dir` option of the Lazy spec to keep your plugin up-to-date with your development version, without having to push your changes remotely. You can use the `Lazy reload` command to reload the plugin - it should work properly, unless you've changed the highlight groups, in which case restarting Neovim might be needed.
+If you have a clone of the project (or your fork of it) just using `vim.opt.rtp:append "~/path/to/compile-mode.nvim"` will make the plugin work as expected.
 
-## Testing
+Your plugin manager of choice may have their own way of configuring "locally loaded" plugins - e.g. if you're using Lazy, you can use the `dir` option of the Lazy spec.
+
+## CI
+
+This repository has several continuous integration checks. Any pull request that doesn't pass CI won't get merged.
+
+### Testing
 
 The tests use `plenary.nvim`'s `busted` style testing. Read their [tests README](https://github.com/nvim-lua/plenary.nvim/blob/master/TESTS_README.md) for more info.
 
 Please add testing for any new features you add. It would also be nice if you added tests to show any bugs that you intend to solve.
 
-Obviously, please don't break any existing tests. I won't merge a pull request that doesn't have its GitHub checks passing. If your PR changes the behavior in a way that would break the tests and you change the tests to fit, please clarify this in the comments on the PR.
+Obviously, please don't break any existing tests. If your PR changes the behavior in a way that would break the tests and you change the tests to fit, please clarify this in the comments on the PR.
+
+You can run tests locally with `make test` (or `make test-debug`, which shows debug logs).
+
+### Formatting
+
+The files are formatted using [stylua](https://github.com/JohnnyMorganz/StyLua). If you have it installed, you can format the files using `make fmt`.
+
+### Typechecking
+
+The Lua code is typechecked using [lua-language-server](https://luals.github.io/#other-install). If you have it installed, you can check the validity of the code using `make typecheck` (or by directly running `./typecheck.sh`).
