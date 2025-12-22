@@ -123,8 +123,8 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
       config = function()
           ---@type CompileModeOpts
           vim.g.compile_mode = {
-              -- if you use something like `nvim-cmp` or `blink.cmp` for completion,
-              -- set this to fix tab completion in command mode:
+              -- if you use something like `nvim-cmp` or `blink.cmp` for
+              -- completion, set this to fix tab completion in command mode:
               -- input_word_completion = true,
 
               -- to add ANSI escape code support, add:
@@ -188,9 +188,9 @@ Additional keymaps within the compilation buffer are:
   messages from `make` to tell what directory a file might be in.
 - `<C-w>f` is mapped like `gf`, but behaves like |CTRL-W_f| instead.
 
-The compilation buffer is deleted automatically when Neovim would be closed, so
-unsaved changes don’t get in the way. It also has the |'buftype'| option set
-to `nofile`.
+The compilation buffer is deleted automatically when Neovim would be closed,
+so unsaved changes don’t get in the way. It also has the |'buftype'| option
+set to `nofile`.
 
 ==============================================================================
 4. Errors                                                *compile-mode-errors*
@@ -361,7 +361,7 @@ bang_expansion                                   *compile-mode.bang_expansion*
     command if you have this setting enabled; this means using `printf \%s`
     instead of `printf %s`, as the latter will be expanded.
 
-error_regexp_table                            *compile-mode.error_regexp_table
+error_regexp_table                           *compile-mode.error_regexp_table*
     See |compile-mode-errors|.
 
 error_ignore_file_list                   *compile-mode.error_ignore_file_list*
@@ -601,17 +601,21 @@ close_buffer()                                   *compile-mode.close_buffer()*
 7. Commands                                            *compile-mode-commands*
 
 
-:Compile[!]                                                         *:Compile*
+:[N]Compile[!] [command]                                            *:Compile*
     Runs a command and places its output in the compilation buffer. The
     command is run from the current working directory, unless the
     |vim.g.compilation_directory| variable is set. The compilation buffer
-    is opened in a new split if it isn’t already opened. If an argument is
-    present, it is used as the command. Otherwise, the user is prompted using
-    |vim.ui.input()|.
+    is opened in a new split if it isn’t already opened.
+
+    If [command] is present, it is used as the command. Otherwise, the user is
+    prompted for a command using |vim.ui.input()|.
 
     With a bang (`:Compile!`), the compilation buffer will only be updated
     once the command finishes (i.e. the compilation command will be run
     synchronously).
+
+    When a count is given, it sets the size of the opened compilation window,
+    like |:split|.
 
     The following commands work when prefixed to `:Compile`:
 
@@ -621,24 +625,24 @@ close_buffer()                                   *compile-mode.close_buffer()*
     - |:hide|
     - |:tab|
 
-    Additionally, you can run the command with a |count| to set the size of
-    the opened window, like with |:split|.
-
                  *compile-compilation-directory* *vim.g.compilation_directory*
     If the `vim.g.compilation_directory` global variable is set to anything
     but Lua `nil`, it is used instead of the current working directory when
     compiling. After `:Compile` is finished, `vim.g.compilation_directory` is
     set to `nil`.
 
-:Recompile[!]                                                     *:Recompile*
+:[N]Recompile[!]                                                  *:Recompile*
     Reruns the last compiled command. If there isn’t one, the error is
-    reported using |vim.notify()|. The compilation buffer is opened in a new
-    split if it isn’t already opened. The command is rerun from the directory
-    in which it was originally run.
+    reported using |vim.notify()| (unless |compile-mode.recompile_no_fail| is
+    set). The compilation buffer is opened in a new split if it isn’t already
+    opened. The command is rerun from the directory where it originally ran.
 
     With a bang (`:Recompile!`), the compilation buffer will only be updated
     once the command finishes (i.e. the compilation command will be run
     synchronously).
+
+    When a count is given, it sets the size of the opened compilation window,
+    like |:split|.
 
     The following commands work when prefixed to `:Recompile`:
 
@@ -648,16 +652,11 @@ close_buffer()                                   *compile-mode.close_buffer()*
     - |:hide|
     - |:tab|
 
-    Additionally, you can run the command with a |count| to set the size of the
-    opened window, like with |:split|.
-
     Mapped to `<C-r>` within the compilation buffer.
 
-:FirstError                                                      *:FirstError*
-:[N]FirstError
-    Jump to the Nth error in the compilation buffer, depending on the count.
-    This modifies the same cursor that |:NextError| and |:PrevError| operate
-    on.
+:[N]FirstError                                                   *:FirstError*
+    Jump to the [N]th error in the compilation buffer. This modifies the same
+    cursor that |:NextError| and |:PrevError| operate on.
 
     The default count is 1, which means jump to the first error.
 
@@ -692,14 +691,13 @@ close_buffer()                                   *compile-mode.close_buffer()*
     These commands will affect the way windows are created when jumping to
     errors, if there's a need to open a new window.
 
-:NextError                                                        *:NextError*
-:[N]NextError
+:[N]NextError                                                     *:NextError*
     Jump to the next error in the compilation buffer. This does not take the
     cursor into effect - it simply starts at the first error in the buffer and
     continues, one by one, from there. Once the last error in the buffer is
     reached the command has no effect and reports on this fact.
 
-    If passed a count, jumps N errors forwards instead.
+    When a count is given, jumps [N] errors forwards instead.
 
     The following commands work when prefixed to `:NextError`:
 
@@ -712,15 +710,14 @@ close_buffer()                                   *compile-mode.close_buffer()*
     These commands will affect the way windows are created when jumping to
     errors, if there's a need to open a new window.
 
-:PrevError                                                        *:PrevError*
-:[N]PrevError
+:[N]PrevError                                                     *:PrevError*
     Jump to a prior error in the compilation buffer. This does not take the
     cursor into effect - it simply starts at the current error in the buffer
     and continues backwards, one by one, from there. As long as the current
     error is before the first error (the default until |:NextError| has not
     yet been used) this command has no effect and reports on this fact.
 
-    If passed a count, jumps N errors backwards instead.
+    When a count is given, jumps [N] errors backwards instead.
 
     The following commands work when prefixed to `:PrevError`:
 
@@ -774,55 +771,51 @@ close_buffer()                                   *compile-mode.close_buffer()*
 
     Mapped to `<C-/>` within the compilation buffer.
 
-:CompileNextError                                          *:CompileNextError*
-:[N]CompileNextError
+:[N]CompileNextError                                       *:CompileNextError*
     Only available within the compilation buffer itself.
 
     Move to the line of the next error within the compilation buffer. Does not
     jump to the error's actual file.
 
-    If passed a count, moves N errors forwards instead.
+    When a count is given, moves [N] errors forwards instead.
 
     You can run this command using |:silent| to disable any messages.
 
     Mapped to `<C-g>n` within the compilation buffer.
 
-:CompileNextFile                                            *:CompileNextFile*
-:[N]CompileNextFile
+:[N]CompileNextFile                                         *:CompileNextFile*
     Only available within the compilation buffer itself.
 
     Move to the line of the next error within the compilation buffer that has
     a different file to the current error. Does not jump to the error's actual
     file.
 
-    If passed a count, moves N files forwards instead.
+    When a count is given, moves [N] files forwards instead.
 
     You can run this command using |:silent| to disable any messages.
 
     Mapped to `<C-g>]` within the compilation buffer.
 
-:CompilePrevError                                          *:CompilePrevError*
-:[N]CompilePrevError
+:[N]CompilePrevError                                       *:CompilePrevError*
     Only available within the compilation buffer itself.
 
     Move to the line of the previous error within the compilation buffer. Does
     not jump to the error's actual file.
 
-    If passed a count, moves N errors backwards instead.
+    When a count is given, moves [N] errors backwards instead.
 
     You can run this command using |:silent| to disable any messages.
 
     Mapped to `<C-g>p` within the compilation buffer.
 
-:CompilePrevFile                                            *:CompilePrevFile*
-:[N]CompilePrevFile
+:[N]CompilePrevFile                                         *:CompilePrevFile*
     Only available within the compilation buffer itself.
 
     Move to the line of the previous error within the compilation buffer that
     has a different file to the current error. Does not jump to the error's
     actual file.
 
-    If passed a count, moves N files backwards instead.
+    When a count is given, moves [N] files backwards instead.
 
     You can run this command using |:silent| to disable any messages.
 
