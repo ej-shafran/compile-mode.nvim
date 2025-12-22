@@ -66,7 +66,7 @@ local function set_lines(bufnr, start, end_, data)
 		utils.buf_set_opt(bufnr, "modified", false)
 	end)
 
-    if not config.focus_beginning_compilation_buffer then
+    if config.auto_scroll then
 	    vim.api.nvim_buf_call(bufnr, function()
 	    	vim.cmd("normal G")
 	    end)

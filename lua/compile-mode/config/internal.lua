@@ -56,7 +56,7 @@ local default_config = {
 	--- @type boolean
 	focus_compilation_buffer = false,
 	--- @type boolean
-	focus_beginning_compilation_buffer = true,
+	auto_scroll = true,
 
 	---@type boolean
 	use_circular_error_navigation = false,
