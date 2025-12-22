@@ -8,9 +8,15 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+Also includes several documentation changes.
+
 ### Added
 
 - Warning if `baleia` could not be `require`d when `baleia_setup` is passed
+
+### Fixed
+
+- The behavior of `bang_expansion` when `focus_compilation_buffer` is also set to `true` - by [@mttgermano](https://github.com/mttgermano)
 
 ## [5.10.1] - 2025-12-18
 
