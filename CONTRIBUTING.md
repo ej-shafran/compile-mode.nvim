@@ -6,6 +6,28 @@ Thank you for wanting to contribute to `compile-mode.nvim`! Generally, I want to
 >
 > As specified in the README, `compile-mode.nvim` only officially supports Neovim versions v0.10.0 and higher. However, if you'd like to contribute some code that makes the plugin work for earlier versions (and isn't too much of a hassle to maintain) I'll be glad to merge it.
 
+## Making changes
+
+### Issues
+
+Please:
+
+- Open an issue before you open a pull request - whatever you're looking for may already exist
+- Search through issues at least a little before opening one
+- Properly fill out the information for your issue
+
+### Pull Requests
+
+See the "CI" section below on what needs to happen for pull requests to get properly merged.
+
+If you've created a new configuration option in your pull request, please update the following places:
+
+- `lua/compile-mode/config/internal.lua`: add a default value for the option
+- `lua/compile-mode/config/meta.lua`: add an `@field` annotation so there's autocomplete and hover information for users
+- `lua/compile-mode/config/check.lua`: add validation logic for the option
+- `README.md` and `doc/compile-mode.txt`: the "full configuration" example
+- `doc/compile-mode.txt`: add a section explaining the option and its default value, and list it in the table of contents
+
 ## The development process
 
 ### Cloning the repository
