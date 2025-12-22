@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.10.2] - 2025-12-22
+
 Also includes several documentation changes.
 
 ### Added
@@ -515,6 +517,7 @@ Also includes several documentation changes.
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[5.10.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.10.1...v5.10.2
 [5.10.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.10.0...v5.10.1
 [5.10.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.9.0...v5.10.0
 [5.9.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.8.2...v5.9.0
