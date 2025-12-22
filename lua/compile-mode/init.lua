@@ -248,6 +248,15 @@ local runcommand = a.void(
 			utils.delay(1000)
 		end
 
+		if config.bang_expansion then
+			command = vim.fn.expandcmd(command)
+		end
+
+		local error = errors.parse(command, 4)
+		if error then
+			errors.error_list[4] = error
+		end
+
 		log.debug("opening compilation buffer...")
 
 		local prev_win = vim.api.nvim_get_current_win()
@@ -274,15 +283,6 @@ local runcommand = a.void(
 		utils.wait()
 
 		utils.buf_set_opt(bufnr, "filetype", "compilation")
-
-		if config.bang_expansion then
-			command = vim.fn.expandcmd(command)
-		end
-
-		local error = errors.parse(command, 4)
-		if error then
-			errors.error_list[4] = error
-		end
 
 		set_lines(bufnr, 0, 0, {
 			"vim: filetype=compilation:path+=" .. default_dir(),
