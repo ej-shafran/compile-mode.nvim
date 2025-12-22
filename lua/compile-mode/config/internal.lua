@@ -5,59 +5,49 @@ local log = require("compile-mode.log")
 ---@class CompileModeConfig
 local default_config = {
 	---@type string
-	buffer_name = "*compilation*",
-	---@type string
-	time_format = "%a %b %e %H:%M:%S",
-	---@type string
 	default_command = "make -k ",
-
+	---@type table | boolean
+	baleia_setup = false,
+	---@type boolean
+	bang_expansion = false,
 	---@type table<string, CompileModeRegexpMatcher>
 	error_regexp_table = {},
 	---@type string[]
 	error_ignore_file_list = {},
 	---@type CompileModeLevel
 	error_threshold = compile_mode.level.WARNING,
-
-	---@type boolean
-	use_diagnostics = false,
-
-	---@type string[]
-	hidden_output = {},
-
-	---@type boolean
-	ask_about_save = true,
-	---@type boolean
-	ask_to_interrupt = true,
-	---@type boolean
-	recompile_no_fail = false,
 	---@type boolean
 	auto_jump_to_first_error = false,
 	---@type boolean|number|nil
 	error_locus_highlight = 500,
-
+	---@type boolean
+	use_diagnostics = false,
+	---@type boolean
+	recompile_no_fail = false,
+	---@type boolean
+	ask_about_save = true,
+	---@type boolean
+	ask_to_interrupt = true,
+	---@type string
+	buffer_name = "*compilation*",
+	---@type string
+	time_format = "%a %b %e %H:%M:%S",
+	---@type string[]
+	hidden_output = {},
 	---@type table<string, string>|nil
 	environment = nil,
 	---@type boolean
 	clear_environment = false,
-
-	---@type table | boolean
-	baleia_setup = false,
-	---@type boolean
-	bang_expansion = false,
-	---@type boolean
-	input_word_completion = false,
-
 	---@type boolean
 	debug = false,
-
+	---@type boolean
+	input_word_completion = false,
 	--- @type boolean
 	hidden_buffer = false,
-
 	--- @type boolean
 	focus_compilation_buffer = false,
 	--- @type boolean
 	auto_scroll = true,
-
 	---@type boolean
 	use_circular_error_navigation = false,
 }

@@ -1,5 +1,6 @@
 local compile_mode = require("compile-mode")
 local config = require("compile-mode.config.internal")
+local log = require("compile-mode.log")
 
 local bufnr = vim.api.nvim_get_current_buf()
 
@@ -13,6 +14,10 @@ if config.baleia_setup then
 
 		local baleia = baleia_mod.setup(opts)
 		baleia.automatically(bufnr)
+	else
+		log.warn(
+			"Could not require `baleia`, but `baleia_setup` was passed. Did you forget to install `baleia` for color code support?"
+		)
 	end
 end
 

@@ -1,73 +1,96 @@
 ---@class CompileModeOpts
 ---
+---The string to show in the compile prompt as a default.
 ---For more info, run `:h compile-mode.default_command`
 ---@field default_command?          string
 ---
----For more info, run `:h compile-mode.time_format`
----@field time_format?              string
----
----For more info, run `:h compile-mode.buffer_name`
----@field buffer_name?              string
----
----For more info, run `:h compile-mode.error_regexp_table`
----@field error_regexp_table?       table<string, CompileModeRegexpMatcher>
----
----For more info, run `:h compile-mode.debug`
----@field debug?                    boolean
----
----For more info, run `:h compile-mode.error_ignore_file_list`
----@field error_ignore_file_list?   string[]
----
----For more info, run `:h compile-mode.hidden_output`
----@field hidden_output?            (string|string[])
----
----For more info, run `:h compile-mode.recompile_no_fail`
----@field recompile_no_fail?        boolean
----
----For more info, run `:h compile-mode.auto_jump_to_first_error`
----@field auto_jump_to_first_error? boolean
----
----For more info, run `:h compile-mode.ask_about_save`
----@field ask_about_save?           boolean
----
----For more info, run `:h compile-mode.environment`
----@field environment?              table<string| string>
----
----For more info, run `:h compile-mode.clear_environment`
----@field clear_environment?        boolean
----
----For more info, run `:h compile-mode.ask_to_interrupt`
----@field ask_to_interrupt?         boolean
----
+---Use `baleia` for parsing ANSI escape codes in the output.
 ---For more info, run `:h compile-mode.baleia_setup`
 ---@field baleia_setup?             boolean|table
 ---
+---Expand commands, like `:!` (e.g. `:Compile echo %`)
 ---For more info, run `:h compile-mode.bang_expansion`
 ---@field bang_expansion?           boolean
 ---
----For more info, run `:h compile-mode.input_word_completion`
----@field input_word_completion?    boolean
+---Configure additional error regexes.
+---For more info, run `:h compile-mode.error_regexp_table`
+---@field error_regexp_table?       table<string, CompileModeRegexpMatcher>
 ---
----For more info, run `:h compile-mode.use_diagnostics`
----@field use_diagnostics?          boolean
+---List of filename regexes to ignore errors from.
+---For more info, run `:h compile-mode.error_ignore_file_list`
+---@field error_ignore_file_list?   string[]
 ---
+---The minimum error level to jump to.
 ---For more info, run `:h compile-mode.error_threshold`
 ---@field error_threshold?          CompileModeLevel
 ---
+---Automatically jump to the first error.
+---For more info, run `:h compile-mode.auto_jump_to_first_error`
+---@field auto_jump_to_first_error? boolean
+---
+---How long to highlight an error's location when jumping to it.
 ---For more info, run `:h compile-mode.error_locus_highlight`
 ---@field error_locus_highlight?    boolean|integer|nil
 ---
+---Use Neovim diagnostics instead of opening the compilation buffer.
+---For more info, run `:h compile-mode.use_diagnostics`
+---@field use_diagnostics?          boolean
+---
+---Default to calling `:Compile` for `:Recompile` when there's no previous command.
+---For more info, run `:h compile-mode.recompile_no_fail`
+---@field recompile_no_fail?        boolean
+---
+---Ask to save unsaved buffers before compiling.
+---For more info, run `:h compile-mode.ask_about_save`
+---@field ask_about_save?           boolean
+---
+---Ask to interrupt already running commands.
+---For more info, run `:h compile-mode.ask_to_interrupt`
+---@field ask_to_interrupt?         boolean
+---
+---The name for the compilation buffer.
+---For more info, run `:h compile-mode.buffer_name`
+---@field buffer_name?              string
+---
+---The format for the time information at the top of the compilation buffer
+---For more info, run `:h compile-mode.time_format`
+---@field time_format?              string
+---
+---List of regexes to hide from the output.
+---For more info, run `:h compile-mode.hidden_output`
+---@field hidden_output?            (string|string[])
+---
+---A table of environment variables to pass to commands.
+---For more info, run `:h compile-mode.environment`
+---@field environment?              table<string| string>
+---
+---Clear all environment variables for each command.
+---For more info, run `:h compile-mode.clear_environment`
+---@field clear_environment?        boolean
+---
+-- Fix compilation for plugins like `nvim-cmp`.
+---For more info, run `:h compile-mode.input_word_completion`
+---@field input_word_completion?    boolean
+---
+---Hide the compliation buffer.
 ---For more info, run `:h compile-mode.hidden_buffer`
 ---@field hidden_buffer?            boolean
 ---
----For more info, run `:h compile-mode.use_circular_error_navigation`
----@field use_circular_error_navigation? boolean
----
+---Automatically focus the compilation buffer.
 ---For more info, run `:h compile-mode.focus_compilation_buffer`
 ---@field focus_compilation_buffer? boolean
 ---
+---Jump back past the end/beginning of the errors with `:NextError`/`:PrevError`
+---For more info, run `:h compile-mode.use_circular_error_navigation`
+---@field use_circular_error_navigation? boolean
+---
+---Automatically scroll to the bottom of the compilation buffer.
 ---For more info, run `:h compile-mode.auto_scroll`
 ---@field auto_scroll? boolean
+---
+---Print debug information.
+---For more info, run `:h compile-mode.debug`
+---@field debug?                    boolean
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode
