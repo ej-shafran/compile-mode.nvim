@@ -6,24 +6,58 @@ Thank you for wanting to contribute to `compile-mode.nvim`! Generally, I want to
 >
 > As specified in the README, `compile-mode.nvim` only officially supports Neovim versions v0.10.0 and higher. However, if you'd like to contribute some code that makes the plugin work for earlier versions (and isn't too much of a hassle to maintain) I'll be glad to merge it.
 
+## Making changes
+
+### Issues
+
+Please:
+
+- Open an issue before you open a pull request - whatever you're looking for may already exist
+- Search through issues at least a little before opening one
+- Properly fill out the information for your issue
+
+### Pull Requests
+
+See the "CI" section below on what needs to happen for pull requests to get properly merged.
+
+If you've created a new configuration option in your pull request, please update the following places:
+
+- `lua/compile-mode/config/internal.lua`: add a default value for the option
+- `lua/compile-mode/config/meta.lua`: add an `@field` annotation so there's autocomplete and hover information for users
+- `lua/compile-mode/config/check.lua`: add validation logic for the option
+- `README.md` and `doc/compile-mode.txt`: the "full configuration" example
+- `doc/compile-mode.txt`: add a section explaining the option and its default value, and list it in the table of contents
+
 ## The development process
 
 ### Cloning the repository
 
 Fork the repository and clone it. It's better if you work from the `nightly` branch, so make sure you fork the repo with all its branches and not just `main`.
 
-### Makefile
-
-The Makefile has commands for `test` and `fmt`. These commands do exactly what you would expect.
-
 ### Using your local changes in Neovim
 
-If you're using Lazy, use the `dir` option of the Lazy spec to keep your plugin up-to-date with your development version, without having to push your changes remotely. You can use the `Lazy reload` command to reload the plugin - it should work properly, unless you've changed the highlight groups, in which case restarting Neovim might be needed.
+If you have a clone of the project (or your fork of it) just using `vim.opt.rtp:append "~/path/to/compile-mode.nvim"` will make the plugin work as expected.
 
-## Testing
+Your plugin manager of choice may have their own way of configuring "locally loaded" plugins - e.g. if you're using Lazy, you can use the `dir` option of the Lazy spec.
+
+## CI
+
+This repository has several continuous integration checks. Any pull request that doesn't pass CI won't get merged.
+
+### Testing
 
 The tests use `plenary.nvim`'s `busted` style testing. Read their [tests README](https://github.com/nvim-lua/plenary.nvim/blob/master/TESTS_README.md) for more info.
 
 Please add testing for any new features you add. It would also be nice if you added tests to show any bugs that you intend to solve.
 
-Obviously, please don't break any existing tests. I won't merge a pull request that doesn't have its GitHub checks passing. If your PR changes the behavior in a way that would break the tests and you change the tests to fit, please clarify this in the comments on the PR.
+Obviously, please don't break any existing tests. If your PR changes the behavior in a way that would break the tests and you change the tests to fit, please clarify this in the comments on the PR.
+
+You can run tests locally with `make test` (or `make test-debug`, which shows debug logs).
+
+### Formatting
+
+The files are formatted using [stylua](https://github.com/JohnnyMorganz/StyLua). If you have it installed, you can format the files using `make fmt`.
+
+### Typechecking
+
+The Lua code is typechecked using [lua-language-server](https://luals.github.io/#other-install). If you have it installed, you can check the validity of the code using `make typecheck` (or by directly running `./typecheck.sh`).

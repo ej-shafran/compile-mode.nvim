@@ -14,4 +14,7 @@ set rtp+=~/.local/share/lunarvim/site/pack/packer/start/plenary.nvim
 " lazy
 set rtp+=~/.local/share/nvim/lazy/plenary.nvim
 
+" vim.pack
+set rtp+=~/.local/share/nvim/site/pack/core/opt/plenary.nvim/
+
 runtime! plugin/plenary.vim
