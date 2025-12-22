@@ -115,25 +115,25 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
       -- or the most up-to-date updates:
       -- branch = "nightly",
       dependencies = {
-	  "nvim-lua/plenary.nvim",
-	  -- if you want to enable coloring of ANSI escape codes in
-	  -- compilation output, add:
-	  -- { "m00qek/baleia.nvim", tag = "v1.3.0" },
+          "nvim-lua/plenary.nvim",
+          -- if you want to enable coloring of ANSI escape codes in
+          -- compilation output, add:
+          -- { "m00qek/baleia.nvim", tag = "v1.3.0" },
       },
       config = function()
-	  ---@type CompileModeOpts
-	  vim.g.compile_mode = {
-	      -- if you use something like `nvim-cmp` or `blink.cmp` for completion,
-	      -- set this to fix tab completion in command mode:
-	      -- input_word_completion = true,
+          ---@type CompileModeOpts
+          vim.g.compile_mode = {
+              -- if you use something like `nvim-cmp` or `blink.cmp` for completion,
+              -- set this to fix tab completion in command mode:
+              -- input_word_completion = true,
 
-	      -- to add ANSI escape code support, add:
-	      -- baleia_setup = true,
+              -- to add ANSI escape code support, add:
+              -- baleia_setup = true,
 
-	      -- to make `:Compile` replace special characters (e.g. `%`) in
-	      -- the command (and behave more like `:!`), add:
-	      -- bang_expansion = true,
-	  }
+              -- to make `:Compile` replace special characters (e.g. `%`) in
+              -- the command (and behave more like `:!`), add:
+              -- bang_expansion = true,
+          }
       end
     }
 <
@@ -237,8 +237,8 @@ For example, to add TypeScript errors:
     vim.g.compile_mode = {
         error_regexp_table = {
           typescript = {
-	    -- TypeScript errors take the form
-	    -- "path/to/error-file.ts(13,23): error TS22: etc."
+            -- TypeScript errors take the form
+            -- "path/to/error-file.ts(13,23): error TS22: etc."
             regex = "^\\(.\\+\\)(\\([1-9][0-9]*\\),\\([1-9][0-9]*\\)): error TS[1-9][0-9]*:",
             filename = 1,
             row = 2,
@@ -266,8 +266,8 @@ An example configuration:
 >lua
     ---@type CompileModeOpts
     vim.g.compile_mode = {
-	-- for an empty prompt
-	default_command = "",
+        -- for an empty prompt
+        default_command = "",
     }
 <
 
@@ -355,12 +355,12 @@ environment                                         *compile-mode.environment*
     For example:
 
     >lua
-	---@type CompileModeOpts
-	vim.g.compile_mode = {
-	  environment = {
-	    CI = "true"
-	  }
-	}
+        ---@type CompileModeOpts
+        vim.g.compile_mode = {
+          environment = {
+            CI = "true"
+          }
+        }
 <
 
 clear_environment                             *compile-mode.clear_environment*
@@ -412,58 +412,58 @@ compile({param})                                      *compile-mode.compile()*
     its result. See |:Compile|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.args}: the string of the command itself, or `nil` if the
-	      user should be prompted to enter a command
-	    - {param.smods}: a table - see |:command-modifiers| for more
+        - {param} (table) command param (optional)
+            - {param.args}: the string of the command itself, or `nil` if the
+              user should be prompted to enter a command
+            - {param.smods}: a table - see |:command-modifiers| for more
 
 recompile({param})                                  *compile-mode.recompile()*
     Reruns the last compiled command. See |:Recompile|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.smods}: a table - see |:command-modifiers| for more
+        - {param} (table) command param (optional)
+            - {param.smods}: a table - see |:command-modifiers| for more
 
 first_error({param})                              *compile-mode.first_error()*
     Jumps to the Nth error within the compilation buffer, based on the count.
     See |:FirstError|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	  - {param.count}: which error to jump to; default `1`
-	  - {param.smods}: a table - see |:command-modifiers| for more; this
-	    will affect the way windows are created when jumping to errors, if
-	    there's a need to open a new window
+        - {param} (table) command param (optional)
+          - {param.count}: which error to jump to; default `1`
+          - {param.smods}: a table - see |:command-modifiers| for more; this
+            will affect the way windows are created when jumping to errors, if
+            there's a need to open a new window
 
 current_error({param})                          *compile-mode.current_error()*
     Jumps to the current error within the compilation buffer. See
     |:CurrentError|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.smods}: a table - see |:command-modifiers| for more; this
-	      will affect the way windows are created when jumping to errors,
-	      if there's a need to open a new window
+        - {param} (table) command param (optional)
+            - {param.smods}: a table - see |:command-modifiers| for more; this
+              will affect the way windows are created when jumping to errors,
+              if there's a need to open a new window
 
 next_error({param})                                *compile-mode.next_error()*
     Jumps to the next error within the compilation buffer. See |:NextError|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.count}: how many errors forwards to jump; default `1`
-	    - {param.smods}: a table - see |:command-modifiers| for more; this
-	      will affect the way windows are created when jumping to errors,
-	      if there's a need to open a new window
+        - {param} (table) command param (optional)
+            - {param.count}: how many errors forwards to jump; default `1`
+            - {param.smods}: a table - see |:command-modifiers| for more; this
+              will affect the way windows are created when jumping to errors,
+              if there's a need to open a new window
 
 prev_error({param})                                *compile-mode.prev_error()*
     Jumps to a prior error within the compilation buffer. See |:PrevError|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.count}: how many errors backwards to jump; default `1`
-	    - {param.smods}: a table - see |:command-modifiers| for more; this
-	      will affect the way windows are created when jumping to errors,
-	      if there's a need to open a new window
+        - {param} (table) command param (optional)
+            - {param.count}: how many errors backwards to jump; default `1`
+            - {param.smods}: a table - see |:command-modifiers| for more; this
+              will affect the way windows are created when jumping to errors,
+              if there's a need to open a new window
 
 send_to_qflist()                               *compile-mode.send_to_qflist()*
     Loads all compilation errors into the quickfix list, replacing the
@@ -480,10 +480,10 @@ goto_error({param})                                *compile-mode.goto_error()*
     Jumps to the error under the cursor. See |:CompileGotoError|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.smods}: a table - see |:command-modifiers| for more; this
-	      will affect the way windows are created when jumping to errors,
-	      if there's a need to open a new window
+        - {param} (table) command param (optional)
+            - {param.smods}: a table - see |:command-modifiers| for more; this
+              will affect the way windows are created when jumping to errors,
+              if there's a need to open a new window
 
 debug_error({param})                              *compile-mode.debug_error()*
     Prints debug information about the error under the cursor. See
@@ -494,32 +494,32 @@ move_to_next_error({param})                *compile-mode.move_to_next_error()*
     |:CompileNextError|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.count}: how many errors forwards to move; default `1`
+        - {param} (table) command param (optional)
+            - {param.count}: how many errors forwards to move; default `1`
 
 move_to_next_file({param})                  *compile-mode.move_to_next_file()*
     Move to the line of the next error within the compilation buffer that has
     a different file to the current error. See |:CompileNextFile|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.count}: how many files forwards to move; default `1`
+        - {param} (table) command param (optional)
+            - {param.count}: how many files forwards to move; default `1`
 
 move_to_prev_error({param})                *compile-mode.move_to_prev_error()*
     Move to the line of the previous error within the compilation buffer. See
     |:CompilePrevError|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.count}: how many errors backwards to move; default `1`
+        - {param} (table) command param (optional)
+            - {param.count}: how many errors backwards to move; default `1`
 
 move_to_prev_file({param})                  *compile-mode.move_to_prev_file()*
     Move to the line of the previous error within the compilation buffer that
     has a different file to the current error. See |:CompilePrevFile|.
 
     Parameters:
-	- {param} (table) command param (optional)
-	    - {param.count}: how many files backwards to move; default `1`
+        - {param} (table) command param (optional)
+            - {param.count}: how many files backwards to move; default `1`
 
 interrupt()                                         *compile-mode.interrupt()*
     Interrupts the currently running compilation. See |:CompileInterrupt|.
@@ -905,18 +905,18 @@ CompilationFinished                                      *CompilationFinished*
     Invoked when the compilation is finished. The |event-data| is a table with
     the following keys:
 
-	- {command} (string) the compilation command that finished executing
-	- {code} (integer) the exit code of the executed command
-	- {bufnr} (integer) the buffer ID for the compilation buffer with the
-	  output of the command
+        - {command} (string) the compilation command that finished executing
+        - {code} (integer) the exit code of the executed command
+        - {bufnr} (integer) the buffer ID for the compilation buffer with the
+          output of the command
 
 CompilationInterrupted                                *CompilationInterrupted*
     Invoked when the compilation is interrupted (when another job is started
     or by a call to |:CompileInterrupt|). The |event-data| is a table with the
     following keys:
 
-	- {job_id} (integer) the job ID of the job which was interrupted
-	- {bufnr} (integer) the buffer ID for the compilation buffer with the
-	  output of the command
+        - {job_id} (integer) the job ID of the job which was interrupted
+        - {bufnr} (integer) the buffer ID for the compilation buffer with the
+          output of the command
 
- vim:tw=78:ts=8:noet:ft=help:norl:
+ vim:tw=78:ts=8:noet:ft=help:norl:expandtab:
