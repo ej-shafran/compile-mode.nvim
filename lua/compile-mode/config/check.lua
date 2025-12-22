@@ -133,6 +133,8 @@ function check.validate(cfg)
 		error_regexp_table = validate_error_regexp_table(cfg.error_regexp_table),
 		hidden_buffer = { cfg.hidden_buffer, "boolean" },
 		use_circular_error_navigation = { cfg.use_circular_error_navigation, "boolean" },
+		focus_compilation_buffer = { cfg.focus_compilation_buffer, "boolean" },
+		auto_scroll = { cfg.auto_scroll, "boolean" },
 	})
 end
 

@@ -62,6 +62,12 @@
 ---
 ---For more info, run `:h compile-mode.use_circular_error_navigation`
 ---@field use_circular_error_navigation? boolean
+---
+---For more info, run `:h compile-mode.focus_compilation_buffer`
+---@field focus_compilation_buffer? boolean
+---
+---For more info, run `:h compile-mode.auto_scroll`
+---@field auto_scroll? boolean
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode
