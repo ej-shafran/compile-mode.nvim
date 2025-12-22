@@ -413,15 +413,18 @@ local function map_to_diagnostic(bufnr, error)
 		level = vim.diagnostic.severity.INFO
 	end
 
+	local col = error.col and error.col.value - 1 or 0
+	local lnum = error.row.value - 1
+
 	---@type vim.Diagnostic
 	return {
 		bufnr = bufnr,
-		col = error.col and error.col.value - 1 or 0,
-		lnum = error.row.value - 1,
+		col = col,
+		lnum = lnum,
 		message = error.full_text,
 		severity = level,
-		end_col = error.end_col and error.end_col.value - 1,
-		end_lnum = error.end_row and error.end_row.value - 1,
+		end_col = error.end_col and error.end_col.value - 1 or col,
+		end_lnum = error.end_row and error.end_row.value - 1 or lnum,
 	}
 end
 
