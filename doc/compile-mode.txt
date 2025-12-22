@@ -30,6 +30,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - hidden_buffer                                 |compile-mode.hidden_buffer|
   - focus_compilation_buffer           |compile-mode.focus_compilation_buffer|
   - use_circular_error_navigation |compile-mode.use_circular_error_navigation|
+  - auto_scroll                                     |compile-mode.auto_scroll|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -402,6 +403,15 @@ use_circular_error_navigation     *compile-mode.use_circular_error_navigation*
     error, and calling |:PrevError| on the first error will jump to the last.
 
     Default: `false`
+
+auto_scroll                                         *compile-mode.auto_scroll*
+    When `true`, the buffer will automatically scroll to the bottom as new
+    output arrives, and the cursor will be placed at the end of the file.
+    When `false`, the cursor and view will be reset to the top of the buffer
+    (after the compile-mode info headers, but at the beginning of
+    compilation log).
+
+    Default: `true`
 
 ==============================================================================
 6. API                                                      *compile-mode-api*
