@@ -1,4 +1,4 @@
-*compile-mode.txt*       A plugin for Neovim inspired by Emacs' Compilation Mode
+*compile-mode*         A plugin for Neovim inspired by Emacs' Compilation Mode
 
 ==============================================================================
 Table of Contents                             *compile-mode-table-of-contents*
