@@ -133,6 +133,7 @@ function check.validate(cfg)
 		hidden_buffer = { cfg.hidden_buffer, "boolean" },
 		focus_compilation_buffer = { cfg.focus_compilation_buffer, "boolean" },
 		use_circular_error_navigation = { cfg.use_circular_error_navigation, "boolean" },
+		auto_scroll = { cfg.auto_scroll, "boolean" },
 		debug = { cfg.debug, "boolean" },
 	})
 end

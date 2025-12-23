@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+Also includes several documentation changes.
+
 ## [5.10.2] - 2025-12-22
 
 Also includes several documentation changes.
