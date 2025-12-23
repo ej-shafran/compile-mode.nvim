@@ -3,12 +3,9 @@ local assert = require("luassert")
 
 describe("auto_scroll functionality", function()
 	it("should scroll to the bottom when auto_scroll is true", function()
-		helpers.setup_tests({ 
-			auto_scroll = true,
-			focus_compilation_buffer = true
-		})
+		helpers.setup_tests()
 
-        helpers.compile({ args = "echo line1 && echo line2 && echo line3" })
+        helpers.compile({ args = "printf '\\n\\n\\n'" })
 		
 		local bufnr = helpers.get_compilation_bufnr()
 		local winid = vim.fn.bufwinid(bufnr)
@@ -21,12 +18,9 @@ describe("auto_scroll functionality", function()
 	it("should stay at the first line of compilation output when auto_scroll is false", function()
 		helpers.setup_tests({ 
 			auto_scroll = false,
-			focus_compilation_buffer = true 
 		})
 
-        helpers.compile({ 
-            args = "echo line1 && echo line2 && echo line3 && echo line4 && echo line5 && echo line6 && echo line7" 
-        })
+        helpers.compile({ args = "printf '\\n\\n\\n'" })
 		
 		local bufnr = helpers.get_compilation_bufnr()
 		local winid = vim.fn.bufwinid(bufnr)
