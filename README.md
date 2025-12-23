@@ -126,6 +126,9 @@ vim.g.compile_mode = {
     -- Automatically focus the compilation buffer.
     -- :h compile-mode.focus_compilation_buffer
     focus_compilation_buffer = false,
+    -- Automatically move the cursor to the end of the compilation buffer.
+    -- :h compile-mode.auto_scroll
+    auto_scroll = true,
     -- Jump back past the end/beginning of the errors
     -- with `:NextError`/`:PrevError`
     -- :h compile-mode.use_circular_error_navigation

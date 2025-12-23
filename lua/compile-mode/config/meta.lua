@@ -84,6 +84,10 @@
 ---For more info, run `:h compile-mode.use_circular_error_navigation`
 ---@field use_circular_error_navigation? boolean
 ---
+---Automatically scroll to the bottom of the compilation buffer.
+---For more info, run `:h compile-mode.auto_scroll`
+---@field auto_scroll? boolean
+---
 ---Print debug information.
 ---For more info, run `:h compile-mode.debug`
 ---@field debug?                    boolean

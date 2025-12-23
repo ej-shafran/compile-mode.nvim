@@ -46,6 +46,8 @@ local default_config = {
 	hidden_buffer = false,
 	--- @type boolean
 	focus_compilation_buffer = false,
+	--- @type boolean
+	auto_scroll = true,
 	---@type boolean
 	use_circular_error_navigation = false,
 }
