@@ -53,7 +53,7 @@ local in_next_error_mode = false
 ---@param end_ integer
 ---@param data string[]
 local function set_lines(bufnr, start, end_, data)
-    local config = require("compile-mode.config.internal")
+	local config = require("compile-mode.config.internal")
 
 	if vim.fn.bufexists(bufnr) == 0 then
 		return
@@ -66,11 +66,11 @@ local function set_lines(bufnr, start, end_, data)
 		utils.buf_set_opt(bufnr, "modified", false)
 	end)
 
-    if config.auto_scroll then
-	    vim.api.nvim_buf_call(bufnr, function()
-	    	vim.cmd("normal G")
-	    end)
-    end
+	if config.auto_scroll then
+		vim.api.nvim_buf_call(bufnr, function()
+			vim.cmd("normal G")
+		end)
+	end
 end
 
 ---Get the directory to look in for a specific line in the compilation buffer,
