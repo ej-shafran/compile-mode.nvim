@@ -332,6 +332,9 @@ Here is the full default configuration:
         -- Automatically focus the compilation buffer.
         -- :h compile-mode.focus_compilation_buffer
         focus_compilation_buffer = false,
+        -- Automatically scroll the compilation buffer to the end.
+        -- :h compile-mode.auto_scroll
+        auto_scroll = true,
         -- Jump back past the end/beginning of the errors
         -- with `:NextError`/`:PrevError`
         -- :h compile-mode.use_circular_error_navigation
