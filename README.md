@@ -133,6 +133,9 @@ vim.g.compile_mode = {
     -- Print debug information.
     -- :h compile-mode.debug
     debug = false,
+    -- Use a pseudo terminal for command execution.
+    -- :h compile-mode.use_pseudo_terminal
+    use_pseudo_terminal = false,
 }
 ```
 
