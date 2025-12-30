@@ -48,6 +48,8 @@ local default_config = {
 	focus_compilation_buffer = false,
 	---@type boolean
 	use_circular_error_navigation = false,
+	---@type boolean
+	use_pseudo_terminal = false,
 }
 
 local user_config = type(vim.g.compile_mode) == "function" and vim.g.compile_mode() or vim.g.compile_mode

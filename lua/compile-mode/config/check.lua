@@ -134,6 +134,7 @@ function check.validate(cfg)
 		focus_compilation_buffer = { cfg.focus_compilation_buffer, "boolean" },
 		use_circular_error_navigation = { cfg.use_circular_error_navigation, "boolean" },
 		debug = { cfg.debug, "boolean" },
+		use_pseudo_terminal = { cfg.use_pseudo_terminal, "boolean" },
 	})
 end
 
