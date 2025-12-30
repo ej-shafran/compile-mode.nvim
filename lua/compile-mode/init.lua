@@ -459,9 +459,23 @@ M.compile = a.void(
 				input_completion_func = "CompileInputCompleteWord"
 			end
 
+			local buf = vim.api.nvim_get_current_buf()
+			local ft = vim.bo[buf].filetype
+			---@type string
+			local default_cmd = vim.g.compile_command
+			if not default_cmd then
+				if type(config.default_command) == "table" then
+					default_cmd = config.default_command[ft] or config.default_command["*"] or ""
+				elseif type(config.default_command) == "function" then
+					default_cmd = config.default_command(ft) or ""
+				else
+					default_cmd = config.default_command or ""
+				end
+			end
+
 			command = utils.input({
 				prompt = "Compile command: ",
-				default = vim.g.compile_command or config.default_command,
+				default = default_cmd,
 				completion = ("customlist,%s"):format(input_completion_func),
 			})
 		end

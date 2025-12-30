@@ -346,6 +346,10 @@ Valid keys and values for `vim.g.compile_mode`:
 default_command                                 *compile-mode.default_command*
     The string to show in the |compile-mode.compile()| prompt as a default.
     You can set it to `""` for an empty prompt. Defaults to: `"make -k "`.
+    Can also be set to a table to correspond filetype to specific commands.
+    "*" as key will act as a fallback for any filetype.
+    Can also be set to a function that returns the command, will fallback to
+    empty of the function returns a falsy value.
 
 baleia_setup                                       *compile-mode.baleia_setup*
     When `true`, baleia.nvim will be set up for the compilation buffer, which

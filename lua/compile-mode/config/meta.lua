@@ -2,7 +2,7 @@
 ---
 ---The string to show in the compile prompt as a default.
 ---For more info, run `:h compile-mode.default_command`
----@field default_command?          string
+---@field default_command?          string|table<string, string>|(fun(): string)
 ---
 ---Use `baleia` for parsing ANSI escape codes in the output.
 ---For more info, run `:h compile-mode.baleia_setup`
