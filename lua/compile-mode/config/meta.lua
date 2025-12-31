@@ -91,6 +91,10 @@
 ---Print debug information.
 ---For more info, run `:h compile-mode.debug`
 ---@field debug?                    boolean
+---
+---Use a pseudo terminal for command execution.
+---For more info, run `:h compile-mode.use_pseudo_terminal`
+---@field use_pseudo_terminal?      boolean
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode

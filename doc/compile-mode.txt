@@ -31,6 +31,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - use_circular_error_navigation |compile-mode.use_circular_error_navigation|
   - auto_scroll                                     |compile-mode.auto_scroll|
   - debug                                                 |compile-mode.debug|
+  - use_pseudo_terminal                     |compile-mode.use_pseudo_terminal|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -342,6 +343,9 @@ Here is the full default configuration:
         -- Print debug information.
         -- :h compile-mode.debug
         debug = false,
+        -- Use a pseudo terminal for command execution.
+        -- :h compile-mode.use_pseudo_terminal
+        use_pseudo_terminal = false,
     }
 <
 
@@ -485,6 +489,11 @@ auto_scroll                                         *compile-mode.auto_scroll*
 debug                                                     *compile-mode.debug*
     Print additional debug information. This is printed using |print|, so you
     can inspect it with |:messages|.
+
+use_pseudo_terminal                         *compile-mode.use_pseudo_terminal*
+    Use a pseudo terminal for command execution.
+    This is useful when the program doesn't automatically flush the buffer so
+    that the output cannot be displayed at realtime.
 
 ==============================================================================
 6. API                                                      *compile-mode-api*

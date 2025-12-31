@@ -135,6 +135,7 @@ function check.validate(cfg)
 		use_circular_error_navigation = { cfg.use_circular_error_navigation, "boolean" },
 		auto_scroll = { cfg.auto_scroll, "boolean" },
 		debug = { cfg.debug, "boolean" },
+		use_pseudo_terminal = { cfg.use_pseudo_terminal, "boolean" },
 	})
 end
 

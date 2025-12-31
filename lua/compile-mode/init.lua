@@ -173,6 +173,7 @@ local runjob = a.wrap(
 				is_exited = true
 				callback(count, code, id)
 			end,
+			pty = config.use_pseudo_terminal,
 			env = config.environment,
 			clear_env = config.clear_environment,
 		})
