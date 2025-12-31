@@ -30,6 +30,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - focus_compilation_buffer           |compile-mode.focus_compilation_buffer|
   - use_circular_error_navigation |compile-mode.use_circular_error_navigation|
   - debug                                                 |compile-mode.debug|
+  - use_pseudo_terminal                     |compile-mode.use_pseudo_terminal|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -338,6 +339,9 @@ Here is the full default configuration:
         -- Print debug information.
         -- :h compile-mode.debug
         debug = false,
+        -- Use a pseudo terminal for command execution.
+        -- :h compile-mode.use_pseudo_terminal
+        use_pseudo_terminal = false,
     }
 <
 
