@@ -1,3 +1,4 @@
+---@diagnostic disable-next-line: duplicate-set-field
 vim.ui.input = function(opts, on_confirm)
 	on_confirm(opts.default)
 end
