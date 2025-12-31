@@ -272,6 +272,26 @@ Here is the full default configuration:
         -- The string to show in the compile prompt as a default.
         -- For an empty prompt, you can use:
         -- default_command = "",
+        -- To use different defaults based on filetype, you can use a table:
+        -- default_command = {
+        --   python = "python %",
+        --   lua = "lua %",
+        --   javascript = "bun %",
+        --   typescript = "bun %",
+        --   c = "cc -o %:r % && ./%:r",
+        --   cpp = "cc -std=c++23 -o %:r % && ./%:r",
+        --   java = "javac % && java %:r",
+        --   go = "go run %",
+        -- },
+        -- A function which returns the default command string is also supported:
+        -- default_command = function()
+        --   local filetype = vim.bo.filetype
+        --   if filetype == "python" then
+        --     return "python %"
+        --   else
+        --     return "make -k "
+        --   end
+        -- end,
         -- :h compile_mode.default_command
         default_command = "make -k ",
         -- Use `baleia` for parsing ANSI escape codes in the output.
@@ -354,6 +374,10 @@ Valid keys and values for `vim.g.compile_mode`:
 default_command                                 *compile-mode.default_command*
     The string to show in the |compile-mode.compile()| prompt as a default.
     You can set it to `""` for an empty prompt. Defaults to: `"make -k "`.
+    Can also be set to a table to correspond filetype to specific commands.
+    "*" as key will act as a fallback for any filetype.
+    Can also be set to a function that returns the command, will fallback to
+    empty of the function returns a falsy value.
 
 baleia_setup                                       *compile-mode.baleia_setup*
     When `true`, baleia.nvim will be set up for the compilation buffer, which
