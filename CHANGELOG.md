@@ -10,6 +10,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 Also includes several documentation changes.
 
+### Added
+
+- The `auto_scroll` configuration option (which defaults to `true`), allowing users to opt out of auto-scrolling behavior - by [@mttgermano](https://github.com/mttgermano)
+- The ability to set `default_command` to a function or a table (from filetype to command, with `"*"` acting as a fallback) - by [@BrandenXia](https://github.com/BrandenXia)
+- The `use_pseudo_terminal` option, which sets the `pty` option for `:h jobstart()` - by [@BrandenXia](https://github.com/BrandenXia
+
 ## [5.10.2] - 2025-12-22
 
 Also includes several documentation changes.
