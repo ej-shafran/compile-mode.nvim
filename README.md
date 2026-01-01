@@ -65,6 +65,26 @@ vim.g.compile_mode = {
     -- The string to show in the compile prompt as a default.
     -- For an empty prompt, you can use:
     -- default_command = "",
+    -- To use different defaults based on filetype, you can use a table:
+    -- default_command = {
+    --   python = "python %",
+    --   lua = "lua %",
+    --   javascript = "bun %",
+    --   typescript = "bun %",
+    --   c = "cc -o %:r % && ./%:r",
+    --   cpp = "cc -std=c++23 -o %:r % && ./%:r",
+    --   java = "javac % && java %:r",
+    --   go = "go run %",
+    -- },
+    -- A function which returns the default command string is also supported:
+    -- default_command = function()
+    --   local filetype = vim.bo.filetype
+    --   if filetype == "python" then
+    --     return "python %"
+    --   else
+    --     return "make -k "
+    --   end
+    -- end,
     -- :h compile_mode.default_command
     default_command = "make -k ",
     -- Use `baleia` for parsing ANSI escape codes in the output.
@@ -126,6 +146,9 @@ vim.g.compile_mode = {
     -- Automatically focus the compilation buffer.
     -- :h compile-mode.focus_compilation_buffer
     focus_compilation_buffer = false,
+    -- Automatically move the cursor to the end of the compilation buffer.
+    -- :h compile-mode.auto_scroll
+    auto_scroll = true,
     -- Jump back past the end/beginning of the errors
     -- with `:NextError`/`:PrevError`
     -- :h compile-mode.use_circular_error_navigation
@@ -133,6 +156,9 @@ vim.g.compile_mode = {
     -- Print debug information.
     -- :h compile-mode.debug
     debug = false,
+    -- Use a pseudo terminal for command execution.
+    -- :h compile-mode.use_pseudo_terminal
+    use_pseudo_terminal = false,
 }
 ```
 

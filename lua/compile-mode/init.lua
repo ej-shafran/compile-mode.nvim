@@ -53,6 +53,8 @@ local in_next_error_mode = false
 ---@param end_ integer
 ---@param data string[]
 local function set_lines(bufnr, start, end_, data)
+	local config = require("compile-mode.config.internal")
+
 	if vim.fn.bufexists(bufnr) == 0 then
 		return
 	end
@@ -63,9 +65,12 @@ local function set_lines(bufnr, start, end_, data)
 		utils.buf_set_opt(bufnr, "modifiable", false)
 		utils.buf_set_opt(bufnr, "modified", false)
 	end)
-	vim.api.nvim_buf_call(bufnr, function()
-		vim.cmd("normal G")
-	end)
+
+	if config.auto_scroll then
+		vim.api.nvim_buf_call(bufnr, function()
+			vim.cmd("normal G")
+		end)
+	end
 end
 
 ---Get the directory to look in for a specific line in the compilation buffer,
@@ -168,6 +173,7 @@ local runjob = a.wrap(
 				is_exited = true
 				callback(count, code, id)
 			end,
+			pty = config.use_pseudo_terminal,
 			env = config.environment,
 			clear_env = config.clear_environment,
 		})
@@ -459,9 +465,23 @@ M.compile = a.void(
 				input_completion_func = "CompileInputCompleteWord"
 			end
 
+			local buf = vim.api.nvim_get_current_buf()
+			local ft = vim.bo[buf].filetype
+			---@type string
+			local default_cmd = vim.g.compile_command
+			if not default_cmd then
+				if type(config.default_command) == "table" then
+					default_cmd = config.default_command[ft] or config.default_command["*"] or ""
+				elseif type(config.default_command) == "function" then
+					default_cmd = config.default_command(ft) or ""
+				else
+					default_cmd = config.default_command or ""
+				end
+			end
+
 			command = utils.input({
 				prompt = "Compile command: ",
-				default = vim.g.compile_command or config.default_command,
+				default = default_cmd,
 				completion = ("customlist,%s"):format(input_completion_func),
 			})
 		end

@@ -2,7 +2,7 @@
 ---
 ---The string to show in the compile prompt as a default.
 ---For more info, run `:h compile-mode.default_command`
----@field default_command?          string
+---@field default_command?          string|table<string, string>|(fun(): string)
 ---
 ---Use `baleia` for parsing ANSI escape codes in the output.
 ---For more info, run `:h compile-mode.baleia_setup`
@@ -84,9 +84,17 @@
 ---For more info, run `:h compile-mode.use_circular_error_navigation`
 ---@field use_circular_error_navigation? boolean
 ---
+---Automatically scroll to the bottom of the compilation buffer.
+---For more info, run `:h compile-mode.auto_scroll`
+---@field auto_scroll? boolean
+---
 ---Print debug information.
 ---For more info, run `:h compile-mode.debug`
 ---@field debug?                    boolean
+---
+---Use a pseudo terminal for command execution.
+---For more info, run `:h compile-mode.use_pseudo_terminal`
+---@field use_pseudo_terminal?      boolean
 
 ---@type CompileModeOpts
 vim.g.compile_mode = vim.g.compile_mode

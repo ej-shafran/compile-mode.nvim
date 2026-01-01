@@ -113,7 +113,7 @@ end
 ---@return string error_message
 function check.validate(cfg)
 	return validate({
-		default_command = { cfg.default_command, "string" },
+		default_command = { cfg.default_command, { "string", "table", "function" } },
 		baleia_setup = { cfg.baleia_setup, { "boolean", "table" } },
 		bang_expansion = { cfg.bang_expansion, "boolean" },
 		error_regexp_table = validate_error_regexp_table(cfg.error_regexp_table),
@@ -133,7 +133,9 @@ function check.validate(cfg)
 		hidden_buffer = { cfg.hidden_buffer, "boolean" },
 		focus_compilation_buffer = { cfg.focus_compilation_buffer, "boolean" },
 		use_circular_error_navigation = { cfg.use_circular_error_navigation, "boolean" },
+		auto_scroll = { cfg.auto_scroll, "boolean" },
 		debug = { cfg.debug, "boolean" },
+		use_pseudo_terminal = { cfg.use_pseudo_terminal, "boolean" },
 	})
 end
 
