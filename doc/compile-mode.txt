@@ -50,6 +50,9 @@ Table of Contents                             *compile-mode-table-of-contents*
   - move_to_prev_file()                                  |move_to_prev_file()|
   - interrupt()                                     |compile-mode.interrupt()|
   - close_buffer()                               |compile-mode.close_buffer()|
+  - statusline_info()                         |compile-mode.statusline_info()|
+  - statusline()                                   |compile-mode.statusline()|
+  - CompileModeStatuslineInfo                      |CompileModeStatuslineInfo|
 7. Commands                                            |compile-mode-commands|
   - :Compile                                                        |:Compile|
     - vim.g.compilation_directory                |vim.g.compilation_directory|
@@ -68,7 +71,9 @@ Table of Contents                             *compile-mode-table-of-contents*
   - :CompilePrevFile                                        |:CompilePrevFile|
   - :CompileInterrupt                                      |:CompileInterrupt|
   - :CompileCloseBuffer                                  |:CompileCloseBuffer|
-8. Highlights                                        |compile-mode-highlights|
+8. Statusline Configuration                          |compile-mode-statusline|
+  - CompileModeStatusline()                          |CompileModeStatusline()|
+9. Highlights                                        |compile-mode-highlights|
   - CompileModeError                                     |hl-CompileModeError|
   - CompileModeInfo                                       |hl-CompileModeInfo|
   - CompileModeWarning                                 |hl-CompileModeWarning|
@@ -81,7 +86,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - CompileModeCheckTarget                               |hl-CompileModeError|
   - CompileModeDirectoryMessage               |hl-CompileModeDirectoryMessage|
   - CompileModeErrorLocus                           |hl-CompileModeErrorLocus|
-9. Autocmd                                              |compile-mode-autocmd|
+10. Autocmd                                             |compile-mode-autocmd|
   - CompilationFinished                                  |CompilationFinished|
   - CompilationInterrupted                            |CompilationInterrupted|
 
@@ -643,6 +648,34 @@ interrupt()                                         *compile-mode.interrupt()*
 close_buffer()                                   *compile-mode.close_buffer()*
     Closes the compilation buffer. See |:CompileCloseBuffer|.
 
+statusline_info()                             *compile-mode.statusline_info()*
+    Returns information about the current compilation which can be displayed
+    in a statusline.
+
+    Return: ~
+        (`CompileModeStatuslineInfo`) Field `counts` is guaranteed to be
+        present. See |CompileModeStatuslineInfo|.
+
+statusline({colors})                               *compile-mode.statusline()*
+    Get a string which can be placed into |stl-%{| expressions of the
+    |statusline| option. See |CompileModeStatusline()|, which calls this
+    internally.
+
+    Parameters: ~
+      • {colors} (`boolean`) 
+
+    Return: ~
+        (`string`)
+
+
+*CompileModeStatuslineInfo*
+    Information about the current compilation.
+
+    Fields: ~
+      • {counts}       (`{error: integer, warning: integer, info: integer}`)
+      • {status}       (`{type: "run"}|{type:"exit", code: integer}|nil`)
+
+
 ==============================================================================
 7. Commands                                            *compile-mode-commands*
 
@@ -884,7 +917,58 @@ close_buffer()                                   *compile-mode.close_buffer()*
     Mapped to `q` within the compilation buffer.
 
 ==============================================================================
-8. Highlights                                        *compile-mode-highlights*
+8. Statusline Configuration                          *compile-mode-statusline*
+
+To configure the default Neovim |statusline| to show information about the
+current compilation and its errors, you can use the Vimscript function
+|CompileModeStatusline()|, with an argument specifying whether you want
+colors to be added to the statusline or not.
+
+If you want colors, use: >vim
+
+    set statusline+=\ %{%CompileModeStatusline(v:true)%}
+<
+Otherwise, you can use: >vim
+
+    set statusline+=\ %{CompileModeStatusline(v:false)}
+<
+If you use some sort of statusline plugin, you can use
+|compile-mode.statusline_info()| to get information which then be rendered
+into whatever format your plugin expects.
+
+NOTE: if you use `lualine`, there's a builtin extension for it.
+TODO: actually write the extension and document it.
+
+
+CompileModeStatusline({colors})                      *CompileModeStatusline()*
+
+    Get a string which can be placed into |stl-%{| expressions of the
+    |statusline| option. The string is in the following format: >vim
+
+         " when the command is still running
+         echo CompileModeStatusline(v:false)
+         " Compilation:run [E W I]
+         " ...where E = error count, W = warning count, and I = info count
+
+         " when the command has exited
+         echo CompileModeStatusline(v:false)
+         " Compilation:exit [X] [E W I]
+         " ...where X = exit code
+<
+    When {colors} is |TRUE|, the returned string will have `%#` and `%*`
+    sections with highlight groups for the error counts and the ":exit [X]" /
+    ":run" string. For this to work, the function must be called inside of a
+    `%{%...%}` section so that the returned sections are properly parsed.
+    See |compile-mode-highlights| and |statusline|.
+
+    Parameters: ~
+      • {colors} (`boolean`) 
+
+    Return: ~
+        (`string`)
+
+==============================================================================
+9. Highlights                                        *compile-mode-highlights*
 
 CompileModeError                                         *hl-CompileModeError*
     The filename of compilation errors.
@@ -1004,7 +1088,7 @@ CompileModeErrorLocus                               *hl-CompileModeErrorLocus*
 
 
 ==============================================================================
-9. Autocmd                                              *compile-mode-autocmd*
+10. Autocmd                                             *compile-mode-autocmd*
 
 You can create custom autocommands (see |:autocmd|) for certain compile-mode
 events by defining autocommands for the |User| event with the following
