@@ -8,6 +8,17 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+Also includes several documentation changes.
+
+### Added
+
+- Some keymaps in the compilation buffer that the Emacs plugin has (`<Tab>` and `<S-Tab>` for going back and forth through errors, and `<LeftMouse>` for clicking on errors)
+- The ability to configure the Neovim statusline to show information about compilations, either using `:h 'statusline'` or with plugins, including a builtin extension for `lualine` - see `:h compile-mode-statusline`
+
+### Fixed
+
+- Colors disappearing when reloading some colorschemes or loading them after the `plugin/highlights.vim` file was loaded
+
 ## [5.11.0] - 2026-01-01
 
 Also includes several documentation changes.
