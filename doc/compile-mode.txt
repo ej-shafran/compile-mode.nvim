@@ -534,59 +534,59 @@ compile({param})                                      *compile-mode.compile()*
     Run a command and place its output in the compilation buffer, reporting on
     its result. See |:Compile|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.args}: the string of the command itself, or `nil` if the
-              user should be prompted to enter a command
-            - {param.smods}: a table - see |:command-modifiers| for more
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {args} (`string|nil`) the command itself, `nil` if the user should
+          be prompted to enter a command
+        • {smods} (`table`) see |:command-modifiers| for more
 
 recompile({param})                                  *compile-mode.recompile()*
     Reruns the last compiled command. See |:Recompile|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.smods}: a table - see |:command-modifiers| for more
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {smods} (`table`) see |:command-modifiers| for more
 
 first_error({param})                              *compile-mode.first_error()*
     Jumps to the Nth error within the compilation buffer, based on the count.
     See |:FirstError|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-          - {param.count}: which error to jump to; default `1`
-          - {param.smods}: a table - see |:command-modifiers| for more; this
-            will affect the way windows are created when jumping to errors, if
-            there's a need to open a new window
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {count} (`integer`) which error to jump to; default `1`
+        • {smods} (`table`) see |:command-modifiers| for more; this will
+          affect the way windows are created when jumping to errors, if
+          there's a need to open a new window
 
 current_error({param})                          *compile-mode.current_error()*
     Jumps to the current error within the compilation buffer. See
     |:CurrentError|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.smods}: a table - see |:command-modifiers| for more; this
-              will affect the way windows are created when jumping to errors,
-              if there's a need to open a new window
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {smods} (`table`) see |:command-modifiers| for more; this will
+          affect the way windows are created when jumping to errors, if
+          there's a need to open a new window
 
 next_error({param})                                *compile-mode.next_error()*
     Jumps to the next error within the compilation buffer. See |:NextError|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.count}: how many errors forwards to jump; default `1`
-            - {param.smods}: a table - see |:command-modifiers| for more; this
-              will affect the way windows are created when jumping to errors,
-              if there's a need to open a new window
+    Parameters: ~
+      • {param} (table) command param (optional)
+        • {count} (`integer`) how many errors forwards to jump; default `1`
+        • {smods} (`table`) see |:command-modifiers| for more; this will
+          affect the way windows are created when jumping to errors, if
+          there's a need to open a new window
 
 prev_error({param})                                *compile-mode.prev_error()*
     Jumps to a prior error within the compilation buffer. See |:PrevError|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.count}: how many errors backwards to jump; default `1`
-            - {param.smods}: a table - see |:command-modifiers| for more; this
-              will affect the way windows are created when jumping to errors,
-              if there's a need to open a new window
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {count} (`integer`) how many errors backwards to jump; default `1`
+        • {smods} (`table`) see |:command-modifiers| for more; this will
+          affect the way windows are created when jumping to errors, if
+          there's a need to open a new window
 
 send_to_qflist()                               *compile-mode.send_to_qflist()*
     Loads all compilation errors into the quickfix list, replacing the
@@ -602,11 +602,11 @@ next_error_follow()                         *compile-mode.next_error_follow()*
 goto_error({param})                                *compile-mode.goto_error()*
     Jumps to the error under the cursor. See |:CompileGotoError|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.smods}: a table - see |:command-modifiers| for more; this
-              will affect the way windows are created when jumping to errors,
-              if there's a need to open a new window
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {smods} (`table`) see |:command-modifiers| for more; this will
+          affect the way windows are created when jumping to errors, if
+          there's a need to open a new window
 
 debug_error({param})                              *compile-mode.debug_error()*
     Prints debug information about the error under the cursor. See
@@ -616,33 +616,33 @@ move_to_next_error({param})                *compile-mode.move_to_next_error()*
     Move to the line of the next error within the compilation buffer. See
     |:CompileNextError|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.count}: how many errors forwards to move; default `1`
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {count} (`integer`) how many errors forwards to move; default `1`
 
 move_to_next_file({param})                  *compile-mode.move_to_next_file()*
     Move to the line of the next error within the compilation buffer that has
     a different file to the current error. See |:CompileNextFile|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.count}: how many files forwards to move; default `1`
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {count} (`integer`) how many files forwards to move; default `1`
 
 move_to_prev_error({param})                *compile-mode.move_to_prev_error()*
     Move to the line of the previous error within the compilation buffer. See
     |:CompilePrevError|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.count}: how many errors backwards to move; default `1`
+    Parameters: ~
+      • {param} (table) command param (optional)
+        • {count} (`integer`) how many errors backwards to move; default `1`
 
 move_to_prev_file({param})                  *compile-mode.move_to_prev_file()*
     Move to the line of the previous error within the compilation buffer that
     has a different file to the current error. See |:CompilePrevFile|.
 
-    Parameters:
-        - {param} (table) command param (optional)
-            - {param.count}: how many files backwards to move; default `1`
+    Parameters: ~
+      • {param} (`table`) command param (optional)
+        • {count} (`integer`) how many files backwards to move; default `1`
 
 interrupt()                                         *compile-mode.interrupt()*
     Interrupts the currently running compilation. See |:CompileInterrupt|.
@@ -977,115 +977,94 @@ CompileModeStatusline({colors})                      *CompileModeStatusline()*
 CompileModeError                                         *hl-CompileModeError*
     The filename of compilation errors.
 
-    Example:
+    Example: >
 
-    >
     README.md:[1,1] error
     ^^^^^^^^^
 <
-
 CompileModeInfo                                           *hl-CompileModeInfo*
     The filename of `INFO` level errors.
 
-    Example:
+    Example: >
 
-    >
     [INFO] README.md:[1,1] error
            ^^^^^^^^^
 <
-
 CompileModeWarning                                     *hl-CompileModeWarning*
     The filename of `WARNING` level errors.
 
-    Example:
+    Example: >
 
-    >
     [WARNING] README.md:[1,1] error
               ^^^^^^^^^
 <
-
 CompileModeMessage                                     *hl-CompileModeMessage*
     The entirety of the compilation error message (i.e. the entire match of
     the regex from `error_regexp_table`).
 
-    Example:
+    Example: >
 
-    >
     README.md:[1,1] error
     ^^^^^^^^^^^^^^^^
 <
-
 CompileModeMessageRow                               *hl-CompileModeMessageRow*
     The row number of compilation errors.
 
-    Example:
+    Example: >
 
-    >
     README.md:[1,1] error
                ^
 <
 CompileModeMessageCol                               *hl-CompileModeMessageCol*
     The column number of compilation errors.
 
-    Example:
+    Example: >
 
-    >
     README.md:[1,1] error
                  ^
 <
-
 CompileModeCommandOutput                         *hl-CompileModeCommandOutput*
     The prefix of a command output (anything that prefixes an output with a
     colon).
 
-    Example:
+    Example: >
 
-    >
     make: Nothing to be done for 'all'.
     ^^^^^
 <
-
 CompileModeOutputFile                               *hl-CompileModeOutputFile*
     The output file of a certain command, found after the `-o`, `--output`, or
     `--output-file` flag of a command.
 
-    Example:
+    Example: >
 
-    >
     gcc -o main main.c
            ^^^^
 <
-
 CompileModeCheckTarget                             *hl-CompileModeCheckTarget*
     The target of a "checking" message (usually from `./configure`).
 
-    Example:
+    Example: >
 
-    >
     checking for gcc... gcc
                  ^^^
 <
-
 CompileModeCheckResult                             *hl-CompileModeCheckResult*
     The result of a "checking" message (usually from `./configure`).
 
-    Example:
+    Example: >
 
-    >
     checking for gcc... gcc
                         ^^^
 <
-
 CompileModeDirectoryMessage                   *hl-CompileModeDirectoryMessage*
     The directory name in a "Leaving directory"/"Entering directory" message.
 
-    Example:
+    Example: >
 
-    >
     make[1]: Entering directory '/home/user/build/directory'
                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
 <
-
 CompileModeErrorLocus                               *hl-CompileModeErrorLocus*
     The highlighting used in the source of an error when jumping to that
     error's locus.
