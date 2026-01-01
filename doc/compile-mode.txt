@@ -171,14 +171,15 @@ cleared and the new command starts running.
 The compilation buffer has a few local commands and keymaps. The local
 commands (and their keymaps, if mentioned) are:
 
-- |:CompileGotoError| - mapped to `<CR>`
+- |:CompileGotoError| - mapped to `<CR>` and `<LeftMouse>`
 - |:CompileDebugError| - mapped to `<C-/>`
 - |:CompileInterrupt| - mapped to `<C-c>`
 - |:CompileCloseBuffer| - mapped to `<q>`
-- |:CompileNextError| - mapped to `<C-g>n`
+- |:CompileNextError| - mapped to `<C-g>n` and `<Tab>`
 - |:CompileNextFile| - mapped to `<C-g>]`
-- |:CompilePrevError| - mapped to `<C-g>p`
+- |:CompilePrevError| - mapped to `<C-g>p` and `<S-Tab>`
 - |:CompilePrevFile| - mapped to `<C-g>[`
+- |:QuickfixErrors| - mapped to `<C-q>`
 
 Additional keymaps within the compilation buffer are:
 
@@ -807,7 +808,7 @@ close_buffer()                                   *compile-mode.close_buffer()*
     These commands will affect the way windows are created when jumping to
     errors, if there's a need to open a new window.
 
-    Mapped to `<CR>` within the compilation buffer.
+    Mapped to `<CR>` and `<LeftMouse>` within the compilation buffer.
 
 :CompileDebugError                                        *:CompileDebugError*
     Only available within the compilation buffer itself.
@@ -827,7 +828,7 @@ close_buffer()                                   *compile-mode.close_buffer()*
 
     You can run this command using |:silent| to disable any messages.
 
-    Mapped to `<C-g>n` within the compilation buffer.
+    Mapped to `<C-g>n` and `<Tab>` within the compilation buffer.
 
 :[N]CompileNextFile                                         *:CompileNextFile*
     Only available within the compilation buffer itself.
@@ -852,7 +853,7 @@ close_buffer()                                   *compile-mode.close_buffer()*
 
     You can run this command using |:silent| to disable any messages.
 
-    Mapped to `<C-g>p` within the compilation buffer.
+    Mapped to `<C-g>p` and `<S-Tab>` within the compilation buffer.
 
 :[N]CompilePrevFile                                         *:CompilePrevFile*
     Only available within the compilation buffer itself.
