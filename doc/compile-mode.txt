@@ -89,6 +89,7 @@ Table of Contents                             *compile-mode-table-of-contents*
 10. Autocmd                                             |compile-mode-autocmd|
   - CompilationFinished                                  |CompilationFinished|
   - CompilationInterrupted                            |CompilationInterrupted|
+11. Extensions                                       |compile-mode-extensions|
 
 ==============================================================================
 1. Introduction                                    *compile-mode-introduction*
@@ -937,10 +938,12 @@ If you use some sort of statusline plugin, you can use
 |compile-mode.statusline_info()| to get information which then be rendered
 into whatever format your plugin expects.
 
-NOTE: if you use `lualine`, there's a builtin extension for it.
-TODO: actually write the extension and document it.
+NOTE: if you use `lualine`, there's a builtin extension for it: >lua
 
-
+        require("lualine").setup({
+            extensions = { require("compile-mode.extensions.lualine") }
+        })
+<
 CompileModeStatusline({colors})                      *CompileModeStatusline()*
 
     Get a string which can be placed into |stl-%{| expressions of the
@@ -1092,4 +1095,17 @@ CompilationInterrupted                                *CompilationInterrupted*
         - {bufnr} (integer) the buffer ID for the compilation buffer with the
           output of the command
 
- vim:tw=78:ts=8:noet:ft=help:norl:expandtab:
+==============================================================================
+11. Extensions                                       *compile-mode-extensions*
+
+There are several popular Neovim plugins that compile-mode has extensions to
+work with seamlessly.
+
+                                              *compile-mode-lualine-extension*
+
+The `lualine` extension configures the popular statusline plugin to show
+information about compilations. The `"compile-mode.extensions.lualine"` file
+is setup so it can be passed directly to the `extensions` table of the `setup`
+function from `lualine`.
+
+ vim:tw=78:ts=8:sw=4:sts=4:noet:ft=help:norl:expandtab:
