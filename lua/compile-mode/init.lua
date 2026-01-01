@@ -185,6 +185,7 @@ local runjob = a.wrap(
 		end
 
 		vim.g.compile_job_id = job_id
+		vim.cmd.redrawstatus()
 
 		if param.bang then
 			log.debug("sync mode - waiting for job to finish...")
@@ -194,6 +195,8 @@ local runjob = a.wrap(
 		vim.api.nvim_create_autocmd({ "BufDelete" }, {
 			buffer = bufnr,
 			callback = function()
+				vim.g.compilation_exit_code = nil
+				vim.g.compile_job_id = nil
 				vim.fn.jobstop(job_id)
 			end,
 		})
@@ -327,6 +330,8 @@ local runcommand = a.void(
 		else
 			compilation_message = "Compilation exited abnormally with code " .. tostring(code)
 		end
+		vim.g.compilation_exit_code = code
+		vim.cmd.redrawstatus()
 
 		local fmt_elapsed = string.format(", duration %.2f s", elapsed)
 
@@ -443,6 +448,81 @@ end
 --- PUBLIC (NON-COMMAND) API
 
 M.level = errors.level
+
+---@class CompileModeStatuslineInfo
+---@field counts {error: integer, warning: integer, info: integer}
+---@field status {type: "run"}|{type:"exit", code: integer}|nil
+
+---@return CompileModeStatuslineInfo
+function M.statusline_info()
+	local info = {
+		status = nil,
+		counts = vim.iter(pairs(errors.error_list)):fold({ error = 0, warning = 0, info = 0 }, function(acc, _, v)
+			if not v then
+				return acc
+			end
+
+			if v.level == M.level.ERROR then
+				acc.error = acc.error + 1
+			elseif v.level == M.level.WARNING then
+				acc.warning = acc.warning + 1
+			elseif v.level == M.level.INFO then
+				acc.info = acc.info + 1
+			end
+
+			return acc
+		end),
+	}
+
+	if vim.g.compile_job_id then
+		info.status = { type = "run" }
+	elseif vim.g.compilation_exit_code then
+		info.status = { type = "exit", code = vim.g.compilation_exit_code }
+	end
+
+	return info
+end
+
+function M.statusline(colors)
+	if vim.bo.filetype ~= "compilation" and not vim.g.compile_job_id and not vim.g.compilation_exit_code then
+		return ""
+	end
+
+	colors = colors and colors ~= 0
+
+	local info = M.statusline_info()
+
+	local status_text
+	if not info.status then
+		status_text = ""
+	elseif info.status.type == "run" then
+		status_text = ":run"
+		if colors then
+			status_text = "%#CompileModeCheckTarget#" .. status_text .. "%*"
+		end
+	elseif info.status.type == "exit" then
+		status_text = (":exit [%d]"):format(info.status.code)
+		if colors then
+			local color = info.status.code == exit_code.SUCCESS and "%#CompileModeInfo#" or "%#CompileModeError#"
+			status_text = color .. status_text .. "%*"
+		end
+	end
+
+	local error_count = ("%d"):format(info.counts.error)
+	if colors then
+		error_count = "%#CompileModeError#" .. error_count .. "%*"
+	end
+	local warning_count = ("%d"):format(info.counts.warning)
+	if colors then
+		warning_count = "%#CompileModeWarning#" .. warning_count .. "%*"
+	end
+	local info_count = ("%d"):format(info.counts.info)
+	if colors then
+		info_count = "%#CompileModeInfo#" .. info_count .. "%*"
+	end
+
+	return ("Compilation%s [%s %s %s]"):format(status_text, error_count, warning_count, info_count)
+end
 
 --- GENERAL COMMANDS
 
@@ -797,6 +877,7 @@ function M._parse_errors(bufnr)
 
 	errors.highlight(bufnr)
 	utils.highlight_command_outputs(bufnr, output_highlights)
+	vim.cmd.redrawstatus()
 end
 
 function M._follow_cursor()
