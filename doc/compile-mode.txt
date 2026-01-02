@@ -181,16 +181,16 @@ commands (and their keymaps, if mentioned) are:
 - |:CompileDebugError| - mapped to `<C-/>`
 - |:CompileInterrupt| - mapped to `<C-c>`
 - |:CompileCloseBuffer| - mapped to `<q>`
-- |:CompileNextError| - mapped to `<C-g>n` and `<Tab>`
-- |:CompileNextFile| - mapped to `<C-g>]`
-- |:CompilePrevError| - mapped to `<C-g>p` and `<S-Tab>`
-- |:CompilePrevFile| - mapped to `<C-g>[`
+- |:CompileNextError| - mapped to `g]` and `<Tab>`
+- |:CompileNextFile| - mapped to `g}`
+- |:CompilePrevError| - mapped to `g[` and `<S-Tab>`
+- |:CompilePrevFile| - mapped to `g{`
 - |:QuickfixErrors| - mapped to `<C-q>`
 
 Additional keymaps within the compilation buffer are:
 
 - `<C-r>` is mapped to `<CMD>Recompile<CR>` for quick recompilation.
-- `<C-g>f` is mapped to `<CMD>NextErrorFollow<CR>` to preview the error under
+- `g<C-f>` is mapped to `<CMD>NextErrorFollow<CR>` to preview the error under
   the cursor.
 - `gf` is mapped to a custom function that behaves similarly to how |gf| does
   regularly, but respects "Entering directory" and "Leaving directory"
@@ -823,7 +823,7 @@ statusline({colors})                               *compile-mode.statusline()*
     to be previewed in another window whenever you move a line in the
     compilation buffer.
 
-    Mapped to `<C-g>f` within the compilation buffer.
+    Mapped to `g<C-f>` within the compilation buffer.
 
 :CompileGotoError                                          *:CompileGotoError*
     Only available within the compilation buffer itself.
@@ -862,7 +862,7 @@ statusline({colors})                               *compile-mode.statusline()*
 
     You can run this command using |:silent| to disable any messages.
 
-    Mapped to `<C-g>n` and `<Tab>` within the compilation buffer.
+    Mapped to `g]` and `<Tab>` within the compilation buffer.
 
 :[N]CompileNextFile                                         *:CompileNextFile*
     Only available within the compilation buffer itself.
@@ -875,7 +875,7 @@ statusline({colors})                               *compile-mode.statusline()*
 
     You can run this command using |:silent| to disable any messages.
 
-    Mapped to `<C-g>]` within the compilation buffer.
+    Mapped to `g}` within the compilation buffer.
 
 :[N]CompilePrevError                                       *:CompilePrevError*
     Only available within the compilation buffer itself.
@@ -887,7 +887,7 @@ statusline({colors})                               *compile-mode.statusline()*
 
     You can run this command using |:silent| to disable any messages.
 
-    Mapped to `<C-g>p` and `<S-Tab>` within the compilation buffer.
+    Mapped to `g[` and `<S-Tab>` within the compilation buffer.
 
 :[N]CompilePrevFile                                         *:CompilePrevFile*
     Only available within the compilation buffer itself.
@@ -900,7 +900,7 @@ statusline({colors})                               *compile-mode.statusline()*
 
     You can run this command using |:silent| to disable any messages.
 
-    Mapped to `<C-g>[` within the compilation buffer.
+    Mapped to `g{` within the compilation buffer.
 
 :CompileInterrupt                                          *:CompileInterrupt*
 :[N]CompileInterrupt
