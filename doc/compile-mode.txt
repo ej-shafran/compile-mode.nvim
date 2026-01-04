@@ -1108,4 +1108,11 @@ information about compilations. The `"compile-mode.extensions.lualine"` file
 is setup so it can be passed directly to the `extensions` table of the `setup`
 function from `lualine`.
 
+                                            *compile-mode-telescope-extension*
+
+The `telescope` extension defines a picker for compilation errors. It can be
+manually loaded as a function from `"compile-mode.extensions.telescope"`, but
+it should be automatically picked up by `telescope` if you have it installed,
+allowing you to call `:Telescope compile-mode` with no setup required.
+
  vim:tw=78:ts=8:sw=4:sts=4:noet:ft=help:norl:expandtab:
