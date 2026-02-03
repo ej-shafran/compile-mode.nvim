@@ -154,9 +154,17 @@ function M.split_unless_open(opts, smods, count)
 		return bufnr
 	end
 
-	local win_ids = vim.fn.win_findbuf(bufnr)
+	local current_tab_id = vim.api.nvim_get_current_tabpage()
+	local window_open = vim.iter(vim.fn.win_findbuf(bufnr))
+		:filter(function(win_id)
+			local tab_id = vim.api.nvim_win_get_tabpage(win_id)
+			return tab_id == current_tab_id
+		end)
+		:any(function()
+			return true
+		end)
 
-	if #win_ids == 0 then
+	if not window_open then
 		vim.cmd({ cmd = "sbuffer", args = { bufnr }, mods = smods })
 
 		if count ~= 0 and count ~= nil then

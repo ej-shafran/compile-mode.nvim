@@ -8,6 +8,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- A builtin extension for `telescope` - see `:h compile-mode-telescope-extension`
+
+### Fixed
+
+- Open the compilation buffer in a new split even if it's already open in another tabpage
+
 ## [5.12.0] - 2026-01-02
 
 Also includes several documentation changes.

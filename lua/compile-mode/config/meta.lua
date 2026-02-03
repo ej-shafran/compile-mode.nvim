@@ -72,7 +72,7 @@
 ---For more info, run `:h compile-mode.input_word_completion`
 ---@field input_word_completion?    boolean
 ---
----Hide the compliation buffer.
+---Hide the compilation buffer.
 ---For more info, run `:h compile-mode.hidden_buffer`
 ---@field hidden_buffer?            boolean
 ---
