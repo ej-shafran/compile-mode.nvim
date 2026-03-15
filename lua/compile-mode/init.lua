@@ -154,9 +154,20 @@ local runjob = a.wrap(
 					new_lines[i] = line
 				end
 
-				if new_lines[i]:sub(-1) == "\r" then
-					new_lines[i] = new_lines[i]:sub(1, -2)
+				-- Strip trailing \r (PTY uses \r\n line endings; after splitting on \n the
+				-- \r is left at the end of each line).
+				if line:sub(-1) == "\r" then
+					line = line:sub(1, -2)
 				end
+
+				-- Strip mid-line \r + ESC[K sequences. Tools like cargo emit
+				-- \r\e[K<new content> to overwrite a progress line in place.
+				-- After removing the trailing \r above, any remaining \r must be
+				-- a mid-line overwrite; everything before (and including) the last
+				-- such \r\e[K can be discarded.
+				line = line:gsub(".*\r\27%[%d*K", "")
+
+				new_lines[i] = line
 			end
 
 			set_lines(bufnr, -2, -1, new_lines)
