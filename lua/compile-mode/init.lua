@@ -45,6 +45,7 @@ local dir_changes = {}
 
 ---Whether or not to preview the error under the cursor.
 local in_next_error_mode = false
+local has_auto_jumped = false
 
 --- UTILITY FUNCTIONS
 
@@ -245,6 +246,7 @@ local runcommand = a.void(
 		error_cursor = 0
 		errors.error_list = {}
 		dir_changes = {}
+		has_auto_jumped = false
 		utils.clear_diagnostics()
 
 		if vim.g.compile_job_id then
@@ -845,7 +847,8 @@ function M._parse_errors(bufnr)
 		if error then
 			errors.error_list[linenum] = error
 
-			if config.auto_jump_to_first_error and #vim.tbl_keys(errors.error_list) == 1 then
+			if config.auto_jump_to_first_error and not has_auto_jumped then
+				has_auto_jumped = true
 				local dir = find_directory_for_line(linenum)
 				utils.jump_to_error(error, dir, {})
 				error_cursor = linenum
