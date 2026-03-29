@@ -37,12 +37,12 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: compile-mode.nvim
 
       - name: Setup `plenary.nvim`
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: nvim-lua/plenary.nvim
           path: plenary.nvim
@@ -88,18 +88,18 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: compile-mode.nvim
 
       - name: Setup `plenary.nvim`
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: nvim-lua/plenary.nvim
           path: "${{ github.workspace }}/plenary.nvim"
 
       - name: Setup Neovim Runtime
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: "v${{ matrix.nvim_version }}"
           repository: neovim/neovim
@@ -122,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Stylua
         uses: JohnnyMorganz/stylua-action@v4

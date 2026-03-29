@@ -1,14 +1,13 @@
-name: Latest
+name: Nightly
 
 on:
   push:
-    tags:
-      - "v*.*.*"
-  workflow_dispatch: {}
+    branches:
+      - main
 
 jobs:
-  latest:
-    name: Update `latest` branch
+  nightly:
+    name: Update `nightly` branch
 
     if: github.event.repository.fork == false
 
@@ -21,10 +20,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          ref: latest
+          ref: nightly
 
-      - name: Pull from tag
+      - name: Pull from main
         run: |
           git fetch origin
-          git merge $GITHUB_REF --ff-only -m 'Update to latest tag'
-          git push origin latest
+          git merge $GITHUB_REF --ff-only -m 'Sync with main'
+          git push origin nightly
