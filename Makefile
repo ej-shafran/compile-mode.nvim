@@ -1,10 +1,12 @@
+FORMAT_FILES := lua/ spec/ plugin/ ftplugin/
+
 fmt:
 	@echo "===> Format"
-	stylua lua/
+	stylua $(FORMAT_FILES)
 
 fmt-check:
 	@echo "===> Check Formatting"
-	stylua --check lua/
+	stylua --check $(FORMAT_FILES)
 
 test:
 	@echo "===> Test"
