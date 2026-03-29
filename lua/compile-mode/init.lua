@@ -866,7 +866,7 @@ function M._parse_errors(bufnr)
 				local leaving = matcher.leaving and matches[matcher.leaving + 1] ~= ""
 				local dir = matches[matcher.filename + 1]
 
-				if vim.fn.isabsolutepath(dir) ~= 0 then
+				if utils.is_absolute(dir) then
 					M.dir_changes[linenum] = vim.fn.fnamemodify(dir, ":p:h" .. (leaving and ":h" or ""))
 				else
 					local latest_dir = find_directory_for_line(linenum)

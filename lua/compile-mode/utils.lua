@@ -250,7 +250,7 @@ M.jump_to_error = a.void(function(error, current_dir, smods)
 	current_dir = string.gsub(current_dir or "", "/$", "")
 
 	local filename = error.filename.value
-	if vim.fn.isabsolutepath(filename) == 0 then
+	if not M.is_absolute(filename) then
 		filename = current_dir .. "/" .. filename
 	end
 
@@ -362,6 +362,21 @@ end
 
 function M.is_windows()
 	return vim.uv.os_uname().sysname == "Windows_NT"
+end
+
+---@param path string
+---@return boolean is_absolute whether `path` is absolute or relative.
+function M.is_absolute(path)
+	if vim.fn.has("nvim-0.11.0") == 1 then
+		return vim.fn.isabsolutepath(path) ~= 0
+	end
+
+	if M.is_windows() then
+		return path:match("^%a:[/\\]") or path:match("^//") or path:match("^\\\\")
+	else
+		local first = path:sub(1, 1)
+		return first == "/" or first == "~"
+	end
 end
 
 return M
