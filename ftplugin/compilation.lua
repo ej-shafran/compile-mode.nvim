@@ -76,7 +76,9 @@ matchadd(
 	"CompileModeError",
 	"^[Cc]hecking \\([Ff]or \\|[Ii]f \\|[Ww]hether \\(to\\)\\?\\)\\?\\(.\\+\\)\\.\\.\\. *\\((cached) *\\)\\?\\zsno\\ze$"
 )
-matchadd("CompileModeDirectoryMessage", "\\(Entering\\|Leaving\\) directory [`']\\zs.\\+\\ze'$")
+for _, matcher in ipairs(config.directory_change_matchers) do
+	matchadd("CompileModeDirectoryMessage", matcher.regex)
+end
 
 command("CompileGotoError", compile_mode.goto_error)
 command("CompileDebugError", compile_mode.debug_error)

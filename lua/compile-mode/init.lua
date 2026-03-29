@@ -41,7 +41,7 @@ local compilation_directory = nil
 ---A table which keeps track of the changes in directory for the compilation buffer,
 ---based on "Entering directory" and "Leaving directory" messages.
 ---@type table<integer, string>
-local dir_changes = {}
+M.dir_changes = {}
 
 ---Whether or not to preview the error under the cursor.
 local in_next_error_mode = false
@@ -81,7 +81,7 @@ end
 local function find_directory_for_line(linenum)
 	local latest_linenum = nil
 	local dir = compilation_directory or vim.fn.getcwd()
-	for old_linenum, old_dir in pairs(dir_changes) do
+	for old_linenum, old_dir in pairs(M.dir_changes) do
 		if old_linenum < linenum and (not latest_linenum or latest_linenum <= old_linenum) then
 			latest_linenum = old_linenum
 			dir = old_dir
@@ -245,7 +245,7 @@ local runcommand = a.void(
 
 		error_cursor = 0
 		errors.error_list = {}
-		dir_changes = {}
+		M.dir_changes = {}
 		has_auto_jumped = false
 		utils.clear_diagnostics()
 
@@ -854,20 +854,26 @@ function M._parse_errors(bufnr)
 				error_cursor = linenum
 			end
 		else
-			local dirchange = vim.fn.matchlist(line, "\\%(Entering\\|Leavin\\(g\\)\\) directory [`']\\(.\\+\\)'$")
-			if #dirchange > 0 then
-				local leaving = dirchange[2] ~= ""
-				local dir = dirchange[3]
+			---@type CompileModeDirectoryMatcher
+			local matcher = vim.iter(config.directory_change_matchers):find(function(matcher)
+				local s0 = matcher._rx:match_str(line)
+				return s0
+			end)
 
-				local latest_dir = find_directory_for_line(linenum)
+			if matcher then
+				local matches = vim.fn.matchlist(line, matcher.regex)
 
-				if utils.is_absolute(dir) then
-					dir_changes[linenum] = vim.fn.fnamemodify(dir, leaving and ":h" or "")
+				local leaving = matcher.leaving and matches[matcher.leaving + 1] ~= ""
+				local dir = matches[matcher.filename + 1]
+
+				if vim.fn.isabsolutepath(dir) ~= 0 then
+					M.dir_changes[linenum] = vim.fn.fnamemodify(dir, ":p:h" .. (leaving and ":h" or ""))
 				else
+					local latest_dir = find_directory_for_line(linenum)
 					if leaving then
-						dir_changes[linenum] = vim.fn.fnamemodify(latest_dir, ":h")
+						M.dir_changes[linenum] = vim.fn.fnamemodify(latest_dir, ":h")
 					else
-						dir_changes[linenum] = vim.fn.resolve(latest_dir .. "/" .. dir)
+						M.dir_changes[linenum] = vim.fn.resolve(latest_dir .. "/" .. dir)
 					end
 				end
 			end

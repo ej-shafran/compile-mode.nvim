@@ -50,18 +50,30 @@ local function validate_string_list(value, or_string)
 	}
 end
 
----@param value unknown
+---@param obj table
+---@param str_field string
+---@param rx_field string
 ---@return table
-local function validate_regex(value)
+local function validate_regex(obj, str_field, rx_field)
 	return {
-		value,
-		function(str)
-			if type(str) ~= "string" then
-				return false
+		obj,
+		function(value)
+			if value[rx_field] then
+				return true
 			end
 
-			local ok = pcall(vim.regex, str)
-			return ok
+			if type(value[str_field]) ~= "string" then
+				return false, "expected string, got " .. type(value[str_field])
+			end
+
+			local ok, rx = pcall(vim.regex, value[str_field])
+			if not ok then
+				return false, "invalid regex '" .. value[str_field] .. "'"
+			end
+
+			obj[rx_field] = rx
+
+			return true
 		end,
 		"regex",
 	}
@@ -90,7 +102,7 @@ local function validate_error_regexp_table(value)
 				end
 
 				local ok, err = pcall(vim.validate, {
-					regex = validate_regex(matcher.regex),
+					regex = validate_regex(matcher, "regex", "_rx"),
 					filename = { matcher.filename, "number" },
 					row = { matcher.row, { "number", "table" }, true },
 					col = { matcher.col, { "number", "table" }, true },
@@ -108,6 +120,39 @@ local function validate_error_regexp_table(value)
 	}
 end
 
+local function validate_directory_matcher_list(value)
+	return {
+		value,
+		function(matcher_list)
+			if type(matcher_list) ~= "table" then
+				return false
+			end
+
+			local err_msg = nil
+			local ok = vim.iter(matcher_list):all(function(matcher)
+				if type(matcher) ~= "table" then
+					err_msg = "expected table, got " .. type(matcher)
+					return false
+				end
+
+				local ok, err = pcall(vim.validate, {
+					regex = validate_regex(matcher, "regex", "_rx"),
+					filename = { matcher.filename, "number" },
+					leaving = { matcher.filename, "number", true },
+				})
+				if not ok then
+					err_msg = err
+				end
+
+				return ok
+			end)
+
+			return ok, err_msg
+		end,
+		"directory matcher list",
+	}
+end
+
 ---@param cfg CompileModeConfig
 ---@return boolean is_valid
 ---@return string error_message
@@ -117,6 +162,7 @@ function check.validate(cfg)
 		baleia_setup = { cfg.baleia_setup, { "boolean", "table" } },
 		bang_expansion = { cfg.bang_expansion, "boolean" },
 		error_regexp_table = validate_error_regexp_table(cfg.error_regexp_table),
+		directory_change_matchers = validate_directory_matcher_list(cfg.directory_change_matchers),
 		error_ignore_file_list = validate_string_list(cfg.error_ignore_file_list),
 		error_threshold = validate_enum(cfg.error_threshold, compile_mode.level, "compile_mode.level.%s"),
 		auto_jump_to_first_error = { cfg.auto_jump_to_first_error, "boolean" },
@@ -145,7 +191,8 @@ end
 ---@param default_tbl table
 ---@return string[]
 function check.unrecognized_keys(tbl, default_tbl)
-	local skipped_keys = { "error_regexp_table", "environment", "error_ignore_file_list", "hidden_output" }
+	local skipped_keys =
+		{ "error_regexp_table", "directory_change_matchers", "environment", "error_ignore_file_list", "hidden_output" }
 
 	local keys = {}
 	for k, _ in pairs(tbl) do
