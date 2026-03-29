@@ -553,7 +553,7 @@ Also includes several documentation changes.
   - Also the ability to pass the `smods` field (and `smods.vertical`) to the
     API functions
 
-[unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...nightly
+[unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...main
 [5.13.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.12.0...v5.13.0
 [5.12.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.11.0...v5.12.0
 [5.11.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.10.2...v5.11.0
