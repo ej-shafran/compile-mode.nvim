@@ -18,4 +18,53 @@ describe("`auto_jump_to_first_error` option", function()
 
 		helpers.assert_at_error_locus(expected)
 	end)
+
+	it("should work with multiple errors", function()
+		---@type CreateError
+		local expected = {
+			filename = "README.md",
+			row = 1,
+			col = 1,
+		}
+		local errors = {
+			helpers.sun_ada_error(expected),
+			helpers.sun_ada_error({
+				filename = expected.filename,
+				row = expected.row + 1,
+				col = 1,
+			}),
+		}
+
+		helpers.compile_multiple_errors(errors)
+
+		helpers.assert_at_error_locus(expected)
+	end)
+
+	it("should not trap focus", function()
+		---@type CreateError
+		local expected = {
+			filename = "README.md",
+			row = 1,
+			col = 1,
+		}
+		local errors = {
+			helpers.sun_ada_error(expected),
+			helpers.sun_ada_error({
+				filename = expected.filename,
+				row = expected.row + 1,
+				col = 1,
+			}),
+		}
+
+		helpers.compile_multiple_errors(errors)
+
+		helpers.assert_at_error_locus(expected)
+
+		local before = vim.api.nvim_get_current_buf()
+		vim.cmd.wincmd("w")
+		helpers.wait_ms(100)
+		local after = vim.api.nvim_get_current_buf()
+
+		assert.are.not_same(before, after)
+	end)
 end)
