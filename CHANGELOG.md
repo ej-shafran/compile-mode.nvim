@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Handling of `\r\e[K` in command outputs - by [@jugarpeupv](https://github.com/jugarpeupv)
+
 ## [5.13.0] - 2026-02-03
 
 ### Added
