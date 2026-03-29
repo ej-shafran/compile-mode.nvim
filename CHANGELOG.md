@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.13.1] - 2026-03-30
+
 ### Fixed
 
 - Handling of `\r` in command outputs to be consistent with the Emacs plugin; a carriage return now clears to the beginning of the line. Pointed out and partially implemented by [@jugarpeupv](https://github.com/jugarpeupv)
@@ -555,6 +557,7 @@ Also includes several documentation changes.
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...main
+[5.13.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.13.0...v5.13.1
 [5.13.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.12.0...v5.13.0
 [5.12.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.11.0...v5.12.0
 [5.11.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.10.2...v5.11.0
