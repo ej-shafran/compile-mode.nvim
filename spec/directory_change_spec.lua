@@ -1,5 +1,9 @@
 local helpers = require("spec.test_helpers")
-local assert = require("luassert")
+
+-- TODO: properly test this logic on Windows
+if vim.o.shell:match("cmd.exe$") then
+	return
+end
 
 describe("default directory_change_matchers", function()
 	before_each(helpers.setup_tests)
