@@ -25,5 +25,5 @@ jobs:
       - name: Pull from main
         run: |
           git fetch origin
-          git merge $GITHUB_REF --ff-only -m 'Sync with main'
+          git merge origin/main --ff-only -m 'Sync with main'
           git push origin nightly
