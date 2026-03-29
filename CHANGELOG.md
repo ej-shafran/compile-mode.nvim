@@ -10,7 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Fixed
 
-- Handling of `\r` in command outputs to be consistent with the Emacs plugin; a carriage return now clears to the beginning of the line. Pointed out and partially implemented by [@jugarpeupv](https://github.com/jugarpeupv).
+- Handling of `\r` in command outputs to be consistent with the Emacs plugin; a carriage return now clears to the beginning of the line. Pointed out and partially implemented by [@jugarpeupv](https://github.com/jugarpeupv)
+- Bug with `auto_jump_to_first_error` repeatedly stealing focus - by [@TEEHEETUMMYTUMMS](https://github.com/TEEHEETUMMYTUMMS)
 
 ## [5.13.0] - 2026-02-03
 
