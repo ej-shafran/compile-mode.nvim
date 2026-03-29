@@ -32,7 +32,7 @@ If you've created a new configuration option in your pull request, please update
 
 ### Cloning the repository
 
-Fork the repository and clone it. It's better if you work from the `nightly` branch, so make sure you fork the repo with all its branches and not just `main`.
+Fork the repository and clone it.
 
 ### Using your local changes in Neovim
 
