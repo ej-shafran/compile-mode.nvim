@@ -154,18 +154,10 @@ local runjob = a.wrap(
 					new_lines[i] = line
 				end
 
-				-- Strip trailing \r (PTY uses \r\n line endings; after splitting on \n the
-				-- \r is left at the end of each line).
-				if line:sub(-1) == "\r" then
-					line = line:sub(1, -2)
+				local last_carriage_return = vim.fn.strridx(line, "\r")
+				if last_carriage_return >= 0 and last_carriage_return < line:len() - 1 then
+					line = line:sub(last_carriage_return + 1, -1)
 				end
-
-				-- Strip mid-line \r + ESC[K sequences. Tools like cargo emit
-				-- \r\e[K<new content> to overwrite a progress line in place.
-				-- After removing the trailing \r above, any remaining \r must be
-				-- a mid-line overwrite; everything before (and including) the last
-				-- such \r\e[K can be discarded.
-				line = line:gsub(".*\r\27%[%d*K", "")
 
 				new_lines[i] = line
 			end
