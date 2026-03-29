@@ -8,9 +8,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-### Changed
+### Fixed
 
-- Handling of `\r\e[K` in command outputs - by [@jugarpeupv](https://github.com/jugarpeupv)
+- Handling of `\r` in command outputs to be consistent with the Emacs plugin; a carriage return now clears to the beginning of the line. Pointed out and partially implemented by [@jugarpeupv](https://github.com/jugarpeupv).
 
 ## [5.13.0] - 2026-02-03
 
