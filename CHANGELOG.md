@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `directory_change_matchers` configuration option, which enables parsing custom messages that specify in which directory an action is occurring.
+
 ## [5.13.1] - 2026-03-30
 
 ### Fixed
