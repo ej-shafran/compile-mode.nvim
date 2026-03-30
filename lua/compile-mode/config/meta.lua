@@ -12,13 +12,13 @@
 ---For more info, run `:h compile-mode.bang_expansion`
 ---@field bang_expansion?           boolean
 ---
----Configure additional error regexes.
----For more info, run `:h compile-mode.error_regexp_table`
----@field error_regexp_table?       table<string, CompileModeRegexpMatcher>
----
 ---Configure additional entering/leaving directory regexes.
 ---For more info, run `:h compile-mode.directory_change_matchers`
 ---@field directory_change_matchers? CompileModeDirectoryMatcher[]
+---
+---Configure additional error regexes.
+---For more info, run `:h compile-mode.error_regexp_table`
+---@field error_regexp_table?       table<string, CompileModeRegexpMatcher>
 ---
 ---List of filename regexes to ignore errors from.
 ---For more info, run `:h compile-mode.error_ignore_file_list`

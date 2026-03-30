@@ -6,11 +6,13 @@ Table of Contents                             *compile-mode-table-of-contents*
 1. Introduction                                    |compile-mode-introduction|
 2. Installation                                    |compile-mode-installation|
 3. Compilation buffer                        |compile-mode-compilation-buffer|
+  - Compilation buffer keymaps                   |compile-mode-buffer-keymaps|
 4. Errors                                                |compile-mode-errors|
 5. Configuration                                  |compile-mode-configuration|
   - default_command                             |compile-mode.default_command|
   - baleia_setup                                   |compile-mode.baleia_setup|
   - bang_expansion                               |compile-mode.bang_expansion|
+  - directory_change_matchers         |compile-mode.directory_change_matchers|
   - error_regexp_table                       |compile-mode.error_regexp_table|
   - error_ignore_file_list               |compile-mode.error_ignore_file_list|
   - error_threshold                             |compile-mode.error_threshold|
@@ -187,6 +189,7 @@ commands (and their keymaps, if mentioned) are:
 - |:CompilePrevFile| - mapped to `<C-g>[`
 - |:QuickfixErrors| - mapped to `<C-q>`
 
+                                                 *compile-mode-buffer-keymaps*
 Additional keymaps within the compilation buffer are:
 
 - `<C-r>` is mapped to `<CMD>Recompile<CR>` for quick recompilation.
@@ -399,6 +402,37 @@ bang_expansion                                   *compile-mode.bang_expansion*
     file's name. Note that you will have to escape characters like `%` in the
     command if you have this setting enabled; this means using `printf \%s`
     instead of `printf %s`, as the latter will be expanded.
+
+directory_change_matchers             *compile-mode.directory_change_matchers*
+    A list of additional regex matchers for "entering directory" and "leaving
+    directory" messages. By default, parses `make`'s messages (when running
+    `make -w`) and `cd`. These messages are used to smartly deduce where files
+    are, for errors and the `gf` keymap. |compile-mode-buffer-keymaps|
+
+    Each matcher is a table with the following keys:
+
+    - {regex} (string) a Vim regex which captures the message; if this regex
+      matches a line, errors in lines afterwards will be in the determined
+      directory (until another directory change is matched)
+    - {filename} (integer) the capture group number for the filename of the
+      directory being entered/exited
+    - {leaving} (integer) the capture group number for determining if this
+      change involves leaving a specific directory (optional)
+
+    For example, the `make` messages are parsed using the following matcher:
+    >lua
+    {
+        -- Note the `\zs` and `\ze` here - these configure where the highlight
+        -- for the message is applied (see `:h /\ze` and `:h /\zs`)
+        regex = [[\%(Entering\|Leavin\(g\)\) directory [`']\zs\(.\+\)\ze'$]],
+        -- The second capture group (`\(.\+\)`) is used to determine which
+        -- directory the message refers to
+        filename = 2,
+        -- The first capture group (the `\(g\)` of `Leavin\(g\)`) is used to
+        -- determine if the message is notifying about exiting out of a directory
+        leaving = 1,
+    }
+<
 
 error_regexp_table                           *compile-mode.error_regexp_table*
     See |compile-mode-errors|.

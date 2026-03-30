@@ -10,10 +10,10 @@ local default_config = {
 	baleia_setup = false,
 	---@type boolean
 	bang_expansion = false,
-	---@type table<string, CompileModeRegexpMatcher>
-	error_regexp_table = {},
 	---@type CompileModeDirectoryMatcher[]
 	directory_change_matchers = {},
+	---@type table<string, CompileModeRegexpMatcher>
+	error_regexp_table = {},
 	---@type string[]
 	error_ignore_file_list = {},
 	---@type CompileModeLevel
