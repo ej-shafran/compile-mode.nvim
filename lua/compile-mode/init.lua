@@ -155,9 +155,13 @@ local runjob = a.wrap(
 					new_lines[i] = line
 				end
 
+				while vim.endswith(line, "\r") do
+					line = line:sub(0, -2)
+				end
+
 				local last_carriage_return = vim.fn.strridx(line, "\r")
 				if last_carriage_return >= 0 and last_carriage_return < line:len() - 1 then
-					line = line:sub(last_carriage_return + 1, -1)
+					line = line:sub(last_carriage_return + 2, -1)
 				end
 
 				new_lines[i] = line
