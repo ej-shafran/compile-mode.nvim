@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.13.2] - 2026-03-31
+
 ### Fixed
 
 - Carriage returns (`\r`) appearing at the end of lines as `^M` (especially noticeable on Windows); the behavior for carriage returns now is consistent with the Emacs plugin
@@ -561,6 +563,7 @@ Also includes several documentation changes.
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...main
+[5.13.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.13.1...v5.13.2
 [5.13.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.13.0...v5.13.1
 [5.13.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.12.0...v5.13.0
 [5.12.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.11.0...v5.12.0
