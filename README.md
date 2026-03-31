@@ -93,6 +93,9 @@ vim.g.compile_mode = {
     -- Expand commands, like `:!` (e.g. `:Compile echo %`)
     -- :h compile_mode.bang_expansion
     bang_expansion = false,
+    -- Configure additional entering/leaving directory regexes.
+    -- :h compile-mode.directory_change_matchers
+    directory_change_matchers = {},
     -- Configure additional error regexes.
     -- :h compile-mode-errors
     error_regexp_table = {},
