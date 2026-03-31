@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.14.0] - 2026-03-31
+
 ### Added
 
 - The `directory_change_matchers` configuration option, which enables parsing custom messages that specify in which directory an action is occurring.
@@ -568,6 +570,7 @@ Also includes several documentation changes.
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...main
+[5.14.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.13.2...v5.14.0
 [5.13.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.13.1...v5.13.2
 [5.13.1]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.13.0...v5.13.1
 [5.13.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.12.0...v5.13.0
