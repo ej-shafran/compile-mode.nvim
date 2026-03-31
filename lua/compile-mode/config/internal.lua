@@ -10,6 +10,8 @@ local default_config = {
 	baleia_setup = false,
 	---@type boolean
 	bang_expansion = false,
+	---@type CompileModeDirectoryMatcher[]
+	directory_change_matchers = {},
 	---@type table<string, CompileModeRegexpMatcher>
 	error_regexp_table = {},
 	---@type string[]
@@ -66,6 +68,10 @@ local health_info = {
 local config = vim.tbl_extend("force", health_info, default_config, user_config or {})
 config.error_regexp_table =
 	vim.tbl_extend("force", require("compile-mode.errors").error_regexp_table, config.error_regexp_table)
+config.directory_change_matchers = vim.list_extend({
+	{ regex = [[\<cd \zs\(\S\+\)\ze]], filename = 1 },
+	{ regex = [[\%(Entering\|Leavin\(g\)\) directory [`']\zs\(.\+\)\ze'$]], filename = 2, leaving = 1 },
+}, config.directory_change_matchers)
 config.error_ignore_file_list = vim.list_extend({ "/bin/[a-z]*sh$" }, config.error_ignore_file_list)
 config.hidden_output = type(config.hidden_output) == "string" and { config.hidden_output } or config.hidden_output
 

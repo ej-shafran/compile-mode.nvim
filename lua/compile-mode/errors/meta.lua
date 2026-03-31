@@ -14,6 +14,12 @@
 ---@field type     nil|CompileModeLevel|CompileModeIntByInt
 ---@field priority nil|integer
 
+---@class CompileModeDirectoryMatcher
+---@field regex    string
+---@field _rx      vim.regex|nil
+---@field filename integer
+---@field leaving? integer
+
 ---@class CompileModeError
 ---@field highlighted boolean
 ---@field level       CompileModeLevel

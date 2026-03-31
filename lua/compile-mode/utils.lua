@@ -367,10 +367,15 @@ end
 ---@param path string
 ---@return boolean is_absolute whether `path` is absolute or relative.
 function M.is_absolute(path)
+	if vim.fn.has("nvim-0.11.0") == 1 then
+		return vim.fn.isabsolutepath(path) ~= 0
+	end
+
 	if M.is_windows() then
 		return path:match("^%a:[/\\]") or path:match("^//") or path:match("^\\\\")
 	else
-		return path:sub(1, 1) == "/"
+		local first = path:sub(1, 1)
+		return first == "/" or first == "~"
 	end
 end
 

@@ -149,11 +149,15 @@ function M.typescript_error(param)
 	return param.filename .. "(" .. param.row .. "," .. param.col .. "): error TS22: "
 end
 
+---ECHO in CMD is strange :(
+---@param str string
+function M.quote_for_echo(str)
+	return vim.o.shell:match("cmd.exe$") and str or vim.fn.shellescape(str)
+end
+
 ---@param error_string string
 function M.compile_error(error_string)
-	-- ECHO in CMD is strange :(
-	local str = vim.o.shell:match("cmd.exe$") and error_string or vim.fn.shellescape(error_string)
-	M.compile({ args = "echo " .. str })
+	M.compile({ args = "echo " .. M.quote_for_echo(error_string) })
 end
 
 ---@param error_strings string[]
