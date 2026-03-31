@@ -56,7 +56,7 @@ body:
   - type: textarea
     attributes:
       label: Plugin Version
-      description: Specify what version of the plugin you are using.
+      description: In Neovim, run `:checkhealth compile-mode` and include the version listed under `compile-mode.nvim version`.
     validations:
       required: true
 

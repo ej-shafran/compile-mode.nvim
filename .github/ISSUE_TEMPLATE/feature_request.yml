@@ -14,6 +14,8 @@ body:
           required: false
         - label: This feature would improve quality of life for all users
           required: false
+        - label: I've read (or at least skimmed) the existing features in the README and in `:help compile-mode`
+          required: true
 
   - type: textarea
     attributes:
