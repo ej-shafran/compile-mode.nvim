@@ -2,6 +2,21 @@ local health = {}
 
 function health.check()
 	local all_ok = true
+
+	vim.health.start("compile-mode.nvim version")
+	local file = vim.api.nvim_get_runtime_file("lua/compile-mode/init.lua", false)[1]
+	if not file then
+		vim.health.error("could not find compile-mode module in runtimepath")
+	else
+		local compile_mode_repo = vim.fs.dirname(file)
+		local version = vim.system({ "git", "describe" }, { cwd = compile_mode_repo }):wait()
+		if version.code ~= 0 then
+			vim.health.error(("failed to get git information:\n%s"):format(version.stderr))
+		else
+			vim.health.info(vim.fn.trim(version.stdout))
+		end
+	end
+
 	vim.health.start("compile-mode.nvim report")
 
 	local config = require("compile-mode.config.internal")
