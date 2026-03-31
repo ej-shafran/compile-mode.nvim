@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Carriage returns (`\r`) appearing at the end of lines as `^M` (especially noticeable on Windows); the behavior for carriage returns now is consistent with the Emacs plugin
+
 ## [5.13.1] - 2026-03-30
 
 ### Fixed

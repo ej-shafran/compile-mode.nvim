@@ -14,6 +14,14 @@ describe("carriage return in command", function()
 		assert.are.same({ cmd, echoed }, helpers.get_output())
 	end)
 
+	it("should have no effect at the end of the line (multiple)", function()
+		local cmd = ([[printf '%s\r\r\r\n']]):format(echoed)
+
+		helpers.compile({ args = cmd })
+
+		assert.are.same({ cmd, echoed }, helpers.get_output())
+	end)
+
 	it("should clear to the start of the line", function()
 		local cmd = ([[printf 'Hello, world!\r%s\n']]):format(echoed)
 
