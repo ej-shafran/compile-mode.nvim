@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Version information in `:checkhealth compile-mode`
+
 ## [5.13.2] - 2026-03-31
 
 ### Fixed
