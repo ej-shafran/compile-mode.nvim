@@ -1,4 +1,4 @@
 error:
-	echo 'directory_change_makefile, line 1, char 1:'
+	echo directory_change_makefile, line 1, char 1:
 
 # vim: filetype=make

@@ -1,18 +1,13 @@
 local helpers = require("spec.test_helpers")
 
--- TODO: properly test this logic on Windows
-if vim.o.shell:match("cmd.exe$") then
-	return
-end
-
 describe("default directory_change_matchers", function()
 	before_each(helpers.setup_tests)
 
 	it("should match `cd` lines", function()
-		local expected = { filename = "compile-mode.txt", row = 1, col = 1 }
+		local expected = { filename = "directory_change_makefile", row = 1, col = 1 }
 
 		helpers.compile({
-			args = "cd doc && echo '" .. helpers.sun_ada_error(expected) .. "'",
+			args = "cd spec && echo " .. helpers.quote_for_echo(helpers.sun_ada_error(expected)),
 		})
 		helpers.next_error()
 		helpers.assert_at_error_locus(expected)
@@ -39,7 +34,7 @@ describe("custom directory_change_matchers", function()
 	it("should work for entering a directory", function()
 		local expected = { filename = "directory_change_makefile", row = 1, col = 1 }
 
-		helpers.compile({ args = "echo @spec && echo '" .. helpers.sun_ada_error(expected) .. "'" })
+		helpers.compile({ args = "echo @spec&& echo " .. helpers.quote_for_echo(helpers.sun_ada_error(expected)) })
 		helpers.next_error()
 		helpers.assert_at_error_locus(expected)
 	end)
@@ -47,7 +42,9 @@ describe("custom directory_change_matchers", function()
 	it("should work for leaving a directory", function()
 		local expected = { filename = "README.md", row = 1, col = 1 }
 
-		helpers.compile({ args = "echo @spec && echo @spec ! && echo '" .. helpers.sun_ada_error(expected) .. "'" })
+		helpers.compile({
+			args = "echo @spec&& echo @spec !&& echo " .. helpers.quote_for_echo(helpers.sun_ada_error(expected)),
+		})
 		helpers.next_error()
 		helpers.assert_at_error_locus(expected)
 	end)
