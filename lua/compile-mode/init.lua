@@ -141,6 +141,8 @@ local runjob = a.wrap(
 				return
 			end
 
+			local line_count = vim.api.nvim_buf_line_count(bufnr)
+
 			count = count + #data
 
 			local new_lines = { partial_line .. data[1] }
@@ -169,7 +171,7 @@ local runjob = a.wrap(
 
 			set_lines(bufnr, -2, -1, new_lines)
 			utils.wait()
-			M._parse_errors(bufnr)
+			M._parse_errors(bufnr, line_count - 1, line_count - 1 + #new_lines)
 		end)
 
 		log.debug("starting job...")
@@ -285,6 +287,8 @@ local runcommand = a.void(
 		)
 		utils.wait()
 
+		utils.clear_highlights(bufnr)
+
 		if config.focus_compilation_buffer then
 			vim.api.nvim_set_current_win(vim.fn.win_findbuf(bufnr)[1])
 		else
@@ -300,6 +304,7 @@ local runcommand = a.void(
 		set_lines(bufnr, 0, -1, {})
 		utils.wait()
 
+		vim.b[bufnr].compilation_main_buffer = true
 		utils.buf_set_opt(bufnr, "filetype", "compilation")
 
 		set_lines(bufnr, 0, 0, {
@@ -310,6 +315,7 @@ local runcommand = a.void(
 		})
 
 		utils.wait()
+		M._parse_errors(bufnr, 0, -1)
 		errors.highlight(bufnr)
 
 		log.fmt_debug("running command: %s", command)
@@ -836,16 +842,16 @@ M._gf = goto_file(false)
 
 M._CTRL_W_f = goto_file(true)
 
----@param bufnr integer
-function M._parse_errors(bufnr)
+---@type fun(bufnr: integer, start_line: integer, end_line: integer)
+M._parse_errors = a.void(function(bufnr, start_line, end_line)
 	local config = require("compile-mode.config.internal")
 
-	errors.error_list = {}
-	utils.clear_highlights(bufnr)
-
 	local output_highlights = {}
-	local lines = vim.api.nvim_buf_get_lines(bufnr, 0, -1, false)
+
+	local lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line, false)
 	for linenum, line in ipairs(lines) do
+		linenum = start_line + linenum
+
 		local error = errors.parse(line, linenum)
 
 		if error then
@@ -894,7 +900,7 @@ function M._parse_errors(bufnr)
 	errors.highlight(bufnr)
 	utils.highlight_command_outputs(bufnr, output_highlights)
 	vim.cmd.redrawstatus()
-end
+end)
 
 function M._follow_cursor()
 	local compilation_buffer = vim.g.compilation_buffer

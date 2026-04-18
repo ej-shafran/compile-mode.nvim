@@ -51,8 +51,6 @@ end
 
 vim.g.compilation_buffer = bufnr
 
-compile_mode._parse_errors(bufnr)
-
 matchadd("CompileModeInfo", "^Compilation \\zsfinished\\ze.*")
 matchadd(
 	"CompileModeError",
@@ -112,10 +110,14 @@ autocmd("CursorMoved", {
 	callback = compile_mode._follow_cursor,
 })
 
-autocmd({ "TextChanged", "TextChangedI" }, {
-	desc = "Error Parsing",
-	buffer = bufnr,
-	callback = function()
-		compile_mode._parse_errors(bufnr)
-	end,
-})
+if not vim.b[bufnr].compilation_main_buffer then
+	compile_mode._parse_errors(bufnr, 0, -1)
+
+	autocmd({ "TextChanged", "TextChangedI" }, {
+		desc = "Error Parsing",
+		buffer = bufnr,
+		callback = function()
+			compile_mode._parse_errors(bufnr, 0, -1)
+		end,
+	})
+end
