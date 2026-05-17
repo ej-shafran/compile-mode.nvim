@@ -80,6 +80,7 @@ end
 ---@param opts CompileModeOpts|nil
 function M.setup_tests(opts)
 	require("plugin.command")
+	require("compile-mode.ansi").reset()
 	vim.g.compile_mode = vim.tbl_extend("force", {
 		debug = vim.env.TEST_DEBUG ~= nil or vim.env.ACTIONS_STEP_DEBUG ~= nil,
 	}, opts or {})

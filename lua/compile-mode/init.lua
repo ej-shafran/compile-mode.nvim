@@ -332,6 +332,8 @@ local runcommand = a.void(
 		end
 		vim.g.compile_job_id = nil
 
+		ansi.flush(bufnr)
+
 		if line_count == 0 then
 			set_lines(bufnr, -1, -1, { "" })
 		end

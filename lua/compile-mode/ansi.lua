@@ -36,7 +36,7 @@ local OSC_PATTERN = OSC_INTRODUCER .. OSC_PREFIX_BYTES .. OSC_TEXT_BYTES .. OSC_
 local OR_LONE_ESCAPE = "\\|\\e$" -- alternation: OR lone ESC at end of input
 local NOT_OSC_TERMINATOR = "[^\\x07\\e\\\\]" -- not BEL (0x07) and not ESC (start of ST)
 
-local PARTIAL_CSI_PATTERN = CSI_INTRODUCER .. PARAM_BYTES .. "*" .. INTERMEDIATE_BYTES .. "*" .. OR_LONE_ESCAPE
+local PARTIAL_CSI_PATTERN = CSI_INTRODUCER .. PARAM_BYTES .. "*" .. INTERMEDIATE_BYTES .. "*" .. "$" .. OR_LONE_ESCAPE
 local PARTIAL_OSC_PATTERN = OSC_INTRODUCER .. NOT_OSC_TERMINATOR .. "*$"
 
 local L_ESC = "\x1b"
@@ -104,14 +104,14 @@ local function process_osc(line)
 	line = line:gsub(OSC_LUA_BEL, function(cmd, data)
 		local handler = osc_handlers[tonumber(cmd)]
 		if handler then
-			handler(data)
+			return handler(data)
 		end
 		return ""
 	end)
 	line = line:gsub(OSC_LUA_ST, function(cmd, data)
 		local handler = osc_handlers[tonumber(cmd)]
 		if handler then
-			handler(data)
+			return handler(data)
 		end
 		return ""
 	end)
@@ -193,7 +193,43 @@ function M.buf_set_lines(bufnr, start, end_, lines)
 		initialized = true
 	end
 	local fn = (mode == "render" and render) or (mode == "filter" and filter) or passthrough
+	vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
 	fn(bufnr, start, end_, lines)
+	vim.schedule(function()
+		if vim.api.nvim_buf_is_valid(bufnr) then
+			vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+		end
+	end)
+end
+
+function M.reset()
+	initialized = false
+	partial_buffer = ""
+end
+
+---Flush any remaining partial buffer to the compilation buffer.
+---Call this when the process exits, before writing the footer.
+---@param bufnr integer
+function M.flush(bufnr)
+	if partial_buffer == "" then
+		return
+	end
+	local line = partial_buffer
+	partial_buffer = ""
+	if mode == "filter" then
+		line = process_osc(strip_csi(line))
+	elseif mode == "render" then
+		line = process_osc(strip_non_sgr_csi(line))
+	end
+	-- Append to last line, not create a new one
+	local last = vim.api.nvim_buf_get_lines(bufnr, -2, -1, false)[1]
+	vim.api.nvim_set_option_value("modifiable", true, { buf = bufnr })
+	vim.api.nvim_buf_set_lines(bufnr, -2, -1, false, { last .. line })
+	vim.schedule(function()
+		if vim.api.nvim_buf_is_valid(bufnr) then
+			vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
+		end
+	end)
 end
 
 return M

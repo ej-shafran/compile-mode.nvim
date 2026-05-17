@@ -93,18 +93,6 @@ vim.g.compile_mode = {
     -- "passthrough": no processing (pass through raw).
     -- :h compile-mode.ansi_color_for_compilation
     ansi_color_for_compilation = "render",
-    -- A table mapping OSC command numbers to handler functions.
-    -- Default handlers are no-ops. Override to act on OSC sequences
-    -- from compilation output (e.g. set window title, working directory).
-    -- :h compile-mode.osc_handlers
-    osc_handlers = {
-        [0] = function(_) end,
-        [1] = function(_) end,
-        [2] = function(_) end,
-        [7] = function(_) end,
-        [8] = function(_) end,
-        [52] = function(_) end,
-    },
     -- Options to pass to baleia.setup() when ansi_color_for_compilation
     -- is "render". Set to true for defaults.
     -- :h compile_mode.baleia_setup
@@ -181,6 +169,20 @@ vim.g.compile_mode = {
     -- Use a pseudo terminal for command execution.
     -- :h compile-mode.use_pseudo_terminal
     use_pseudo_terminal = false,
+    -- A table mapping OSC command numbers to handler functions.
+    -- Each handler receives data and returns a replacement string.
+    -- Return "" to strip, or return text to show in the buffer.
+    -- :h compile-mode.osc_handlers
+    osc_handlers = {
+       [0] = function(_) return "" end,   -- set window title and icon name
+       [1] = function(_) return "" end,   -- set icon name
+       [2] = function(_) return "" end,   -- set window title
+       [7] = function(_) return "" end,   -- set working directory
+       [8] = function(data)               -- hyperlink
+           return data:match(";%s*(.*)") or ""
+       end,
+       [52] = function(_) return "" end,  -- clipboard access
+    }
 }
 ```
 

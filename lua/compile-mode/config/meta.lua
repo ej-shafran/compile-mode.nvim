@@ -24,8 +24,12 @@
 ---  7  - set working directory (vTE)
 ---  8  - create hyperlink
 ---  52 - clipboard access
----Default handlers are no-ops. Override to act on OSC sequences from compilation output.
----Example: `vim.g.compile_mode = { osc_handlers = { [2] = function(data) print("title:", data) end } }`
+---Each handler must return a replacement string that appears in the buffer in place of the
+---OSC sequence. Return `""` to strip the sequence entirely. Default handlers return `""`
+---(strip) except OSC 8 which returns the URI + trailing space.
+---Examples:
+---  Strip: `osc_handlers = { [2] = function(data) vim.opt.titlestring = data; return "" end }`
+---  Show:  `osc_handlers = { [2] = function(data) return "[" .. data .. "]" end }`
 ---For more info, run `:h compile-mode.osc_handlers`
 ---@field osc_handlers?             table<number, function>
 ---

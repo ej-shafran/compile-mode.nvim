@@ -12,7 +12,6 @@ Table of Contents                             *compile-mode-table-of-contents*
   - default_command                             |compile-mode.default_command|
   - baleia_setup                                   |compile-mode.baleia_setup|
   - ansi_color_for_compilation       |compile-mode.ansi_color_for_compilation|
-  - osc_handlers                                   |compile-mode.osc_handlers|
   - bang_expansion                               |compile-mode.bang_expansion|
   - directory_change_matchers         |compile-mode.directory_change_matchers|
   - error_regexp_table                       |compile-mode.error_regexp_table|
@@ -36,6 +35,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - auto_scroll                                     |compile-mode.auto_scroll|
   - debug                                                 |compile-mode.debug|
   - use_pseudo_terminal                     |compile-mode.use_pseudo_terminal|
+  - osc_handlers                                   |compile-mode.osc_handlers|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -312,18 +312,6 @@ Here is the full default configuration:
         -- "passthrough": no processing (pass through raw).
         -- :h compile-mode.ansi_color_for_compilation
         ansi_color_for_compilation = "render",
-        -- A table mapping OSC command numbers to handler functions.
-        -- Default handlers are no-ops. Override to act on OSC sequences
-        -- from compilation output (e.g. set window title, working directory).
-        -- :h compile-mode.osc_handlers
-        osc_handlers = {
-            [0] = function(_) end,
-            [1] = function(_) end,
-            [2] = function(_) end,
-            [7] = function(_) end,
-            [8] = function(_) end,
-            [52] = function(_) end,
-        },
         -- Options to pass to baleia.setup() when ansi_color_for_compilation
         -- is "render". Set to true for defaults.
         -- :h compile_mode.baleia_setup
@@ -400,6 +388,20 @@ Here is the full default configuration:
         -- Use a pseudo terminal for command execution.
         -- :h compile-mode.use_pseudo_terminal
         use_pseudo_terminal = false,
+        -- A table mapping OSC command numbers to handler functions.
+        -- Each handler receives data and returns a replacement string.
+        -- Return "" to strip, or return text to show in the buffer.
+        -- :h compile-mode.osc_handlers
+        osc_handlers = {
+           [0] = function(_) return "" end,   -- set window title and icon name
+           [1] = function(_) return "" end,   -- set icon name
+           [2] = function(_) return "" end,   -- set window title
+           [7] = function(_) return "" end,   -- set working directory
+           [8] = function(data)               -- hyperlink
+               return data:match(";%s*(.*)") or ""
+           end,
+           [52] = function(_) return "" end,  -- clipboard access
+        }
     }
 <
 
@@ -414,43 +416,25 @@ default_command                                 *compile-mode.default_command*
     empty of the function returns a falsy value.
 
 baleia_setup                                       *compile-mode.baleia_setup*
-   Options to pass to `baleia.setup()` when |compile-mode.ansi_color_for_compilation|
-   is `"render"`. When set to `true`, baleia.nvim is set up with defaults.
-   This option can also be a table of options to pass to `baleia.setup()`.
+    Options to pass to `baleia.setup()` when |compile-mode.ansi_color_for_compilation|
+    is `"render"`. When set to `true`, baleia.nvim is set up with defaults.
+    This option can also be a table of options to pass to `baleia.setup()`.
 
 ansi_color_for_compilation             *compile-mode.ansi_color_for_compilation*
-   Control how ANSI escape sequences are handled in compilation output.
-   Three modes are available:
+    Control how ANSI escape sequences are handled in compilation output.
+    Three modes are available:
      - `"render"`: strip non-SGR CSI and OSC sequences, render SGR color
        codes via baleia.nvim (requires baleia.nvim to be installed).
      - `"filter"`: strip all CSI and OSC sequences, writing plain text.
      - `"passthrough"`: no processing, pass through raw escape sequences.
-   Default: `"render"`.
+    Default: `"render"`.
 
-   Note: when set to `"render"` and baleia.nvim is not available, the mode
-   falls back to `"filter"` with a warning.
+    Note: when set to `"render"` and baleia.nvim is not available, the mode
+    falls back to `"filter"` with a warning.
 
-osc_handlers                                       *compile-mode.osc_handlers*
-   A table mapping OSC command numbers to handler functions. Each handler
-   receives the data portion of the OSC sequence as a string. Supported
-   command numbers:
-     - 0  - set window title and icon name
-     - 1  - set icon name
-     - 2  - set window title
-     - 7  - set working directory (VTE)
-     - 8  - create hyperlink
-     - 52 - clipboard access
-   Default handlers are no-ops. Override to act on OSC sequences from
-   compilation output. Example: >lua
-
-       vim.g.compile_mode = {
-           osc_handlers = {
-               [2] = function(data)
-                   vim.opt.titlestring = data
-               end,
-           },
-       }
-<
+    In all modes except `"passthrough"`, incomplete escape sequences at the
+    end of an output chunk are buffered and reassembled when the next chunk
+    arrives. Any remaining partial sequence is flushed when the process exits.
 
 bang_expansion                                   *compile-mode.bang_expansion*
     When `true`, commands will be run through |expandcmd()| before being
@@ -617,6 +601,35 @@ use_pseudo_terminal                         *compile-mode.use_pseudo_terminal*
     Use a pseudo terminal for command execution.
     This is useful when the program doesn't automatically flush the buffer so
     that the output cannot be displayed at realtime.
+
+osc_handlers                                       *compile-mode.osc_handlers*
+    A table mapping OSC command numbers to handler functions. Each handler
+    receives the data portion of the OSC sequence as a string and must return
+    a replacement string that will appear in the buffer in place of the OSC
+    sequence. Return `""` to strip the sequence entirely.
+
+    Supported command numbers with their default behavior:
+    - 0  - set window title and icon name (stripped)
+    - 1  - set icon name (stripped)
+    - 2  - set window title (stripped)
+    - 7  - set working directory (stripped)
+    - 8  - create hyperlink (URI + trailing space shown; empty if no URI)
+    - 52 - clipboard access (stripped)
+
+    You can add handlers for any OSC command number, including proprietary
+    or custom sequences not listed above.
+
+    Example: set the Neovim title from OSC 2 and strip it from output: >lua
+
+      vim.g.compile_mode = {
+          osc_handlers = {
+              [2] = function(data)
+                  vim.opt.titlestring = data
+                  return ""
+              end,
+          },
+      }
+    <
 
 ==============================================================================
 6. API                                                      *compile-mode-api*
