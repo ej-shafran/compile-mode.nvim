@@ -6,8 +6,19 @@ local log = require("compile-mode.log")
 local default_config = {
 	---@type string
 	default_command = "make -k ",
+	---@type "passthrough"|"filter"|"render"
+	ansi_color_for_compilation = "render",
 	---@type table | boolean
 	baleia_setup = false,
+	---@type table<number, function>
+	osc_handlers = {
+		[0] = function(_) end, -- set window title and icon name
+		[1] = function(_) end, -- set icon name
+		[2] = function(_) end, -- set window title
+		[7] = function(_) end, -- set working directory
+		[8] = function(_) end, -- create hyperlink
+		[52] = function(_) end, -- clipboard access
+	},
 	---@type boolean
 	bang_expansion = false,
 	---@type CompileModeDirectoryMatcher[]

@@ -32,8 +32,8 @@ return {
   -- branch = "nightly",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    -- if you want to enable coloring of ANSI escape codes in
-    -- compilation output, add:
+    -- if you want to enable ANSI escape code support (colors && highlighting)
+    -- in compilation output, add:
     -- { "m00qek/baleia.nvim", tag = "v1.3.0" },
   },
   config = function()
@@ -43,8 +43,8 @@ return {
         -- set this to fix tab completion in command mode:
         -- input_word_completion = true,
 
-        -- to add ANSI escape code support, add:
-        -- baleia_setup = true,
+        -- to add ANSI escape code support (requires baleia.nvim):
+        -- ansi_color_for_compilation = "render",
 
         -- to make `:Compile` replace special characters (e.g. `%`) in
         -- the command (and behave more like `:!`), add:
@@ -87,7 +87,26 @@ vim.g.compile_mode = {
     -- end,
     -- :h compile_mode.default_command
     default_command = "make -k ",
-    -- Use `baleia` for parsing ANSI escape codes in the output.
+    -- Control how ANSI escape sequences are handled in compilation output.
+    -- "render": strip non-SGR CSI and OSC, render SGR colors via baleia.
+    -- "filter": strip all CSI and OSC sequences.
+    -- "passthrough": no processing (pass through raw).
+    -- :h compile-mode.ansi_color_for_compilation
+    ansi_color_for_compilation = "render",
+    -- A table mapping OSC command numbers to handler functions.
+    -- Default handlers are no-ops. Override to act on OSC sequences
+    -- from compilation output (e.g. set window title, working directory).
+    -- :h compile-mode.osc_handlers
+    osc_handlers = {
+        [0] = function(_) end,
+        [1] = function(_) end,
+        [2] = function(_) end,
+        [7] = function(_) end,
+        [8] = function(_) end,
+        [52] = function(_) end,
+    },
+    -- Options to pass to baleia.setup() when ansi_color_for_compilation
+    -- is "render". Set to true for defaults.
     -- :h compile_mode.baleia_setup
     baleia_setup = false,
     -- Expand commands, like `:!` (e.g. `:Compile echo %`)
