@@ -4,9 +4,34 @@
 ---For more info, run `:h compile-mode.default_command`
 ---@field default_command?          string|table<string, string>|(fun(): string)
 ---
+---Control how ANSI escape sequences are handled in compilation output.
+---`passthrough`: no processing (pass through raw).
+---`"filter"`: strip all CSI and OSC sequences.
+---`"render"`: strip non-SGR CSI and OSC, render SGR colors via baleia.
+---For more info, run `:h compile-mode.ansi_color_for_compilation`
+---@field ansi_color_for_compilation? "passthrough"|"filter"|"render"
+---
 ---Use `baleia` for parsing ANSI escape codes in the output.
 ---For more info, run `:h compile-mode.baleia_setup`
 ---@field baleia_setup?             boolean|table
+---
+---A table mapping OSC command numbers to handler functions.
+---Each handler receives the data portion of the OSC sequence as a string.
+---Supported command numbers:
+---  0  - set window title and icon name
+---  1  - set icon name
+---  2  - set window title
+---  7  - set working directory (vTE)
+---  8  - create hyperlink
+---  52 - clipboard access
+---Each handler must return a replacement string that appears in the buffer in place of the
+---OSC sequence. Return `""` to strip the sequence entirely. Default handlers return `""`
+---(strip) except OSC 8 which returns the URI + trailing space.
+---Examples:
+---  Strip: `osc_handlers = { [2] = function(data) vim.opt.titlestring = data; return "" end }`
+---  Show:  `osc_handlers = { [2] = function(data) return "[" .. data .. "]" end }`
+---For more info, run `:h compile-mode.osc_handlers`
+---@field osc_handlers?             table<number, function>
 ---
 ---Expand commands, like `:!` (e.g. `:Compile echo %`)
 ---For more info, run `:h compile-mode.bang_expansion`

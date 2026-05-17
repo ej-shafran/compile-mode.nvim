@@ -4,23 +4,6 @@ local log = require("compile-mode.log")
 
 local bufnr = vim.api.nvim_get_current_buf()
 
-if config.baleia_setup then
-	local ok, baleia_mod = pcall(require, "baleia")
-	if ok then
-		local opts = {}
-		if type(config.baleia_setup) == "table" then
-			opts = config.baleia_setup --[[@as table]]
-		end
-
-		local baleia = baleia_mod.setup(opts)
-		baleia.automatically(bufnr)
-	else
-		log.warn(
-			"Could not require `baleia`, but `baleia_setup` was passed. Did you forget to install `baleia` for color code support?"
-		)
-	end
-end
-
 local matchadd = vim.fn.matchadd
 
 ---@param cmd string

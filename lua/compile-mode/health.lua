@@ -41,10 +41,15 @@ function health.check()
 		vim.health.error(err or "")
 	end
 
-	local baleia_ok = pcall(require, "baleia")
-	if config.baleia_setup ~= false and not baleia_ok then
-		all_ok = false
-		vim.health.error("configured baleia_setup but failed to require baleia")
+	if config.ansi_color_for_compilation == "render" then
+		local baleia_ok = pcall(require, "baleia")
+		if not baleia_ok then
+			all_ok = false
+			vim.health.warn(
+				"ansi_color_for_compilation is set to 'render' but failed to require baleia.nvim."
+					.. "ANSI colors will be filtered instead of rendered."
+			)
+		end
 	end
 
 	if all_ok then
