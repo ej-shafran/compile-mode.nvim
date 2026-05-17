@@ -160,9 +160,6 @@ local function render(bufnr, start, end_, lines)
 	for i, line in ipairs(lines) do
 		lines[i] = process_osc(strip_non_sgr_csi(line))
 	end
-	--  for _, l in ipairs(lines) do
-	--    log.warn("render input: " .. vim.inspect(l))
-	-- end
 	-- Baleia's buf_set_lines uses start as absolute row for extmarks.
 	-- Negative indices (like -2) are invalid for nvim_buf_set_extmark.
 	if start < 0 then
