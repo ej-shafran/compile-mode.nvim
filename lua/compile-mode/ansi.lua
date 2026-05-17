@@ -1,63 +1,62 @@
 local log = require("compile-mode.log")
 
--- All patterns are sourced directly from Emacs' ansi-color.el and ansi-osc.el,
--- translated to Vim regex syntax. See:
--- - https://github.com/emacs-mirror/emacs/blob/ee9b2db1cf036d6f511d7e6eea0189073076e7c0/lisp/ansi-color.el
+-- Lua pattern building blocks for ANSI escape sequence processing.
+-- All patterns are sourced from Emacs' ansi-color.el and ansi-osc.el.
+-- See:
+-- - https://github.com/emacs-mirror/emacs/blob/master/lisp/ansi-color.el
 -- - https://github.com/emacs-mirror/emacs/blob/master/lisp/ansi-osc.el
+
+local ESC = "\x1b" -- ESC byte (0x1B)
 
 -- CSI (Control Sequence Introducer) structure:
 --   ESC [ <parameter bytes> <intermediate bytes> <final byte>
+-- Parameter bytes: 0x30-0x3F (0-9 : ; < = > ?)
+-- Intermediate bytes: 0x20-0x2F (space through /)
+-- Final bytes: 0x40-0x7E (@ through ~)
 
-local CSI_INTRODUCER = "\\e\\[" -- ESC [
-local PARAM_BYTES = "[\\x30-\\x3F]" -- 0-9 : ; < = > ?
-local INTERMEDIATE_BYTES = "[\\x20-\\x2F]" -- space ! " # $ % & ' ( ) * + , - . /
-local FINAL_BYTES = "[\\x40-\\x7E]" -- @ A-Z [ \ ] ^ _ ` a-z { | } ~
-local FINAL_BYTES_NON_SGR = "[\\x40-\\x6C\\x6E-\\x7E]" -- same as FINAL_BYTES but without m [color ending byte] (0x6D, SGR)
+local CSI_INTRO = ESC .. "%["
+local CSI_PARAM = "[%d:;<=>?]*"
+local CSI_INTERMEDIATE = "[ -/]*"
+local CSI_FINAL = "[@-~]"
+local CSI_FINAL_NON_SGR = "[@-ln-~]" -- excludes m (0x6D, SGR final byte)
+
+-- Composed CSI patterns
+local CSI_COMPLETE = CSI_INTRO .. CSI_PARAM .. CSI_INTERMEDIATE .. CSI_FINAL
+local CSI_NON_SGR = CSI_INTRO .. CSI_PARAM .. CSI_INTERMEDIATE .. CSI_FINAL_NON_SGR
+
+-- Partial CSI patterns (incomplete sequences at end of input)
+local PARTIAL_CSI = CSI_INTRO .. CSI_PARAM .. CSI_INTERMEDIATE .. "$"
+local LONE_ESC = ESC .. "$"
 
 -- OSC (Operating System Command) structure:
---   ESC ] <prefix bytes> <text bytes> <terminator>
+--   ESC ] <command> ; <data> <terminator>
+-- Terminators: BEL (0x07) or ESC \ (ST)
 
-local OSC_INTRODUCER = "\\e\\]" -- ESC ]
-local OSC_PREFIX_BYTES = "[\\x08-\\x0D]*" -- BS HT LF VT FF CR (control characters)
-local OSC_TEXT_BYTES = "[\\x20-\\x7E]*" -- space through ~ (printable ASCII)
-local OSC_BEL_TERMINATOR = "\\x07" -- BEL (bell character, 0x07)
-local OSC_ST_TERMINATOR = "\\e\\\\" -- ESC \ (string terminator)
-local OSC_TERMINATOR = "\\(" .. OSC_BEL_TERMINATOR .. "\\|" .. OSC_ST_TERMINATOR .. "\\)" -- BEL or ST
+local OSC_INTRO = ESC .. "%]"
+local OSC_CMD = "(%d+)" -- captures command number
+local OSC_SEP = ";"
+local OSC_DATA = "([^\x07\x1b]-)" -- captures data (non-greedy, stops at BEL or ESC)
+local BEL = "\x07" -- BEL byte (0x07)
+local ST = ESC .. "\\" -- String Terminator: ESC \
+local OSC_TEXT = "[^\x07\x1b]*" -- for BEL-terminated and partial patterns
+local OSC_TEXT_ST = "[^\x1b]*" -- for ST-terminated (BEL is allowed in data)
 
--- Composed patterns: match complete CSI/OSC sequences for stripping
+-- Composed OSC patterns with captures (for handler dispatch)
+local OSC_BEL_PATTERN = OSC_INTRO .. OSC_CMD .. OSC_SEP .. OSC_DATA .. BEL
+local OSC_ST_PATTERN = OSC_INTRO .. OSC_CMD .. OSC_SEP .. OSC_DATA .. ST
 
-local CSI_COMPLETE_PATTERN = CSI_INTRODUCER .. PARAM_BYTES .. "*" .. INTERMEDIATE_BYTES .. "*" .. FINAL_BYTES
-local CSI_NON_SGR_PATTERN = CSI_INTRODUCER .. PARAM_BYTES .. "*" .. INTERMEDIATE_BYTES .. "*" .. FINAL_BYTES_NON_SGR
-local OSC_PATTERN = OSC_INTRODUCER .. OSC_PREFIX_BYTES .. OSC_TEXT_BYTES .. OSC_TERMINATOR
+-- Composed OSC patterns without captures (for stripping)
+local OSC_BEL_TERM = OSC_INTRO .. OSC_TEXT .. BEL
+local OSC_ST_TERM = OSC_INTRO .. OSC_TEXT_ST .. ST
 
--- Partial patterns: match incomplete sequences at end of input.
--- These are buffered and reassembled when the next chunk of data arrives.
+-- Partial OSC pattern (incomplete sequence at end of input)
+local PARTIAL_OSC = OSC_INTRO .. OSC_TEXT .. "$"
 
-local OR_LONE_ESCAPE = "\\|\\e$" -- alternation: OR lone ESC at end of input
-local NOT_OSC_TERMINATOR = "[^\\x07\\e\\\\]" -- not BEL (0x07) and not ESC (start of ST)
-
-local PARTIAL_CSI_PATTERN = CSI_INTRODUCER .. PARAM_BYTES .. "*" .. INTERMEDIATE_BYTES .. "*" .. "$" .. OR_LONE_ESCAPE
-local PARTIAL_OSC_PATTERN = OSC_INTRODUCER .. NOT_OSC_TERMINATOR .. "*$"
-
-local L_ESC = "\x1b"
-local L_OSC_INTRO = L_ESC .. "%]"
-local L_OSC_CMD = "(%d+)"
-local L_OSC_SEP = ";"
-local L_OSC_DATA = "([^\x07\x1b]-)" -- non-greedy, no BEL or ESC
-local L_BEL = "\x07"
-local L_ST = L_ESC .. "\\"
-
-local OSC_LUA_BEL = L_OSC_INTRO .. L_OSC_CMD .. L_OSC_SEP .. L_OSC_DATA .. L_BEL
-local OSC_LUA_ST = L_OSC_INTRO .. L_OSC_CMD .. L_OSC_SEP .. L_OSC_DATA .. L_ST
-
---- OSC handler table: maps command number to function wich processes the data in the OSC sequence.
 local partial_buffer = ""
 local mode = "render"
 local osc_handlers = {}
 ---@type table?
 local baleia_instance = nil
-local rx_partial_csi = vim.regex(PARTIAL_CSI_PATTERN)
-local rx_partial_osc = vim.regex(PARTIAL_OSC_PATTERN)
 local initialized = false
 
 local M = {}
@@ -83,32 +82,32 @@ end
 ---@param line string
 ---@return string
 local function strip_csi(line)
-	return vim.fn.substitute(line, CSI_COMPLETE_PATTERN, "", "g")
+	return (line:gsub(CSI_COMPLETE, ""))
 end
 
 ---Strip non-SGR CSI sequences from a line, keeping SGR (color) sequences intact.
 ---@param line string
 ---@return string
 local function strip_non_sgr_csi(line)
-	return vim.fn.substitute(line, CSI_NON_SGR_PATTERN, "", "g")
+	return (line:gsub(CSI_NON_SGR, ""))
 end
 
 ---Strip all OSC sequences from a line.
 ---@param line string
 ---@return string
 local function strip_osc(line)
-	return vim.fn.substitute(line, OSC_PATTERN, "", "g")
+	return (line:gsub(OSC_BEL_TERM, ""):gsub(OSC_ST_TERM, ""))
 end
 
 local function process_osc(line)
-	line = line:gsub(OSC_LUA_BEL, function(cmd, data)
+	line = line:gsub(OSC_BEL_PATTERN, function(cmd, data)
 		local handler = osc_handlers[tonumber(cmd)]
 		if handler then
 			return handler(data)
 		end
 		return ""
 	end)
-	line = line:gsub(OSC_LUA_ST, function(cmd, data)
+	line = line:gsub(OSC_ST_PATTERN, function(cmd, data)
 		local handler = osc_handlers[tonumber(cmd)]
 		if handler then
 			return handler(data)
@@ -120,10 +119,13 @@ end
 
 ---Check if a line ends with a partial escape sequence.
 ---@param line string
----@return integer|nil start_pos 0-indexed byte position where partial begins, or nil
+---@return integer|nil start_pos 1-indexed byte position where partial begins, or nil
 local function check_partial(line)
-	local csi = rx_partial_csi:match_str(line)
-	local osc = rx_partial_osc:match_str(line)
+	local csi = string.find(line, PARTIAL_CSI)
+	if not csi then
+		csi = string.find(line, LONE_ESC)
+	end
+	local osc = string.find(line, PARTIAL_OSC)
 	if csi and osc then
 		return math.min(csi, osc)
 	elseif csi then
@@ -143,8 +145,8 @@ local function handle_partial(lines)
 	local last = lines[#lines]
 	local partial_start = check_partial(last)
 	if partial_start then
-		partial_buffer = last:sub(partial_start + 1)
-		lines[#lines] = last:sub(1, partial_start)
+		partial_buffer = last:sub(partial_start)
+		lines[#lines] = last:sub(1, partial_start - 1)
 	end
 end
 
@@ -158,8 +160,19 @@ local function render(bufnr, start, end_, lines)
 	for i, line in ipairs(lines) do
 		lines[i] = process_osc(strip_non_sgr_csi(line))
 	end
+	--  for _, l in ipairs(lines) do
+	--    log.warn("render input: " .. vim.inspect(l))
+	-- end
+	-- Baleia's buf_set_lines uses start as absolute row for extmarks.
+	-- Negative indices (like -2) are invalid for nvim_buf_set_extmark.
+	if start < 0 then
+		start = vim.api.nvim_buf_line_count(bufnr) + start + 1
+	end
+	if end_ < 0 then
+		end_ = vim.api.nvim_buf_line_count(bufnr) + end_ + 1
+	end
 	---@cast baleia_instance table
-	baleia_instance:buf_set_lines(bufnr, start, end_, false, lines)
+	baleia_instance.buf_set_lines(bufnr, start, end_, false, lines)
 end
 
 ---Strip all CSI and OSC sequences, write plain text.
@@ -231,5 +244,9 @@ function M.flush(bufnr)
 		end
 	end)
 end
+
+M._strip_csi = strip_csi
+M._strip_non_sgr_csi = strip_non_sgr_csi
+M._strip_osc = strip_osc
 
 return M
