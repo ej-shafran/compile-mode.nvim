@@ -11,6 +11,7 @@ Table of Contents                             *compile-mode-table-of-contents*
 5. Configuration                                  |compile-mode-configuration|
   - default_command                             |compile-mode.default_command|
   - baleia_setup                                   |compile-mode.baleia_setup|
+  - ansi_color                   |compile-mode.ansi_color|
   - bang_expansion                               |compile-mode.bang_expansion|
   - directory_change_matchers         |compile-mode.directory_change_matchers|
   - error_regexp_table                       |compile-mode.error_regexp_table|
@@ -34,6 +35,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - auto_scroll                                     |compile-mode.auto_scroll|
   - debug                                                 |compile-mode.debug|
   - use_pseudo_terminal                     |compile-mode.use_pseudo_terminal|
+  - ansi_osc                                   |compile-mode.ansi_osc|
 6. API                                                      |compile-mode-api|
   - compile()                                         |compile-mode.compile()|
   - recompile()                                     |compile-mode.recompile()|
@@ -126,9 +128,9 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
       -- branch = "nightly",
       dependencies = {
           "nvim-lua/plenary.nvim",
-          -- if you want to enable coloring of ANSI escape codes in
-          -- compilation output, add:
-          -- { "m00qek/baleia.nvim", tag = "v1.3.0" },
+           -- if you want to enable ANSI escape code support (colors && highlighting)
+           -- in compilation output, add:
+           -- { "m00qek/baleia.nvim", tag = "v1.3.0" },
       },
       config = function()
           ---@type CompileModeOpts
@@ -137,8 +139,8 @@ Here’s an example of a Lazy <https://github.com/folke/lazy.nvim> config for
               -- completion, set this to fix tab completion in command mode:
               -- input_word_completion = true,
 
-              -- to add ANSI escape code support, add:
-              -- baleia_setup = true,
+              -- to add ANSI escape code support (requires baleia.nvim):
+              -- ansi_color = { kind = "render" }
 
               -- to make `:Compile` replace special characters (e.g. `%`) in
               -- the command (and behave more like `:!`), add:
@@ -302,13 +304,16 @@ Here is the full default configuration:
         --     return "make -k "
         --   end
         -- end,
-        -- :h compile_mode.default_command
+        -- :h compile-mode.default_command
         default_command = "make -k ",
-        -- Use `baleia` for parsing ANSI escape codes in the output.
-        -- :h compile_mode.baleia_setup
-        baleia_setup = false,
+        -- Control how ANSI escape sequences are handled in compilation output.
+        -- "render": strip non-SGR CSI and OSC, render SGR colors via baleia.
+        -- "filter": strip all CSI and OSC sequences.
+        -- "passthrough": no processing (pass through raw).
+        -- :h compile-mode.ansi_color
+        ansi_color = { kind = "filter", baleia_setup = false },
         -- Expand commands, like `:!` (e.g. `:Compile echo %`)
-        -- :h compile_mode.bang_expansion
+        -- :h compile-mode.bang_expansion
         bang_expansion = false,
         -- Configure additional entering/leaving directory regexes.
         -- :h compile-mode.directory_change_matchers
@@ -379,6 +384,37 @@ Here is the full default configuration:
         -- Use a pseudo terminal for command execution.
         -- :h compile-mode.use_pseudo_terminal
         use_pseudo_terminal = false,
+        -- A table controlling how OSC sequences are handled.
+        -- :h compile-mode.ansi_osc
+        ansi_osc = {
+            kind = "render",
+            handlers = {
+                [0] = function(ctx)
+                    vim.opt.titlestring = ctx.data
+                    vim.opt.iconstring = ctx.data
+                    return ""
+                end,
+                [1] = function(ctx)
+                    vim.opt.iconstring = ctx.data
+                    return ""
+                end,
+                [2] = function(ctx)
+                    vim.opt.titlestring = ctx.data
+                    return ""
+                end,
+                [8] = function(ctx)
+                    local uri = ctx.data:match(";%s*(.*)")
+                    if uri and uri ~= "" then
+                        return "", { link_open = { uri = uri } }
+                    end
+                    return "", { link_close = true }
+                end,
+                [9] = function(ctx)
+                    vim.notify(ctx.data, vim.log.levels.INFO)
+                    return ""
+                end,
+            },
+        },
     }
 <
 
@@ -392,10 +428,43 @@ default_command                                 *compile-mode.default_command*
     Can also be set to a function that returns the command, will fallback to
     empty of the function returns a falsy value.
 
-baleia_setup                                       *compile-mode.baleia_setup*
-    When `true`, baleia.nvim will be set up for the compilation buffer, which
-    will color in ANSI escape codes in the compilation output. This option can
-    also be a table of options to pass to `baleia.setup()`.
+ansi_color                                         *compile-mode.ansi_color*
+    A table controlling how ANSI escape sequences are handled in compilation
+    output. It has two fields:
+
+    kind (string) ~
+        One of:
+        - `"render"`: strip non-SGR CSI and OSC sequences, render SGR color
+          codes via baleia.nvim (requires baleia.nvim to be installed).
+        - `"filter"`: strip all CSI and OSC sequences, writing plain text.
+        - `"passthrough"`: no processing, pass through raw escape sequences.
+        Default: `"filter"`.
+
+    baleia_setup (boolean|table, optional) ~
+        Options to pass to `baleia.setup()` when `kind` is `"render"`.
+        Set to `true` for defaults, or a table of options.
+        Default: `false`.
+
+    Example: >lua
+        vim.g.compile_mode = {
+            ansi_color = {
+                kind = "render",
+                baleia_setup = true,
+            },
+        }
+    <
+
+    Note: when `kind` is `"render"` and baleia.nvim is not available, the mode
+    falls back to `"filter"` with a warning.
+
+    In all modes except `"passthrough"`, incomplete escape sequences at the
+    end of an output chunk are buffered and reassembled when the next chunk
+    arrives. Any remaining partial sequence is flushed when the process exits.
+
+baleia_setup (deprecated)                     *compile-mode.baleia_setup*
+    DEPRECATED: use `ansi_color.baleia_setup` instead. Will be removed in v6.
+    If set at the top level, it overrides `ansi_color` entirely by setting
+    `kind` to `"render"` and forwarding the value as `baleia_setup`.
 
 bang_expansion                                   *compile-mode.bang_expansion*
     When `true`, commands will be run through |expandcmd()| before being
@@ -562,6 +631,52 @@ use_pseudo_terminal                         *compile-mode.use_pseudo_terminal*
     Use a pseudo terminal for command execution.
     This is useful when the program doesn't automatically flush the buffer so
     that the output cannot be displayed at realtime.
+
+ansi_osc                                         *compile-mode.ansi_osc*
+    A table controlling how OSC (Operating System Command) sequences are
+    handled in compilation output. It has two fields:
+
+    kind (string) ~
+        One of:
+        - `"render"`: set window title via OSC 0/1/2, render hyperlinks via
+          extmarks (OSC 8), strip the rest.
+        - `"filter"`: strip all OSC sequences.
+        - `"passthrough"`: leave OSC sequences untouched in the buffer.
+        Default: `"render"`.
+
+    handlers (table, optional) ~
+        A table mapping OSC command numbers to handler functions, overriding
+        the defaults for the chosen `kind`. Each handler receives a context
+        table with:
+          - `bufnr` (integer): the compilation buffer
+          - `data` (string): the data portion of the OSC sequence
+        and must return a replacement string (usually `""` to strip) and
+        optionally a metadata table for side effects (e.g. `link_open`/`link_close`
+        for hyperlinks).
+
+    Supported command numbers:
+    - 0  - set window title and icon name (sets titlestring + iconstring)
+    - 1  - set icon name (sets iconstring)
+    - 2  - set window title (sets titlestring)
+    - 7  - set working directory (stripped by default)
+    - 9  - notification (fires vim.notify)
+    - 8  - create hyperlink (rendered as clickable extmark by default)
+    - 52 - clipboard access (stripped by default)
+
+    Example: set the Neovim title from OSC 2 and strip it from output: >lua
+
+      vim.g.compile_mode = {
+          ansi_osc = {
+              kind = "filter",
+              handlers = {
+                  [2] = function(ctx)
+                      vim.opt.titlestring = ctx.data
+                      return ""
+                  end,
+              },
+          },
+      }
+    <
 
 ==============================================================================
 6. API                                                      *compile-mode-api*

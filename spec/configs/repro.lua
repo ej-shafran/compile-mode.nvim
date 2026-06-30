@@ -36,7 +36,7 @@ local compile_mode_lazy_spec = {
 		---@type CompileModeOpts
 		vim.g.compile_mode = {
 			-- to add ANSI escape code support, add:
-			-- baleia_setup = true,
+			-- ansi_color = { kind = "render", baleia_setup = true },
 
 			-- to make `:Compile` replace special characters (e.g. `%`) in
 			-- the command (and behave more like `:!`), add:

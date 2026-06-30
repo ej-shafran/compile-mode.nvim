@@ -80,6 +80,7 @@ end
 ---@param opts CompileModeOpts|nil
 function M.setup_tests(opts)
 	require("plugin.command")
+	require("compile-mode.ansi").reset()
 	vim.g.compile_mode = vim.tbl_extend("force", {
 		debug = vim.env.TEST_DEBUG ~= nil or vim.env.ACTIONS_STEP_DEBUG ~= nil,
 	}, opts or {})
@@ -233,6 +234,11 @@ function M.assert_cursor_at_error(error_string)
 
 	local actual_row = unpack(vim.api.nvim_win_get_cursor(0))
 	assert.are.same(actual_row, line)
+end
+
+---@return table
+function M.get_default_config()
+	return require("compile-mode.config.internal")
 end
 
 return M

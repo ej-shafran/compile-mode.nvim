@@ -20,6 +20,18 @@ test-debug:
 		-u spec/configs/tests.vim \
 		-c "PlenaryBustedDirectory spec/ {minimal_init = 'spec/configs/tests.vim', sequential = true}"
 
+test/%:
+	@echo "===> Test spec/$*_spec.lua"
+	nvim --headless --clean \
+		 -u spec/configs/tests.vim \
+		 -c "PlenaryBustedFile spec/$*_spec.lua"
+
+test-debug/%:
+	@echo "===> Test spec/$*_spec.lua (w/ Debug Logs)"
+	TEST_DEBUG=true nvim --headless --clean \
+		 -u spec/configs/tests.vim \
+		 -c "PlenaryBustedFile spec/$*_spec.lua"
+
 typecheck:
 	@echo "===> Typecheck"
 	./typecheck.sh

@@ -1,12 +1,38 @@
+---@class CompileModeAnsiColor
+---@field kind "passthrough"|"filter"|"render"
+---@field baleia_setup? boolean|table
+---
 ---@class CompileModeOpts
 ---
 ---The string to show in the compile prompt as a default.
 ---For more info, run `:h compile-mode.default_command`
 ---@field default_command?          string|table<string, string>|(fun(): string)
 ---
----Use `baleia` for parsing ANSI escape codes in the output.
+---Control how ANSI escape sequences are handled in compilation output.
+---`passthrough`: no processing (pass through raw).
+---`"filter"`: strip all CSI and OSC sequences.
+---`"render"`: strip non-SGR CSI and OSC, render SGR colors via baleia.
+---For more info, run `:h compile-mode.ansi_color`
+---@field ansi_color?             CompileModeAnsiColor
+---
+---DEPRECATED: use `ansi_color.baleia_setup` instead. Will be removed in v6.
 ---For more info, run `:h compile-mode.baleia_setup`
 ---@field baleia_setup?             boolean|table
+---
+---@class AnsiOscContext
+---@field bufnr integer  buffer being written to
+---@field data  string   data portion of the OSC sequence
+---
+---@class CompileModeAnsiOsc
+---@field kind "passthrough"|"filter"|"render"
+---@field handlers? table<number, fun(ctx: AnsiOscContext): string?, table?>
+---
+---Control how OSC (Operating System Command) sequences are handled.
+---`kind` chooses default handlers; `handlers` overrides or extends them.
+---Each handler receives a context table and returns optional replacement text
+---and an optional metadata table for side effects (e.g. URL extmarks).
+---For more info, run `:h compile-mode.ansi_osc`
+---@field ansi_osc?             CompileModeAnsiOsc
 ---
 ---Expand commands, like `:!` (e.g. `:Compile echo %`)
 ---For more info, run `:h compile-mode.bang_expansion`

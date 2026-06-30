@@ -159,6 +159,20 @@ end
 function check.validate(cfg)
 	return validate({
 		default_command = { cfg.default_command, { "string", "table", "function" } },
+		ansi_color = {
+			cfg.ansi_color,
+			function(v)
+				return type(v) == "table" and vim.tbl_contains({ "passthrough", "filter", "render" }, v.kind)
+			end,
+			"table with kind field one of 'passthrough', 'filter', 'render'",
+		},
+		ansi_osc = {
+			cfg.ansi_osc,
+			function(v)
+				return type(v) == "table" and vim.tbl_contains({ "passthrough", "filter", "render" }, v.kind)
+			end,
+			"table with kind field one of 'passthrough', 'filter', 'render'",
+		},
 		baleia_setup = { cfg.baleia_setup, { "boolean", "table" } },
 		bang_expansion = { cfg.bang_expansion, "boolean" },
 		directory_change_matchers = validate_directory_matcher_list(cfg.directory_change_matchers),
@@ -191,8 +205,15 @@ end
 ---@param default_tbl table
 ---@return string[]
 function check.unrecognized_keys(tbl, default_tbl)
-	local skipped_keys =
-		{ "error_regexp_table", "directory_change_matchers", "environment", "error_ignore_file_list", "hidden_output" }
+	local skipped_keys = {
+		"error_regexp_table",
+		"directory_change_matchers",
+		"environment",
+		"error_ignore_file_list",
+		"hidden_output",
+		"baleia_setup",
+		"ansi_osc",
+	}
 
 	local keys = {}
 	for k, _ in pairs(tbl) do
