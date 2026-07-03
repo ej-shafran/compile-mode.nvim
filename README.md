@@ -131,6 +131,9 @@ vim.g.compile_mode = {
     -- at the top of the compilation buffer
     -- :h compile-mode.time_format
     time_format = "%a %b %e %H:%M:%S",
+    -- Maximum number of lines allowed in the compilation buffer.
+    -- :h compile-mode.max_lines
+    max_lines = nil,
     -- List of regexes to hide from the output.
     -- :h compile-mode.hidden_output
     hidden_output = {},

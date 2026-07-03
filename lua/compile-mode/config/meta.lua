@@ -60,6 +60,10 @@
 ---For more info, run `:h compile-mode.time_format`
 ---@field time_format?              string
 ---
+---Maximum number of command output lines to keep in the compilation buffer.
+---For more info, run `:h compile-mode.max_lines`
+---@field max_lines?                integer
+---
 ---List of regexes to hide from the output.
 ---For more info, run `:h compile-mode.hidden_output`
 ---@field hidden_output?            (string|string[])

@@ -34,6 +34,8 @@ local default_config = {
 	buffer_name = "*compilation*",
 	---@type string
 	time_format = "%a %b %e %H:%M:%S",
+	---@type integer|nil
+	max_lines = nil,
 	---@type string[]
 	hidden_output = {},
 	---@type table<string, string>|nil

@@ -24,6 +24,7 @@ Table of Contents                             *compile-mode-table-of-contents*
   - ask_to_interrupt                           |compile-mode.ask_to_interrupt|
   - buffer_name                                     |compile-mode.buffer_name|
   - time_format                                     |compile-mode.time_format|
+  - max_lines                                       |compile-mode.max_lines|
   - hidden_output                                 |compile-mode.hidden_output|
   - environment                                     |compile-mode.environment|
   - clear_environment                         |compile-mode.clear_environment|
@@ -348,6 +349,9 @@ Here is the full default configuration:
         -- at the top of the compilation buffer
         -- :h compile-mode.time_format
         time_format = "%a %b %e %H:%M:%S",
+        -- Maximum number of lines allowed in the compilation buffer.
+        -- :h compile-mode.max_lines
+        max_lines = nil,
         -- List of regexes to hide from the output.
         -- :h compile-mode.hidden_output
         hidden_output = {},
@@ -487,6 +491,15 @@ buffer_name                                         *compile-mode.buffer_name*
 time_format                                         *compile-mode.time_format*
     The way to format the time displayed at the top of the compilation buffer.
     Passed into |strftime()|. Defaults to: `"%a %b %e %H:%M:%S"`.
+
+max_lines                                           *compile-mode.max_lines*
+    The maximum number of command output lines allowed in the compilation
+    buffer.
+
+    When this is set and incoming output would exceed the limit, the running
+    command is terminated and no more command output is appended.
+
+    Must be positive integer.
 
 hidden_output                                     *compile-mode.hidden_output*
     A Vim regex or list of Vim regexes run on every line in the compilation
