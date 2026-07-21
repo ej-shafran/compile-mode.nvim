@@ -83,9 +83,35 @@ describe("jumping to errors", function()
 
 		vim.cmd.edit(expected.filename)
 
+		local original_win_id = vim.api.nvim_get_current_win()
+
 		helpers.compile_error(error_string)
 
+		local compilation_bufnr = helpers.get_compilation_bufnr()
+		assert.are.not_same(compilation_bufnr, vim.api.nvim_get_current_buf())
+		vim.cmd("wincmd w")
+
+		helpers.next_error()
+
+		assert.are_same(original_win_id, vim.api.nvim_get_current_win())
+	end)
+
+	it("should reuse a window for the error's buffer if it exists (different previous window)", function()
+		---@type CreateError
+		local expected = {
+			filename = "README.md",
+			row = 1,
+			col = 1,
+		}
+		local error_string = helpers.sun_ada_error(expected)
+
+		vim.cmd.edit(expected.filename)
+
 		local original_win_id = vim.api.nvim_get_current_win()
+
+		vim.cmd.split("CONTRIBUTING.md")
+
+		helpers.compile_error(error_string)
 
 		local compilation_bufnr = helpers.get_compilation_bufnr()
 		assert.are.not_same(compilation_bufnr, vim.api.nvim_get_current_buf())
