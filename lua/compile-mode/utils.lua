@@ -211,12 +211,23 @@ local function jump_to_file(filename, error, smods)
 	if current_bufnr ~= target_bufnr then
 		if current_bufnr ~= compilation_buffer then
 			vim.api.nvim_set_current_buf(target_bufnr)
-		elseif #vim.api.nvim_list_wins() > 1 then
-			local prev_win_id = vim.fn.win_getid(vim.fn.winnr("#"))
-			vim.api.nvim_win_set_buf(prev_win_id, target_bufnr)
-			vim.api.nvim_set_current_win(prev_win_id)
 		else
-			M.split_unless_open({ bufnr = target_bufnr }, smods, 0)
+			local current_tab_id = vim.api.nvim_get_current_tabpage()
+			local buf_win_id = vim.iter(vim.fn.win_findbuf(target_bufnr)):find(function(win_id)
+				local tab_id = vim.api.nvim_win_get_tabpage(win_id)
+				return tab_id == current_tab_id
+			end)
+
+			if not buf_win_id and #vim.api.nvim_tabpage_list_wins(current_tab_id) > 1 then
+				buf_win_id = vim.fn.win_getid(vim.fn.winnr("#"))
+			end
+
+			if buf_win_id then
+				vim.api.nvim_win_set_buf(buf_win_id, target_bufnr)
+				vim.api.nvim_set_current_win(buf_win_id)
+			else
+				M.split_unless_open({ bufnr = target_bufnr }, smods, 0)
+			end
 		end
 	end
 
