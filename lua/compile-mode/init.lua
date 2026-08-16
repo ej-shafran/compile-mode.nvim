@@ -30,6 +30,16 @@ local M = {}
 
 --- FILE-GLOBAL VARIABLES
 
+local header_line_count = 4
+
+---Common exit codes to check against.
+---See `:h on_exit` to understand why 128 + signal number
+local exit_code = {
+	SUCCESS = 0,
+	SIGSEGV = 139, -- 128 + signal number 11
+	SIGTERM = 143, -- 128 + signal number 15
+}
+
 ---Line in the compilation buffer that the current error is on;
 ---acts as an index of `errors.error_list`
 local error_cursor = 0
@@ -53,15 +63,29 @@ local has_auto_jumped = false
 ---@param start integer
 ---@param end_ integer
 ---@param data string[]
-local function set_lines(bufnr, start, end_, data)
+---@return integer
+local function set_lines(bufnr, start, end_, data, trim)
 	local config = require("compile-mode.config.internal")
 
 	if vim.fn.bufexists(bufnr) == 0 then
-		return
+		return 0
 	end
 
 	utils.buf_set_opt(bufnr, "modifiable", true)
 	vim.api.nvim_buf_set_lines(bufnr, start, end_, false, data)
+
+	local removed_lines = 0
+	if trim ~= false and config.max_lines then
+		local effective_max_lines = config.max_lines + header_line_count
+
+		local line_count = vim.api.nvim_buf_line_count(bufnr)
+		removed_lines = math.max(line_count - effective_max_lines, 0)
+
+		if removed_lines > 0 then
+			vim.api.nvim_buf_set_lines(bufnr, header_line_count, header_line_count + removed_lines, false, {})
+		end
+	end
+
 	vim.schedule(function()
 		utils.buf_set_opt(bufnr, "modifiable", false)
 		utils.buf_set_opt(bufnr, "modified", false)
@@ -72,6 +96,51 @@ local function set_lines(bufnr, start, end_, data)
 			vim.cmd("normal G")
 		end)
 	end
+
+	return removed_lines
+end
+
+---@param line integer
+---@param removed_lines integer
+---@return integer|nil
+local function shift_linenum(line, removed_lines)
+	if line <= header_line_count then
+		return line
+	end
+
+	if line <= header_line_count + removed_lines then
+		return nil
+	end
+
+	return line - removed_lines
+end
+
+---@param removed_lines integer
+local function trim_line_metadata(removed_lines)
+	if removed_lines <= 0 then
+		return
+	end
+
+	local new_error_list = {}
+	for line, error in pairs(errors.error_list) do
+		local new_line = shift_linenum(line, removed_lines)
+		if new_line then
+			error.linenum = new_line
+			new_error_list[new_line] = error
+		end
+	end
+	errors.error_list = new_error_list
+
+	local new_dir_changes = {}
+	for line, dir in pairs(M.dir_changes) do
+		local new_line = shift_linenum(line, removed_lines)
+		if new_line then
+			new_dir_changes[new_line] = dir
+		end
+	end
+	M.dir_changes = new_dir_changes
+
+	error_cursor = shift_linenum(error_cursor, removed_lines) or 0
 end
 
 ---Get the directory to look in for a specific line in the compilation buffer,
@@ -121,12 +190,12 @@ local function goto_file(same_window)
 	end
 end
 
----@type fun(cmd: string, bufnr: integer, param: CommandParam): integer, integer, integer
+---@type fun(cmd: string, bufnr: integer, param: CommandParam): integer, integer, integer, boolean
 local runjob = a.wrap(
 	---@param cmd string
 	---@param bufnr integer
 	---@param param CommandParam
-	---@param callback fun(integer, integer, integer)
+	---@param callback fun(integer, integer, integer, boolean)
 	function(cmd, bufnr, param, callback)
 		local config = require("compile-mode.config.internal")
 
@@ -135,6 +204,8 @@ local runjob = a.wrap(
 		local count = 0
 		local partial_line = ""
 		local is_exited = false
+		local line_limit_exceeded = false
+		local job_id
 
 		local on_either = a.void(function(_, data)
 			if is_exited or not data or #data < 1 or (#data == 1 and data[1] == "") then
@@ -169,19 +240,39 @@ local runjob = a.wrap(
 				new_lines[i] = line
 			end
 
+			local max_lines = config.max_lines
+			if max_lines then
+				local effective_max_lines = max_lines + header_line_count
+				local max_new_lines = effective_max_lines - (line_count - 1)
+				if max_new_lines <= 0 then
+					line_limit_exceeded = true
+					vim.fn.jobstop(job_id)
+					return
+				elseif #new_lines > max_new_lines then
+					line_limit_exceeded = true
+					new_lines = vim.list_slice(new_lines, 1, max_new_lines)
+					partial_line = new_lines[#new_lines]
+				end
+			end
+
 			set_lines(bufnr, -2, -1, new_lines)
 			utils.wait()
 			M._parse_errors(bufnr, line_count - 1, line_count - 1 + #new_lines)
+
+			if line_limit_exceeded then
+				vim.fn.jobstop(job_id)
+			end
 		end)
 
 		log.debug("starting job...")
-		local job_id = vim.fn.jobstart(cmd, {
+		job_id = vim.fn.jobstart(cmd, {
 			cwd = compilation_directory,
 			on_stdout = on_either,
 			on_stderr = on_either,
 			on_exit = function(id, code)
 				is_exited = true
-				callback(count, code, id)
+				local effective_code = line_limit_exceeded and exit_code.SIGTERM or code
+				callback(count, effective_code, id, line_limit_exceeded)
 			end,
 			pty = config.use_pseudo_terminal,
 			env = config.environment,
@@ -225,14 +316,6 @@ local function default_dir()
 	local cwd = compilation_directory or vim.fn.getcwd() --[[@as string]]
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
-
----Common exit codes to check against.
----See `:h on_exit` to understand why 128 + signal number
-local exit_code = {
-	SUCCESS = 0,
-	SIGSEGV = 139, -- 128 + signal number 11
-	SIGTERM = 143, -- 128 + signal number 15
-}
 
 ---Run `command` and place the results in the "Compilation" buffer.
 ---
@@ -322,7 +405,7 @@ local runcommand = a.void(
 
 		local start_time = vim.loop.hrtime()
 
-		local line_count, code, job_id = runjob(command, bufnr, param)
+		local line_count, code, job_id, line_limit_exceeded = runjob(command, bufnr, param)
 
 		local elapsed = (vim.loop.hrtime() - start_time) / 1e9
 
@@ -332,11 +415,13 @@ local runcommand = a.void(
 		vim.g.compile_job_id = nil
 
 		if line_count == 0 then
-			set_lines(bufnr, -1, -1, { "" })
+			trim_line_metadata(set_lines(bufnr, -1, -1, { "" }))
 		end
 
 		local compilation_message
-		if code == exit_code.SUCCESS then
+		if line_limit_exceeded then
+			compilation_message = "Compilation terminated: max_lines reached"
+		elseif code == exit_code.SUCCESS then
 			compilation_message = "Compilation finished"
 		elseif code == exit_code.SIGSEGV then
 			compilation_message = "Compilation segmentation fault (core dumped)"
@@ -353,7 +438,7 @@ local runcommand = a.void(
 		set_lines(bufnr, -1, -1, {
 			compilation_message .. " at " .. time() .. fmt_elapsed,
 			"",
-		})
+		}, false)
 
 		if not param.smods or not param.smods.silent then
 			vim.notify(compilation_message)

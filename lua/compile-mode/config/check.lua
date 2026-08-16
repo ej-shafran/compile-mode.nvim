@@ -173,6 +173,13 @@ function check.validate(cfg)
 		ask_to_interrupt = { cfg.ask_to_interrupt, "boolean" },
 		buffer_name = { cfg.buffer_name, "string" },
 		time_format = { cfg.time_format, "string" },
+		max_lines = {
+			cfg.max_lines,
+			function(value)
+				return value == nil or (type(value) == "number" and value > 0 and value % 1 == 0)
+			end,
+			"positive integer",
+		},
 		hidden_output = validate_string_list(cfg.hidden_output, true),
 		environment = { cfg.environment, "table", true },
 		clear_environment = { cfg.clear_environment, "boolean" },
@@ -191,8 +198,14 @@ end
 ---@param default_tbl table
 ---@return string[]
 function check.unrecognized_keys(tbl, default_tbl)
-	local skipped_keys =
-		{ "error_regexp_table", "directory_change_matchers", "environment", "error_ignore_file_list", "hidden_output" }
+	local skipped_keys = {
+		"error_regexp_table",
+		"directory_change_matchers",
+		"environment",
+		"error_ignore_file_list",
+		"hidden_output",
+		"max_lines",
+	}
 
 	local keys = {}
 	for k, _ in pairs(tbl) do
