@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- The `max_lines` option - by [@RupenderSinghRathore](https://github.com/RupenderSinghRathore)
+
 ### Fixed
 
 - Properly reuse a window for an error locus with a different previous window
