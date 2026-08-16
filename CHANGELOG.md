@@ -15,6 +15,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 
 - Properly reuse a window for an error locus with a different previous window
+- Error occurring when NUL bytes are output by the compilation command - by [@jiura](https://github.com/jiura)
 
 ## [5.14.0] - 2026-03-31
 
