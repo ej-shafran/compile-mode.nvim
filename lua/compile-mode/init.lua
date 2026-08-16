@@ -216,9 +216,9 @@ local runjob = a.wrap(
 
 			count = count + #data
 
-			local new_lines = { partial_line .. data[1] }
+			local new_lines = { partial_line .. (data[1]:gsub("\n", "")) }
 			for i = 2, #data do
-				table.insert(new_lines, data[i])
+				table.insert(new_lines, (data[i]:gsub("\n", "")))
 			end
 			partial_line = new_lines[#new_lines]
 
