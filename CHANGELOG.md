@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Properly reuse a window for an error locus with a different previous window
+
 ## [5.14.0] - 2026-03-31
 
 ### Added
