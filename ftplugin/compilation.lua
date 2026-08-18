@@ -87,6 +87,24 @@ command("CompileNextFile", compile_mode.move_to_next_file, { count = 1 })
 command("CompilePrevError", compile_mode.move_to_prev_error, { count = 1 })
 command("CompilePrevFile", compile_mode.move_to_prev_file, { count = 1 })
 
+local deprecated_keymap_fmt = [[
+keymap "%s" has been replaced by "%s"
+if you want to keep the old keymap, create an `ftplugin/compilation.lua` file with:
+
+  vim.g.compile_mode_no_warn_keymaps = true
+  vim.keymap.set("n", "%s", "%s", { buffer = true })
+]]
+
+local function deprecated_keymap(keymap, rhs, replacement)
+	if vim.g.compile_mode_no_warn_keymaps then
+		return
+	end
+
+	set("n", keymap, function()
+		vim.notify(deprecated_keymap_fmt:format(keymap, replacement, keymap, rhs), vim.log.levels.WARN)
+	end)
+end
+
 set("n", "<cr>", "<cmd>CompileGotoError<cr>")
 set("n", "<LeftMouse>", "<LeftMouse><cmd>CompileGotoError<cr>")
 set("n", "<C-/>", "<cmd>CompileDebugError<cr>")
@@ -96,13 +114,18 @@ set("n", "<C-q>", "<cmd>QuickfixErrors<cr>")
 set("n", "<C-r>", "<cmd>Recompile<cr>")
 set("n", "<Tab>", "<cmd>CompileNextError<cr>")
 set("n", "<S-Tab>", "<cmd>CompilePrevError<cr>")
-set("n", "<C-g>n", "<cmd>CompileNextError<cr>")
-set("n", "<C-g>p", "<cmd>CompilePrevError<cr>")
-set("n", "<C-g>]", "<cmd>CompileNextFile<cr>")
-set("n", "<C-g>[", "<cmd>CompilePrevFile<cr>")
+set("n", "g]", "<cmd>CompileNextError<cr>")
+set("n", "g[", "<cmd>CompilePrevError<cr>")
+set("n", "g}", "<cmd>CompileNextFile<cr>")
+set("n", "g{", "<cmd>CompilePrevFile<cr>")
 set("n", "gf", compile_mode._gf)
 set("n", "<C-w>f", compile_mode._CTRL_W_f)
-set("n", "<C-g>f", "<cmd>NextErrorFollow<cr>")
+set("n", "g<C-f>", "<cmd>NextErrorFollow<cr>")
+deprecated_keymap("<C-g>n", "<cmd>CompileNextError<cr>", "g]")
+deprecated_keymap("<C-g>p", "<cmd>CompilePrevError<cr>", "g[")
+deprecated_keymap("<C-g>]", "<cmd>CompileNextFile<cr>", "g}")
+deprecated_keymap("<C-g>[", "<cmd>CompilePrevFile<cr>", "g{")
+deprecated_keymap("<C-g>f", "<cmd>NextErrorFollow<cr>", "g<C-f>")
 
 autocmd("CursorMoved", {
 	desc = "Next Error Follow",
