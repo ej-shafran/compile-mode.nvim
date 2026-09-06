@@ -32,8 +32,8 @@ return {
   -- branch = "nightly",
   dependencies = {
     "nvim-lua/plenary.nvim",
-    -- if you want to enable coloring of ANSI escape codes in
-    -- compilation output, add:
+    -- if you want to enable ANSI escape code support (colors && highlighting)
+    -- in compilation output, add:
     -- { "m00qek/baleia.nvim", tag = "v1.3.0" },
   },
   config = function()
@@ -43,8 +43,14 @@ return {
         -- set this to fix tab completion in command mode:
         -- input_word_completion = true,
 
-        -- to add ANSI escape code support, add:
-        -- baleia_setup = true,
+        -- to add ANSI escape code support (requires baleia.nvim):
+        -- `baleia_options = {}` uses baleia's defaults, or pass a table to customize:
+        -- ansi_color = { kind = "render", baleia_options = {} },
+
+        -- to enable OSC sequence handling (titles, hyperlinks, notifications):
+        -- built-in handlers for OSC 0/1/2/8/9 are injected when `kind` is "render";
+        -- `handlers = {}` uses them, or pass a table to override:
+        -- ansi_osc = { kind = "render", handlers = {} },
 
         -- to make `:Compile` replace special characters (e.g. `%`) in
         -- the command (and behave more like `:!`), add:
@@ -85,13 +91,19 @@ vim.g.compile_mode = {
     --     return "make -k "
     --   end
     -- end,
-    -- :h compile_mode.default_command
+    -- :h compile-mode.default_command
     default_command = "make -k ",
-    -- Use `baleia` for parsing ANSI escape codes in the output.
-    -- :h compile_mode.baleia_setup
-    baleia_setup = false,
+    -- Control how ANSI escape sequences are handled in compilation output.
+    -- :h compile-mode.ansi_color
+    ansi_color = {
+        kind = "filter",
+        -- Baleia options to pass to baleia.setup() when kind is "render".
+        -- Use `{}` for baleia's defaults, or a table of baleia options.
+        -- :h compile-mode.ansi_color
+        baleia_options = {},
+    },
     -- Expand commands, like `:!` (e.g. `:Compile echo %`)
-    -- :h compile_mode.bang_expansion
+    -- :h compile-mode.bang_expansion
     bang_expansion = false,
     -- Configure additional entering/leaving directory regexes.
     -- :h compile-mode.directory_change_matchers
@@ -165,6 +177,14 @@ vim.g.compile_mode = {
     -- Use a pseudo terminal for command execution.
     -- :h compile-mode.use_pseudo_terminal
     use_pseudo_terminal = false,
+    -- Control how OSC sequences are handled (hyperlinks, titles, etc.)
+    -- The default `handlers` is empty; when `kind` is `"render"`, built-in
+    -- handlers for OSC 0/1/2/8/9 are injected automatically.
+    -- :h compile-mode.ansi_osc
+    ansi_osc = {
+        kind = "render",
+        handlers = {},
+    }
 }
 ```
 

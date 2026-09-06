@@ -159,6 +159,22 @@ end
 function check.validate(cfg)
 	return validate({
 		default_command = { cfg.default_command, { "string", "table", "function" } },
+		ansi_color = {
+			cfg.ansi_color,
+			function(v)
+				return type(v) == "table"
+					and vim.tbl_contains({ "passthrough", "filter", "render" }, v.kind)
+					and (v.baleia_options == nil or type(v.baleia_options) == "table")
+			end,
+			"table with kind field one of 'passthrough', 'filter', 'render' and optional table baleia_options",
+		},
+		ansi_osc = {
+			cfg.ansi_osc,
+			function(v)
+				return type(v) == "table" and vim.tbl_contains({ "passthrough", "filter", "render" }, v.kind)
+			end,
+			"table with kind field one of 'passthrough', 'filter', 'render'",
+		},
 		baleia_setup = { cfg.baleia_setup, { "boolean", "table" } },
 		bang_expansion = { cfg.bang_expansion, "boolean" },
 		directory_change_matchers = validate_directory_matcher_list(cfg.directory_change_matchers),
@@ -204,6 +220,8 @@ function check.unrecognized_keys(tbl, default_tbl)
 		"environment",
 		"error_ignore_file_list",
 		"hidden_output",
+		"baleia_setup",
+		"ansi_osc",
 		"max_lines",
 	}
 
