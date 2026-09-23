@@ -43,7 +43,7 @@ describe("ANSI escape sequence handling", function()
 		end)
 
 		it("strips OSC sequences with ST terminator", function()
-			assert_output([[printf 'hello\e]2;mytitle\e\\world\n']], { "helloworld" })
+			assert_output([[printf 'hello\e]2;mytitle\e\134world\n']], { "helloworld" })
 		end)
 
 		it("strips mixed CSI + OSC + SGR sequences", function()
@@ -216,7 +216,7 @@ describe("OSC handlers", function()
 			ansi_osc = { kind = "render" },
 		})
 
-		assert_output([[printf '\e]8;id=123;https://example.com\e\\click here\e]8;;\e\\\n']], { "click here" })
+		assert_output([[printf '\e]8;id=123;https://example.com\e\134click here\e]8;;\e\134\n']], { "click here" })
 	end)
 
 	it("OSC 8 hyperlink with empty params strips escape from output", function()
@@ -225,7 +225,7 @@ describe("OSC handlers", function()
 			ansi_osc = { kind = "render" },
 		})
 
-		assert_output([[printf '\e]8;;https://example.com\e\\click here\e]8;;\e\\\n']], { "click here" })
+		assert_output([[printf '\e]8;;https://example.com\e\134click here\e]8;;\e\134\n']], { "click here" })
 	end)
 
 	it("OSC 8 hyperlink with URI containing semicolons strips escape from output", function()
@@ -234,7 +234,7 @@ describe("OSC handlers", function()
 			ansi_osc = { kind = "render" },
 		})
 
-		assert_output([[printf '\e]8;;https://example.com/path?a=1;b=2\e\\link\e]8;;\e\\\n']], { "link" })
+		assert_output([[printf '\e]8;;https://example.com/path?a=1;b=2\e\134link\e]8;;\e\134\n']], { "link" })
 	end)
 
 	it("handler return value replaces the OSC sequence in buffer", function()
