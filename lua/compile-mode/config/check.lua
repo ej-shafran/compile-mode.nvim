@@ -8,6 +8,7 @@ local function vim_validate(name, ...)
 		return vim.validate(name, ...)
 	end
 
+	---@diagnostic disable-next-line: missing-fields
 	return vim.validate({ [name] = { ... } })
 end
 
