@@ -157,7 +157,7 @@ local function validate_directory_matcher_list(value)
 				local ok = vim.iter(validate_table):all(function(name, test)
 					local ok, err = pcall(vim.validate, name, unpack(test))
 					if not ok then
-						err_msg = group .. "." .. err .. test
+						err_msg = err
 					end
 					return ok
 				end)
