@@ -35,6 +35,6 @@ describe("carriage return in command", function()
 
 		helpers.compile({ args = cmd })
 
-		assert.are.same({ cmd, "\27[K" .. echoed }, helpers.get_output())
+		assert.are.same({ cmd, echoed }, helpers.get_output())
 	end)
 end)

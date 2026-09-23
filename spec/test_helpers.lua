@@ -80,6 +80,7 @@ end
 ---@param opts CompileModeOpts|nil
 function M.setup_tests(opts)
 	require("plugin.command")
+	require("compile-mode.ansi").reset()
 	vim.g.compile_mode = vim.tbl_extend("force", {
 		debug = vim.env.TEST_DEBUG ~= nil or vim.env.ACTIONS_STEP_DEBUG ~= nil,
 	}, opts or {})
@@ -123,6 +124,14 @@ function M.wait_ms(ms)
 	vim.defer_fn(function()
 		coroutine.resume(co)
 	end, ms)
+	coroutine.yield(co)
+end
+
+function M.wait_for_schedule()
+	local co = coroutine.running()
+	vim.schedule(function()
+		coroutine.resume(co)
+	end)
 	coroutine.yield(co)
 end
 
@@ -233,6 +242,11 @@ function M.assert_cursor_at_error(error_string)
 
 	local actual_row = unpack(vim.api.nvim_win_get_cursor(0))
 	assert.are.same(actual_row, line)
+end
+
+---@return table
+function M.get_default_config()
+	return require("compile-mode.config.internal")
 end
 
 return M

@@ -25,6 +25,7 @@ local a = require("plenary.async")
 local errors = require("compile-mode.errors")
 local utils = require("compile-mode.utils")
 local log = require("compile-mode.log")
+local ansi = require("compile-mode.ansi")
 
 local M = {}
 
@@ -255,7 +256,7 @@ local runjob = a.wrap(
 				end
 			end
 
-			set_lines(bufnr, -2, -1, new_lines)
+			ansi.buf_set_lines(bufnr, -2, -1, new_lines)
 			utils.wait()
 			M._parse_errors(bufnr, line_count - 1, line_count - 1 + #new_lines)
 
@@ -413,6 +414,8 @@ local runcommand = a.void(
 			return
 		end
 		vim.g.compile_job_id = nil
+
+		ansi.flush(bufnr)
 
 		if line_count == 0 then
 			trim_line_metadata(set_lines(bufnr, -1, -1, { "" }))

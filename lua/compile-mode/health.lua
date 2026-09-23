@@ -27,6 +27,25 @@ function health.check()
 		vim.health.warn("no configuration found; did you forget to set the `vim.g.compile_mode` table?")
 	end
 
+	if config.baleia_setup ~= nil and config.baleia_setup ~= false then
+		all_ok = false
+		if config.baleia_setup == true then
+			vim.health.warn(
+				[['baleia_setup' at top level is deprecated;]]
+					.. [[ use 'ansi_color = { kind = "render" }' instead.]]
+					.. [[ It will be removed in v6.]]
+			)
+		else
+			vim.health.warn(
+				[['baleia_setup' at top level is deprecated;]]
+					.. [[ use 'ansi_color = { kind = "render", baleia_options = ]]
+					.. vim.inspect(config.baleia_setup, { newline = "" })
+					.. [[ }' instead.]]
+					.. [[ It will be removed in v6.]]
+			)
+		end
+	end
+
 	---@diagnostic disable-next-line: undefined-field
 	vim.iter(config.health_info.unrecognized_keys)
 		:map(function(key)
@@ -41,10 +60,15 @@ function health.check()
 		vim.health.error(err or "")
 	end
 
-	local baleia_ok = pcall(require, "baleia")
-	if config.baleia_setup ~= false and not baleia_ok then
-		all_ok = false
-		vim.health.error("configured baleia_setup but failed to require baleia")
+	if config.ansi_color.kind == "render" then
+		local baleia_ok = pcall(require, "baleia")
+		if not baleia_ok then
+			all_ok = false
+			vim.health.warn(
+				"ansi_color.kind is set to 'render' but failed to require baleia.nvim."
+					.. "ANSI colors will be filtered instead of rendered."
+			)
+		end
 	end
 
 	if all_ok then

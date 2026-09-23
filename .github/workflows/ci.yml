@@ -41,6 +41,13 @@ jobs:
         with:
           path: compile-mode.nvim
 
+      - name: Setup `baleia.nvim`
+        uses: actions/checkout@v6
+        with:
+          repository: m00qek/baleia.nvim
+          path: baleia.nvim
+          ref: v1.3.0
+
       - name: Setup `plenary.nvim`
         uses: actions/checkout@v6
         with:
