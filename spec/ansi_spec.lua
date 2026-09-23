@@ -457,54 +457,45 @@ describe("pattern correctness", function()
 	end)
 end)
 
-describe("render mode with mock baleia", function()
-	local captured_lines
-
-	local function assert_render(input, expected)
-		helpers.setup_tests({ ansi_color = { kind = "render" } })
+describe("render mode with baleia", function()
+	local function assert_render(input, expected, has_highlights)
 		local ansi = require("compile-mode.ansi")
 		local bufnr = vim.api.nvim_create_buf(false, true)
 
-		ansi.buf_set_lines(bufnr, 0, -1, { input })
+		ansi.buf_set_lines(bufnr, 0, -1, input)
+		helpers.wait_for_schedule()
 
-		assert.are.same(expected, captured_lines)
+		if has_highlights then
+			local hls = vim.api.nvim_buf_get_extmarks(bufnr, -1, 0, -1, { type = "highlight" })
+			assert.is_true(#hls >= 1)
+		end
+
+		assert.are.same(expected, vim.api.nvim_buf_get_lines(bufnr, 0, -1, true))
 		vim.api.nvim_buf_delete(bufnr, { force = true })
 	end
 
 	before_each(function()
-		captured_lines = {}
-		local ansi_mod = require("compile-mode.ansi")
-		package.loaded["baleia"] = {
-			setup = function(opts)
-				return {
-					buf_set_lines = function(bufnr, start, end_, strict, lines)
-						for _, l in ipairs(lines) do
-							table.insert(captured_lines, l)
-						end
-						local cleaned = vim.tbl_map(function(l)
-							return ansi_mod._strip_sgr(l)
-						end, lines)
-						vim.api.nvim_buf_set_lines(bufnr, start, end_, strict, cleaned)
-					end,
-				}
-			end,
-		}
+		helpers.setup_tests({ ansi_color = { kind = "render" } })
 	end)
 
-	after_each(function()
-		package.loaded["baleia"] = nil
+	it("does nothing with no ANSI sequences", function()
+		assert_render({ "GREEN" }, { "GREEN" }, false)
 	end)
 
-	it("passes SGR sequences through to baleia", function()
-		assert_render("\27[32mGREEN\27[0m", { "\27[32mGREEN\27[0m" })
+	it("strips non-SGR CSI", function()
+		assert_render({ "\27[1AGREEN" }, { "GREEN" }, false)
 	end)
 
-	it("strips non-SGR CSI before passing to baleia", function()
-		assert_render("\27[1A\27[32mGREEN\27[0m", { "\27[32mGREEN\27[0m" })
+	it("strips and highlights SGR CSI", function()
+		assert_render({ "\27[32mGREEN\27[0m" }, { "GREEN" }, true)
 	end)
 
-	it("strips OSC before passing to baleia", function()
-		assert_render("\27]2;title\7\27[32mGREEN\27[0m", { "\27[32mGREEN\27[0m" })
+	it("strips non-SGR CSI, then strips and highlights SGR CSI", function()
+		assert_render({ "\27[1A\27[32mGREEN\27[0m" }, { "GREEN" }, true)
+	end)
+
+	it("filters OSC, then strips and highlights SGR CSI", function()
+		assert_render({ "\27]2;title\7\27[32mGREEN\27[0m" }, { "GREEN" }, true)
 	end)
 end)
 

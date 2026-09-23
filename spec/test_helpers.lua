@@ -127,6 +127,14 @@ function M.wait_ms(ms)
 	coroutine.yield(co)
 end
 
+function M.wait_for_schedule()
+	local co = coroutine.running()
+	vim.schedule(function()
+		coroutine.resume(co)
+	end)
+	coroutine.yield(co)
+end
+
 ---@param param CreateError
 function M.maven_error(param)
 	return param.filename .. ":[" .. param.row .. "," .. param.col .. "] "
