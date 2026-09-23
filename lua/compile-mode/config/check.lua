@@ -4,6 +4,7 @@ local compile_mode = require("compile-mode")
 
 local function vim_validate(name, ...)
 	if vim.fn.has("nvim-0.11.0") == 1 then
+		---@diagnostic disable-next-line: redundant-parameter
 		return vim.validate(name, ...)
 	end
 
