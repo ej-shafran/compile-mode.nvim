@@ -8,15 +8,7 @@ local compile_mode = require("compile-mode")
 local function get_errors_by_validate_table(tbl)
 	return vim.iter(tbl)
 		:map(function(name, test)
-			local ok, err = pcall(vim.validate, name, unpack(test))
-			-- if not ok then
-			-- 	if total_err ~= nil then
-			-- 		total_err = total_err .. (err and ("; " .. err) or "")
-			-- 	elseif err ~= nil then
-			-- 		total_err = "invalid config" .. (err and (": " .. err) or "")
-			-- 	end
-			-- end
-			return ok, err
+			return pcall(vim.validate, name, unpack(test))
 		end)
 		:filter(function(ok, _)
 			return not ok
