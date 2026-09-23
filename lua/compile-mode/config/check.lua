@@ -8,7 +8,7 @@ local function vim_validate(name, ...)
 		return vim.validate(name, ...)
 	end
 
-	return vim.validate({ [name] = ... })
+	return vim.validate({ [name] = { ... } })
 end
 
 ---@param tbl table the table to validate
