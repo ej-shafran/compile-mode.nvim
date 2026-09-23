@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [5.16.0] - 2026-09-23
+
 Special thanks to [KlevisImeri](https://github.com/KlevisImeri) for all the work implementing the ANSI logic.
 
 ### Added
@@ -602,6 +604,7 @@ Also includes several documentation changes.
     API functions
 
 [unreleased]: https://github.com/ej-shafran/compile-mode.nvim/compare/latest...main
+[5.16.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.15.0...v5.16.0
 [5.15.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.14.0...v5.15.0
 [5.14.0]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.13.2...v5.14.0
 [5.13.2]: https://github.com/ej-shafran/compile-mode.nvim/compare/v5.13.1...v5.13.2
