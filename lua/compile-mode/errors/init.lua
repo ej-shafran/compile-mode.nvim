@@ -396,7 +396,14 @@ end
 ---@param error_list table<integer, CompileModeError> table of compilation errors, usually `errors.error_list`
 ---@return unknown[] qflist values which can be inserted into the quickfix list using `setqflist()`
 function M.toqflist(error_list)
-	return vim.tbl_values(vim.tbl_map(map_to_qflist, error_list))
+	local config = require("compile-mode.config.internal")
+
+	return vim.tbl_values(vim.iter(error_list)
+		:filter(function(error)
+			return error.level >= config.error_threshold
+		end)
+		:map(map_to_qflist)
+		:totable())
 end
 
 ---@param bufnr integer
