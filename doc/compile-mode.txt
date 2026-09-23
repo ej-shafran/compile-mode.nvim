@@ -503,7 +503,8 @@ error_ignore_file_list                   *compile-mode.error_ignore_file_list*
 error_threshold                                 *compile-mode.error_threshold*
     An error type (`INFO`, `WARNING`, or `ERROR`, taken from
     `require("compile-mode").level`) which determines the lowest level of
-    error that should be considered when jumping/moving between errors.
+    error that should be considered when jumping/moving between errors or
+    adding them to the quickfix list.
     Defaults to `WARNING`.
 
 auto_jump_to_first_error               *compile-mode.auto_jump_to_first_error*
