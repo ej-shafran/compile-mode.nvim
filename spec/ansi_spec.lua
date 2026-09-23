@@ -669,7 +669,8 @@ describe("ansi_color config validation", function()
 	local function validate(ac_override)
 		local cfg = helpers.get_default_config()
 		cfg.ansi_color = ac_override
-		return check.validate(cfg)
+		local errors = check.get_errors(cfg)
+		return #errors == 0
 	end
 
 	it("accepts valid kind: filter", function()
