@@ -8,6 +8,21 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+Special thanks to [KlevisImeri](https://github.com/KlevisImeri) for all the work implementing the ANSI logic.
+
+### Added
+
+- ANSI OSC handling (links, titles, etc.) - useful when `use_pseudo_terminal` is `true`, since lots of commands will attempt to pass along OSC sequences.
+
+### Changed
+
+- The configuration logic for ANSI color sequence handling. Instead of passing `baleia_setup`, `ansi_color` should be passed as a table with `kind = "render"`. You still need `baleia.nvim` as a dependency for this to work.
+
+> [!WARNING]
+>
+> You will receive deprecation warnings about `baleia_setup`, but your configuration will still work as expected.
+> However, it is recommended to replace this configuration option, since it will be removed in the next major version.
+
 ## [5.15.0] - 2026-08-16
 
 ### Added
