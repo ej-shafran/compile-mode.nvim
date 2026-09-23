@@ -3,6 +3,7 @@
 ---@field row      integer
 ---@field col      integer
 ---@field filename string
+---@field level?   CompileModeLevel
 
 local compile_mode = require("compile-mode")
 local errors = require("compile-mode.errors")
@@ -138,6 +139,19 @@ end
 ---@param param CreateError
 function M.maven_error(param)
 	return param.filename .. ":[" .. param.row .. "," .. param.col .. "] "
+end
+
+---@param param CreateError
+function M.ibm_error(param)
+	local level_string
+	if param.level == compile_mode.level.INFO then
+		level_string = "informational"
+	elseif param.level == compile_mode.level.WARNING then
+		level_string = "warning"
+	else
+		level_string = "error"
+	end
+	return param.filename .. "(" .. param.row .. ":" .. param.col .. ") : " .. level_string
 end
 
 ---@param param CreateError
