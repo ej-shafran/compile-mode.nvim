@@ -349,23 +349,14 @@ end)
 describe("fallback behavior", function()
 	it("falls back to filter when baleia is unavailable and mode is render", function()
 		-- Temporarily hide baleia so require("baleia") fails
+		local saved_preload = package.preload["baleia"]
 		package.loaded["baleia"] = nil
-		local original = package.searchers
-		-- Ensure baleia can't be found
-		package.searchers = {
-			function(name)
-				if name == "baleia" then
-					return nil, "module not found"
-				end
-				for i = 1, #original do
-					local result = { original[i](name) }
-					if result[1] then
-						return unpack(result)
-					end
-				end
-				return nil, "module not found"
-			end,
-		}
+		package.preload["baleia"] = function()
+			error("module 'baleia' not found (hidden by test)")
+		end
+
+		local ok, _ = pcall(require, "baleia")
+		assert.is_false(ok)
 
 		helpers.setup_tests({
 			ansi_color = { kind = "render" },
@@ -378,7 +369,10 @@ describe("fallback behavior", function()
 		local output = helpers.get_output()
 		assert.are.same({ cmd, "helloworld" }, output)
 
-		package.searchers = original
+		package.preload["baleia"] = saved_preload
+		package.loaded["baleia"] = nil
+		ok, _ = pcall(require, "baleia")
+		assert.is_true(ok)
 	end)
 end)
 
