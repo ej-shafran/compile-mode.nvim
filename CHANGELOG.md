@@ -14,6 +14,11 @@ Special thanks to [KlevisImeri](https://github.com/KlevisImeri) for all the work
 
 - ANSI OSC handling (links, titles, etc.) - useful when `use_pseudo_terminal` is `true`, since lots of commands will attempt to pass along OSC sequences.
 - Logic to take `error_threshold` into account for the quickfix list functions/commands (`:QuickfixErrors`, `send_to_qflist` and `add_to_qflist`).
+- More verbose warnings when multiple things are wrong with the configuration.
+
+### Fixed
+
+- Removed deprecated use of `vim.validate`.
 
 ### Changed
 
