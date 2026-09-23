@@ -78,16 +78,26 @@ local config = vim.tbl_extend("force", health_info, default_config, user_config 
 
 -- Deprecation: top-level baleia_setup overrides ansi_color entirely
 if config.baleia_setup ~= nil and config.baleia_setup ~= false then
-	log.fmt_warn(
-		"'baleia_setup' at top level is deprecated, use 'ansi_color.baleia_options' instead."
-			.. " It will be removed in v6."
-	)
+	if config.baleia_setup == true then
+		log.warn(
+			[['baleia_setup' at top level is deprecated;]]
+				.. [[ use 'ansi_color = { kind = "render" }' instead.]]
+				.. [[ It will be removed in v6.]]
+		)
+	else
+		log.warn(
+			[['baleia_setup' at top level is deprecated;]]
+				.. [[ use 'ansi_color = { kind = "render", baleia_options = ]]
+				.. vim.inspect(config.baleia_setup, { newline = "" })
+				.. [[ }' instead.]]
+				.. [[ It will be removed in v6.]]
+		)
+	end
 	config.ansi_color = {
 		kind = "render",
 		baleia_options = config.baleia_setup == true and {} or config.baleia_setup,
 	}
 end
-config.baleia_setup = false
 config.error_regexp_table =
 	vim.tbl_extend("force", require("compile-mode.errors").error_regexp_table, config.error_regexp_table)
 config.directory_change_matchers = vim.list_extend({

@@ -27,6 +27,25 @@ function health.check()
 		vim.health.warn("no configuration found; did you forget to set the `vim.g.compile_mode` table?")
 	end
 
+	if config.baleia_setup ~= nil and config.baleia_setup ~= false then
+		all_ok = false
+		if config.baleia_setup == true then
+			vim.health.warn(
+				[['baleia_setup' at top level is deprecated;]]
+					.. [[ use 'ansi_color = { kind = "render" }' instead.]]
+					.. [[ It will be removed in v6.]]
+			)
+		else
+			vim.health.warn(
+				[['baleia_setup' at top level is deprecated;]]
+					.. [[ use 'ansi_color = { kind = "render", baleia_options = ]]
+					.. vim.inspect(config.baleia_setup, { newline = "" })
+					.. [[ }' instead.]]
+					.. [[ It will be removed in v6.]]
+			)
+		end
+	end
+
 	---@diagnostic disable-next-line: undefined-field
 	vim.iter(config.health_info.unrecognized_keys)
 		:map(function(key)
