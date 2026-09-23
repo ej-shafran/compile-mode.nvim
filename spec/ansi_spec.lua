@@ -51,7 +51,7 @@ describe("ANSI escape sequence handling", function()
 		end)
 
 		it("passes plain text through unchanged", function()
-			assert_output("echo 'hello world'", { "hello world" })
+			assert_output("echo " .. helpers.quote_for_echo("hello world"), { "hello world" })
 		end)
 
 		it("strips multiple CSI sequences on one line", function()
