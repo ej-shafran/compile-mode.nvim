@@ -2,13 +2,21 @@ local check = {}
 
 local compile_mode = require("compile-mode")
 
+local function vim_validate(name, ...)
+	if vim.fn.has("nvim-0.11.0") == 1 then
+		return vim.validate(name, ...)
+	end
+
+	return vim.validate({ name, ... })
+end
+
 ---@param tbl table the table to validate
 ---@see vim.validate
 ---@return string[] errors
 local function get_errors_by_validate_table(tbl)
 	return vim.iter(tbl)
 		:map(function(name, test)
-			return pcall(vim.validate, name, unpack(test))
+			return pcall(vim_validate, name, unpack(test))
 		end)
 		:filter(function(ok, _)
 			return not ok
@@ -117,7 +125,7 @@ local function validate_error_regexp_table(value)
 				}
 
 				local ok = vim.iter(validate_table):all(function(name, test)
-					local ok, err = pcall(vim.validate, name, unpack(test))
+					local ok, err = pcall(vim_validate, name, unpack(test))
 					if not ok then
 						err_msg = group .. "." .. err .. test
 					end
@@ -155,7 +163,7 @@ local function validate_directory_matcher_list(value)
 				}
 
 				local ok = vim.iter(validate_table):all(function(name, test)
-					local ok, err = pcall(vim.validate, name, unpack(test))
+					local ok, err = pcall(vim_validate, name, unpack(test))
 					if not ok then
 						err_msg = err
 					end
