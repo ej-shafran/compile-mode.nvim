@@ -54,10 +54,11 @@ function health.check()
 		end)
 		:each(vim.health.warn)
 
-	local config_ok, err = require("compile-mode.config.check").validate(config)
-	if not config_ok then
+	local errors = require("compile-mode.config.check").get_errors(config)
+	if #errors > 0 then
 		all_ok = false
-		vim.health.error(err or "")
+
+		vim.iter(errors):each(vim.health.warn)
 	end
 
 	if config.ansi_color.kind == "render" then

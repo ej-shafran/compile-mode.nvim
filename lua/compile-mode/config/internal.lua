@@ -107,9 +107,9 @@ config.directory_change_matchers = vim.list_extend({
 config.error_ignore_file_list = vim.list_extend({ "/bin/[a-z]*sh$" }, config.error_ignore_file_list)
 config.hidden_output = type(config.hidden_output) == "string" and { config.hidden_output } or config.hidden_output
 
-local ok, err = check.validate(config)
-if not ok then
-	log.error(err)
+local errors = check.get_errors(config)
+if #errors > 0 then
+	log.error("invalid config: " .. vim.iter(errors):join("; "))
 end
 
 if #config.health_info.unrecognized_keys > 0 then

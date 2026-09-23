@@ -4,11 +4,27 @@ local compile_mode = require("compile-mode")
 
 ---@param tbl table the table to validate
 ---@see vim.validate
----@return boolean is_valid
----@return string error_message
-local function validate(tbl)
-	local ok, err = pcall(vim.validate, tbl)
-	return ok or false, "invalid config" .. (err and (": " .. err) or "")
+---@return string[] errors
+local function get_errors_by_validate_table(tbl)
+	return vim.iter(tbl)
+		:map(function(name, test)
+			local ok, err = pcall(vim.validate, name, unpack(test))
+			-- if not ok then
+			-- 	if total_err ~= nil then
+			-- 		total_err = total_err .. (err and ("; " .. err) or "")
+			-- 	elseif err ~= nil then
+			-- 		total_err = "invalid config" .. (err and (": " .. err) or "")
+			-- 	end
+			-- end
+			return ok, err
+		end)
+		:filter(function(ok, _)
+			return not ok
+		end)
+		:map(function(_, err)
+			return err
+		end)
+		:totable()
 end
 
 ---@param value unknown
@@ -100,17 +116,22 @@ local function validate_error_regexp_table(value)
 					err_msg = group .. " expected table or false, got " .. type(matcher)
 					return false
 				end
-
-				local ok, err = pcall(vim.validate, {
+				local validate_table = {
 					regex = validate_regex(matcher, "regex", "_rx"),
 					filename = { matcher.filename, "number" },
 					row = { matcher.row, { "number", "table" }, true },
 					col = { matcher.col, { "number", "table" }, true },
 					type = { matcher.type, { "number", "table" }, true },
-				})
-				if not ok then
-					err_msg = group .. "." .. err
-				end
+				}
+
+				local ok = vim.iter(validate_table):all(function(name, test)
+					local ok, err = pcall(vim.validate, name, unpack(test))
+					if not ok then
+						err_msg = group .. "." .. err .. test
+					end
+					return ok
+				end)
+
 				return ok
 			end)
 
@@ -135,14 +156,19 @@ local function validate_directory_matcher_list(value)
 					return false
 				end
 
-				local ok, err = pcall(vim.validate, {
+				local validate_table = {
 					regex = validate_regex(matcher, "regex", "_rx"),
 					filename = { matcher.filename, "number" },
 					leaving = { matcher.filename, "number", true },
-				})
-				if not ok then
-					err_msg = err
-				end
+				}
+
+				local ok = vim.iter(validate_table):all(function(name, test)
+					local ok, err = pcall(vim.validate, name, unpack(test))
+					if not ok then
+						err_msg = group .. "." .. err .. test
+					end
+					return ok
+				end)
 
 				return ok
 			end)
@@ -154,10 +180,9 @@ local function validate_directory_matcher_list(value)
 end
 
 ---@param cfg CompileModeConfig
----@return boolean is_valid
----@return string error_message
-function check.validate(cfg)
-	return validate({
+---@return string[] errors
+function check.get_errors(cfg)
+	return get_errors_by_validate_table({
 		default_command = { cfg.default_command, { "string", "table", "function" } },
 		ansi_color = {
 			cfg.ansi_color,
