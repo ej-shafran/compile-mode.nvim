@@ -700,7 +700,7 @@ describe("ansi_color config validation", function()
 	it("rejects flat string value", function()
 		local cfg = helpers.get_default_config()
 		cfg.ansi_color = "filter"
-		assert.is_false(check.validate(cfg))
+		assert.is_false(#check.get_errors(cfg) == 0)
 	end)
 
 	it("rejects table with invalid kind", function()
@@ -714,7 +714,7 @@ describe("ansi_color config validation", function()
 	it("rejects wrong type for ansi_color", function()
 		local cfg = helpers.get_default_config()
 		cfg.ansi_color = 123
-		assert.is_false(check.validate(cfg))
+		assert.is_false(#check.get_errors(cfg) == 0)
 	end)
 
 	it("rejects nil kind", function()
@@ -774,7 +774,8 @@ describe("ansi_osc config validation", function()
 	local function validate(osc_override)
 		local cfg = helpers.get_default_config()
 		cfg.ansi_osc = osc_override
-		return check.validate(cfg)
+		local errors = check.get_errors(cfg)
+		return #errors == 0
 	end
 
 	it("accepts valid kind: filter", function()
@@ -800,7 +801,7 @@ describe("ansi_osc config validation", function()
 	it("rejects flat string value", function()
 		local cfg = helpers.get_default_config()
 		cfg.ansi_osc = "filter"
-		assert.is_false(check.validate(cfg))
+		assert.is_false(#check.get_errors(cfg) == 0)
 	end)
 
 	it("rejects table with invalid kind", function()
@@ -814,7 +815,7 @@ describe("ansi_osc config validation", function()
 	it("rejects wrong type for ansi_osc", function()
 		local cfg = helpers.get_default_config()
 		cfg.ansi_osc = 123
-		assert.is_false(check.validate(cfg))
+		assert.is_false(#check.get_errors(cfg) == 0)
 	end)
 
 	it("rejects nil kind", function()
