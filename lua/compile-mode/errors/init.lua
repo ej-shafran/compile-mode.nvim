@@ -398,12 +398,12 @@ end
 function M.toqflist(error_list)
 	local config = require("compile-mode.config.internal")
 
-	return vim.tbl_values(vim.iter(error_list)
+	return vim.iter(vim.tbl_values(error_list))
 		:filter(function(error)
 			return error.level >= config.error_threshold
 		end)
 		:map(map_to_qflist)
-		:totable())
+		:totable()
 end
 
 ---@param bufnr integer
