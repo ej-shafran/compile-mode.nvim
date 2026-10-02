@@ -1,4 +1,5 @@
 local utils = require("compile-mode.utils")
+local cdir = require("compile-mode.dir")
 
 local M = {}
 
@@ -383,9 +384,10 @@ end
 ---@param error CompileModeError
 ---@return unknown
 local function map_to_qflist(error)
+	local lnum = error.row and error.row.value
 	return {
-		filename = error.filename.value,
-		lnum = error.row and error.row.value,
+		filename = cdir.resolve_filename(error.filename.value, lnum),
+		lnum = lnum,
 		end_lnum = error.end_row and error.end_row.value,
 		col = error.col and error.col.value,
 		end_col = error.end_col and error.end_col.value,
@@ -440,7 +442,8 @@ end
 function M.todiagnostic(bufnr, error_list)
 	return vim.iter(vim.tbl_values(error_list))
 		:filter(function(error)
-			local error_buf = vim.fn.bufadd(error.filename.value)
+			local resolved = cdir.resolve_filename(error.filename.value, error.row and error.row.value)
+			local error_buf = vim.fn.bufadd(resolved)
 			return error_buf == bufnr
 		end)
 		:map(function(error)

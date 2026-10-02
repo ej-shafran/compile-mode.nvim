@@ -26,6 +26,7 @@ local errors = require("compile-mode.errors")
 local utils = require("compile-mode.utils")
 local log = require("compile-mode.log")
 local ansi = require("compile-mode.ansi")
+local cdir = require("compile-mode.dir")
 
 local M = {}
 
@@ -44,15 +45,6 @@ local exit_code = {
 ---Line in the compilation buffer that the current error is on;
 ---acts as an index of `errors.error_list`
 local error_cursor = 0
-
----The previous directory used for compilation.
----@type string|nil
-local compilation_directory = nil
-
----A table which keeps track of the changes in directory for the compilation buffer,
----based on "Entering directory" and "Leaving directory" messages.
----@type table<integer, string>
-M.dir_changes = {}
 
 ---Whether or not to preview the error under the cursor.
 local in_next_error_mode = false
@@ -133,31 +125,15 @@ local function trim_line_metadata(removed_lines)
 	errors.error_list = new_error_list
 
 	local new_dir_changes = {}
-	for line, dir in pairs(M.dir_changes) do
+	for line, dir in pairs(cdir.dir_changes) do
 		local new_line = shift_linenum(line, removed_lines)
 		if new_line then
 			new_dir_changes[new_line] = dir
 		end
 	end
-	M.dir_changes = new_dir_changes
+	cdir.dir_changes = new_dir_changes
 
 	error_cursor = shift_linenum(error_cursor, removed_lines) or 0
-end
-
----Get the directory to look in for a specific line in the compilation buffer,
----while respecting "Entering directory" and "Leaving directory" messages.
----@param linenum integer the line number to check the directory for
----@return string
-local function find_directory_for_line(linenum)
-	local latest_linenum = nil
-	local dir = compilation_directory or vim.fn.getcwd()
-	for old_linenum, old_dir in pairs(M.dir_changes) do
-		if old_linenum < linenum and (not latest_linenum or latest_linenum <= old_linenum) then
-			latest_linenum = old_linenum
-			dir = old_dir
-		end
-	end
-	return dir
 end
 
 ---Like `:find`, but splits unless `same_window` is configured.
@@ -183,7 +159,7 @@ local function goto_file(same_window)
 		local cfile = vim.fn.expand("<cfile>")
 		local linenum = unpack(vim.api.nvim_win_get_cursor(0))
 
-		local dir = find_directory_for_line(linenum)
+		local dir = cdir.find_directory_for_line(linenum)
 
 		vim.cmd("set path+=" .. dir)
 		file_find(cfile, same_window)
@@ -267,7 +243,7 @@ local runjob = a.wrap(
 
 		log.debug("starting job...")
 		job_id = vim.fn.jobstart(cmd, {
-			cwd = compilation_directory,
+			cwd = cdir.compilation_directory,
 			on_stdout = on_either,
 			on_stderr = on_either,
 			on_exit = function(id, code)
@@ -314,7 +290,7 @@ end
 
 ---Get the default directory, formatted.
 local function default_dir()
-	local cwd = compilation_directory or vim.fn.getcwd() --[[@as string]]
+	local cwd = cdir.compilation_directory or vim.fn.getcwd() --[[@as string]]
 	return cwd:gsub("^" .. vim.env.HOME, "~")
 end
 
@@ -335,7 +311,7 @@ local runcommand = a.void(
 
 		error_cursor = 0
 		errors.error_list = {}
-		M.dir_changes = {}
+		cdir.dir_changes = {}
 		has_auto_jumped = false
 		utils.clear_diagnostics()
 
@@ -540,7 +516,7 @@ local function act_from_current_error(action, direction, different_file)
 
 		error_cursor = error_line
 		if action == "jump" then
-			local dir = find_directory_for_line(error_line)
+			local dir = cdir.find_directory_for_line(error_line)
 			utils.jump_to_error(errors.error_list[error_line], dir, param.smods or {})
 		else
 			vim.api.nvim_win_set_cursor(0, { error_line, 0 })
@@ -674,7 +650,7 @@ M.compile = a.void(
 		end
 
 		vim.g.compile_command = command
-		compilation_directory = vim.g.compilation_directory or vim.fn.getcwd()
+		cdir.compilation_directory = vim.g.compilation_directory or vim.fn.getcwd()
 
 		runcommand(command, param)
 		vim.g.compilation_directory = nil
@@ -742,7 +718,7 @@ M.first_error = a.void(
 		error_cursor = assert(lines[count])
 		local error = assert(errors.error_list[error_cursor])
 
-		local dir = find_directory_for_line(error_cursor)
+		local dir = cdir.find_directory_for_line(error_cursor)
 		utils.jump_to_error(error, dir, param.smods or {})
 	end
 )
@@ -768,7 +744,7 @@ M.current_error = a.void(
 			return
 		end
 
-		local dir = find_directory_for_line(error_cursor)
+		local dir = cdir.find_directory_for_line(error_cursor)
 		utils.jump_to_error(error, dir, param.smods or {})
 	end
 )
@@ -831,7 +807,7 @@ M.goto_error = a.void(
 			return
 		end
 
-		local dir = find_directory_for_line(linenum)
+		local dir = cdir.find_directory_for_line(linenum)
 
 		error_cursor = linenum
 		utils.jump_to_error(error, dir, param.smods or {})
@@ -947,7 +923,7 @@ M._parse_errors = a.void(function(bufnr, start_line, end_line)
 
 			if config.auto_jump_to_first_error and not has_auto_jumped then
 				has_auto_jumped = true
-				local dir = find_directory_for_line(linenum)
+				local dir = cdir.find_directory_for_line(linenum)
 				utils.jump_to_error(error, dir, {})
 				error_cursor = linenum
 			end
@@ -965,13 +941,13 @@ M._parse_errors = a.void(function(bufnr, start_line, end_line)
 				local dir = matches[matcher.filename + 1]
 
 				if utils.is_absolute(dir) then
-					M.dir_changes[linenum] = vim.fn.fnamemodify(dir, ":p:h" .. (leaving and ":h" or ""))
+					cdir.dir_changes[linenum] = vim.fn.fnamemodify(dir, ":p:h" .. (leaving and ":h" or ""))
 				else
-					local latest_dir = find_directory_for_line(linenum)
+					local latest_dir = cdir.find_directory_for_line(linenum)
 					if leaving then
-						M.dir_changes[linenum] = vim.fn.fnamemodify(latest_dir, ":h")
+						cdir.dir_changes[linenum] = vim.fn.fnamemodify(latest_dir, ":h")
 					else
-						M.dir_changes[linenum] = vim.fn.resolve(latest_dir .. "/" .. dir)
+						cdir.dir_changes[linenum] = vim.fn.resolve(latest_dir .. "/" .. dir)
 					end
 				end
 			end
@@ -1040,7 +1016,7 @@ function M._follow_cursor()
 	end
 
 	vim.schedule(function()
-		local dir = find_directory_for_line(cursor_row)
+		local dir = cdir.find_directory_for_line(cursor_row)
 		vim.api.nvim_win_call(preview_win, function()
 			utils.jump_to_error(error, dir, {})
 		end)
