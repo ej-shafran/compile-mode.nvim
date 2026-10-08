@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Correctly resolve file locations for quickfix list and diagnostics - by [@kkanden](https://github.com/kkanden)
+
 ## [5.16.0] - 2026-09-23
 
 Special thanks to [KlevisImeri](https://github.com/KlevisImeri) for all the work implementing the ANSI logic.
