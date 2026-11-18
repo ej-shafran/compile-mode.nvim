@@ -349,6 +349,9 @@ function M.buf_set_lines(bufnr, start, end_, lines)
 			vim.api.nvim_set_option_value("modifiable", false, { buf = bufnr })
 		end
 	end)
+	vim.api.nvim_buf_call(bufnr, function()
+		vim.cmd("normal G")
+	end)
 end
 
 function M.reset()
