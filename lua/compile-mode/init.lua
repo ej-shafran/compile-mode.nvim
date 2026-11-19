@@ -84,12 +84,6 @@ local function set_lines(bufnr, start, end_, data, trim)
 		utils.buf_set_opt(bufnr, "modified", false)
 	end)
 
-	if config.auto_scroll then
-		vim.api.nvim_buf_call(bufnr, function()
-			vim.cmd("normal G")
-		end)
-	end
-
 	return removed_lines
 end
 
